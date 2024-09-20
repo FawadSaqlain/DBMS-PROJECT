@@ -1,0 +1,45 @@
+{% extends "inventry/layout.html" %}
+
+{% block body %}
+<div>
+    <form action="{% if is_editing %} {% url 'inventry:edit_product' prod_index prod_code %} {% else %}{% url 'inventry:add' %}{% endif %}" method="post">
+        {% csrf_token %}
+        <!-- Dynamic heading based on whether you are adding or editing an item -->
+        <h1>
+            {% if is_editing %}
+                Please edit details
+            {% else %}
+                Please add details
+            {% endif %}
+        </h1>
+
+        {% if form %}
+            {{ form.as_p }}
+        {% endif %}
+        
+        <input type="submit" style="width: fit-content; height: fit-content; background-color: brown; color: white; padding: 5px; margin-top: 7px; border-radius: 2px; border: 1px solid rgb(0, 0, 0);">
+    </form>
+
+    <a href="{% url 'inventry:index' %}">
+        <button style="width: fit-content; height: fit-content; background-color: brown; color: white; padding: 5px; margin-top: -25px; border-radius: 2px; border: 1px solid rgb(0, 0, 0); float: right;">
+            Inventry
+        </button>
+    </a>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Focus on the product name field if the customer name field is hidden
+        const productNameField = document.getElementById("id_name");
+        const customerNameField = document.getElementById("id_customer_name");
+
+        if (customerNameField && !customerNameField.closest("form").querySelector(".hidden")) {
+            // Focus on the customer name field if it's visible
+            customerNameField.focus();
+        } else if (productNameField) {
+            // Focus on the product name field otherwise
+            productNameField.focus();
+        }
+    });
+</script>
+{% endblock %}

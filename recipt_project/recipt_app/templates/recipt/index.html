@@ -1,0 +1,158 @@
+{% extends "recipt/layout.html" %}
+
+{% block body %}
+<div>
+    <div id="receipt-content">
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                {% if not customer_name %}
+                {% if request.user.first_name and request.user.last_name %}
+                <h3>Here is your receipt by {{ request.user.first_name }} {{ request.user.last_name }}</h3>
+                {% else %}
+                <h3>Here is your receipt by {{ request.user.username }}</h3>
+                {% endif %}
+                {% else %}
+                {% if request.user.first_name and request.user.last_name %}
+                <h3>Here is {{ customer_name }}'s receipt by {{ request.user.first_name }} {{ request.user.last_name }}
+                    {% if customer_name %}
+                    <a href="{% url 'recipt:edit_customer' customer_name customer_email %}" class="edit-button">
+                        <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain"
+                            alt="EDIT" style="width: 15px; height: 20px; margin-left: 10px;">
+                    </a>
+                    {% endif %}
+                </h3>
+                {% else %}
+                <h3>Here is {{ customer_name }}'s receipt by {{ request.user.username }}
+                    {% if customer_name %}
+                    <a href="{% url 'recipt:edit_customer' customer_name customer_email %}" class="edit-button">
+                        <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain"
+                            alt="EDIT" style="width: 15px; height: 20px; margin-left: 10px;">
+                    </a>
+                    {% endif %}
+                </h3>
+                {% endif %}
+                {% endif %}
+            </div>
+            <h6 class="receipt-date">{{ now }}</h6>
+        </div>
+        <h6>recipt no :{{recipt_no}}</h6>
+
+        <div id="index_outer_div" class="receipt-details">
+            <div>
+                <ol>
+                    <br>
+
+                    {% if products %}
+                    <h3 style="margin-top: 8px;">Product Name</h3>
+                    {% for product in products %}
+                    <li style="margin-left: 15px;">{{ product.0 }}</li>
+                    <br>
+                    {% endfor %}
+                    {% else %}
+                    <h1>No items added</h1>
+                    {% endif %}
+                </ol>
+            </div>
+
+            <div class="receipt-section">
+                <br>
+                {% if products %}
+                <h3>Quantity</h3>
+                {% for product in products %}
+                {{ product.1 }}
+                <br><br>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="receipt-section">
+                <br>
+                {% if products %}
+                <h3>Price</h3>
+                {% for product in products %}
+                {{ product.2 }}
+                <br><br>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="receipt-section">
+                <br>
+                {% if products %}
+                <h3>Total for Each Item</h3>
+                {% for product in products %}
+                {{ product.3 }}
+                <br><br>
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="receipt-actions">
+                <br><br>
+                {% for id in range_5 %}
+                <a href="{% url 'recipt:dele' id %}" class="delete-button">
+                    <img src="https://icon-library.com/images/icon-remove/icon-remove-18.jpg" alt="DEL"
+                        style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
+                </a>
+                <a href="{% url 'recipt:edit_product' id %}" class="edit-button">
+                    <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain" alt="EDIT"
+                        style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
+                </a>
+                <br>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <h4>Total Price: {{ total_price }}</h4>
+        </div>
+        <br>
+    </div>
+
+
+
+
+    <a href="{% url 'recipt:new_receipt' %}" class="action-button">New Receipt</a>
+    <a href="{% url 'recipt:sendmail' %}" class="action-button">E.recipt</a>
+    <a href="{% url 'recipt:add' %}" class="action-button">Add New Item</a>
+    <a href="{% url 'recipt:save_customer' 1 %}" class="action-button">Save E.recipt</a>
+<button onclick="printAndSaveReceipt()" class="action-button print-button">Print & Save Receipt</button>
+<script>
+function printAndSaveReceipt() {
+    document.querySelectorAll('.delete-button').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.edit-button').forEach(el => el.style.display = 'none');
+
+    window.print();
+
+    document.querySelectorAll('.delete-button').forEach(el => el.style.display = 'inline');
+    document.querySelectorAll('.edit-button').forEach(el => el.style.display = 'inline');
+
+    console.log("Saving data after printing...");
+    saveCustomer()
+    // setTimeout(saveCustomer, 1000); // 1-second delay
+}
+
+function saveCustomer() {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "/recipt_app/save-customer/1", true);
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            console.log("Customer data saved successfully!");
+            // Redirect to a new receipt after saving
+            window.location.href = "/recipt_app/new/";
+        } else {
+            console.log("Error saving customer data: " + xhr.status);
+        }
+    };
+
+    xhr.onerror = function () {
+        console.log("Request failed.");
+    };
+
+    xhr.send();
+}
+</script>
+
+    {% endblock %}
