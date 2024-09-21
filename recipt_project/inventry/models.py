@@ -4,6 +4,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime, username):
+    product=get_product(prod_code)
+    product=product[0]
+    # print(f"condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
     """Inserts or updates product data in the product table."""
     try:
         with connection.cursor() as cursor:
@@ -13,7 +16,9 @@ def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, q
             if exists:
                 # Update the existing record
                 product=get_product(prod_code)
-                if product[1] != prod_description or product[4] != quantity_price_sale or product[6] != username:
+                product=product[0]
+                # print(f"condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
+                if product[1] != prod_description or product[4] != quantity_price_sale :
                     cursor.execute("""
                         UPDATE dbo.product
                         SET product_description = %s,

@@ -71,6 +71,11 @@ def add(request):
             quantity_price_sale = prod_sale_price * prod_quantity
             updated_datetime = datetime.now()
             models.add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime,request.user.username)
+            if request.user.first_name and request.user.last_name:
+                models.add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime,f"{request.user.first_name} {request.user.last_name} ({request.user.username})")
+            else :
+                models.add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime,f" - - ({request.user.username})")
+
         else:
             return render(request, 'inventry/add.html', {'form': form})
     
@@ -92,7 +97,7 @@ def edit_product(request, prod_index,prod_code):
         # Fetch the product details from the session
         product = models.get_product(prod_code)
         product=product[0]
-        print(f"edit product is :: {product}")
+        # print(f"before edit product is :: {product}")
         prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime,username = product
 
     except IndexError:
@@ -107,7 +112,11 @@ def edit_product(request, prod_index,prod_code):
             new_prod_quantity = form.cleaned_data['prod_quantity']
             new_quantity_price_sale = new_prod_sale_price * new_prod_quantity
             new_updated_datetime = datetime.now()
-            models.add_each_item(prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,"{request.user.firstname} {request.user.lastname} ({request.user.username})")
+            # print("after edit product is ::",prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,f"{request.user.firstname} {request.user.lastname} ({request.user.username})")
+            if request.user.first_name and request.user.last_name:
+                models.add_each_item(prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,f"{request.user.first_name} {request.user.last_name} ({request.user.username})")
+            else :
+                models.add_each_item(prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,f" - - ({request.user.username})")
             return redirect('inventry:index')
         else:
             print(f"Form is invalid: {form.errors}")
