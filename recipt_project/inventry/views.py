@@ -49,21 +49,8 @@ class NewDataForm(forms.Form):
 def index(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
-
-    # Initialize session variables if they do not exist
-    # if "products" not in request.session:
-    #     request.session["products"] = []
-    # 2D list to store [                name,           quantity,        price,      quantity_price]
-    # 2D list to store [prod_code, prod_description, prod_quantity, prod_sale_price,prod_quantity * prod_sale_price , updated_datetime]
-
-    # return render(request, 'inventry/index.html', {
-    #     "products": request.session["products"],
-    #     # 'now': datetime.now(),
-    #     'length_products':range(len(request.session["products"]))
-    # })
     return render(request, 'inventry/index.html', {
         "products": models.view_inventory(request),
-        # 'now': datetime.now(),
         'length_products':range(len(models.view_inventory(request)))
     })
 def add(request):
@@ -83,17 +70,6 @@ def add(request):
             prod_quantity = form.cleaned_data['prod_quantity']
             quantity_price_sale = prod_sale_price * prod_quantity
             updated_datetime = datetime.now()
-
-            # Append the new product to the session 'products' list
-            # request.session["products"].append([
-            #     prod_code,
-            #     prod_description,
-            #     prod_quantity,
-            #     prod_sale_price,
-            #     quantity_price_sale,
-            #     updated_datetime.strftime("%Y-%m-%d %H:%M:%S")  # Convert datetime to string
-            # ])
-            # request.session.modified = True  # Mark the session as modified to ensure changes are saved
             models.add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime,request.user.username)
         else:
             return render(request, 'inventry/add.html', {'form': form})
@@ -104,13 +80,8 @@ def delet(request, prod_index,prod_code):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
 
-    # try:
     models.delete_item(prod_code)
     print("deleted the product")
-        # delete product from database where prod_code
-    # except IndexError:
-    #     pass  # Handle index errors if necessary
-
     return redirect('inventry:index')
 
 def edit_product(request, prod_index,prod_code):
@@ -136,18 +107,7 @@ def edit_product(request, prod_index,prod_code):
             new_prod_quantity = form.cleaned_data['prod_quantity']
             new_quantity_price_sale = new_prod_sale_price * new_prod_quantity
             new_updated_datetime = datetime.now()
-
-            # Update the product details in the session
-            # request.session["products"][prod_index] = [
-            #     prod_code,
-            #     new_prod_description,
-            #     new_prod_quantity,
-            #     new_prod_sale_price,
-            #     new_quantity_price_sale,
-            #     new_updated_datetime.strftime("%Y-%m-%d %H:%M:%S")  # Convert datetime to string
-            # ]
-            # request.session.modified = True  # Ensure session is saved
-            models.add_each_item(prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,request.user.username)
+            models.add_each_item(prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,"{request.user.firstname} {request.user.lastname} ({request.user.username})")
             return redirect('inventry:index')
         else:
             print(f"Form is invalid: {form.errors}")

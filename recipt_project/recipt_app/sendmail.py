@@ -14,7 +14,7 @@ class EmailSupportAgent:
         <html>
         <body>
         <h2>E-RECEIPT</h2>
-        <p>Receipt no: {email_data['recipt_no']}</p>
+        <p>Receipt no: {email_data['recipt_code']}</p>
         <h3>Customer Details:</h3>
         <p>Name: {email_data['customer_name']}</p>
         <p>Email: {email_data['customer_email']}</p>

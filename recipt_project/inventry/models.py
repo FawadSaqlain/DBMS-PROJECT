@@ -2,7 +2,6 @@ from django.db import connection
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 
-
 @csrf_exempt
 def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime, username):
     """Inserts or updates product data in the product table."""

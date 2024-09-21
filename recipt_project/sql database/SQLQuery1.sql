@@ -33,4 +33,4 @@ SELECT * FROM product
 SELECT * FROM information_schema.tables WHERE table_name = 'product';
 SELECT * FROM product
 SELECT * FROM customers
-SELECT * FROM 
+SELECT * FROM _6fiVJ

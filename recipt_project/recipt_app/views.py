@@ -14,7 +14,7 @@ from . import models  # Assuming this function saves customer data to DB
 def generate_random_key(length=5):
     characters = string.ascii_letters + string.digits
     random_key = ''.join(random.choices(characters, k=length))
-    return random_key
+    return "_"+random_key
 
 # Form for adding/editing products
 class NewDataForm(forms.Form):
@@ -151,7 +151,18 @@ def add(request):
             product_inventry=product_inventry[0]
             if product_inventry[2] >= quantity:
                 quantity_price = product_inventry[3] * quantity
-                request.session["products"].append([prod_code, quantity, product_inventry[3], quantity_price])
+                product_found = False
+
+                for product in request.session["products"]:
+                    if product[0] == prod_code:
+                        product[1] += quantity
+                        product[3] += quantity_price
+                        product_found = True
+                        break
+
+                if not product_found:
+                    request.session["products"].append([prod_code, quantity, product_inventry[3], quantity_price])
+
                 request.session['total_price'] += quantity_price
 
             customer_name = form_customer.cleaned_data['customer_name']
@@ -245,7 +256,7 @@ def save_customer_recipt(request, new_recipt):
     total_price = request.session.get("total_price")
     products = request.session.get("products")
     if request.user.first_name and request.user.last_name:
-        Employ_name = f"{request.user.first_name} {request.user.last_name}"
+        Employ_name = f"{request.user.first_name} {request.user.last_name} ({request.user.last_name})"
     else:
         Employ_name = request.user.username
 
@@ -261,6 +272,7 @@ def save_customer_recipt(request, new_recipt):
             # return HttpResponse("Customer data saved successfully.")
     else:
         return HttpResponse("Customer data not provided.", status=400)
+from django.contrib import messages
 
 def login_view(request):
     if request.method == "POST":
@@ -269,6 +281,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            messages.success(request, 'This is a success TEST message!')
             return HttpResponseRedirect(reverse("recipt:new_receipt"))
         else:
             return render(request, "recipt/login.html", {
