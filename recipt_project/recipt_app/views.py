@@ -8,7 +8,7 @@ from .sendmail import viewsdata
 import random
 import string
 from django.views.decorators.csrf import csrf_exempt
-from .models import save_customer_to_db  # Assuming this function saves customer data to DB
+from . import models  # Assuming this function saves customer data to DB
 
 # Helper function to generate a random receipt number
 def generate_random_key(length=5):
@@ -18,23 +18,15 @@ def generate_random_key(length=5):
 
 # Form for adding/editing products
 class NewDataForm(forms.Form):
-    def for_edit_product(self, nam, pric, quant, *args, **kwargs):
+    def for_edit_product(self, code, quant, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['name'].initial = nam
-        self.fields['price'].initial = pric
+        self.fields['prod_code'].initial = code
         self.fields['quantity'].initial = quant
 
-    name = forms.CharField(
+    prod_code = forms.CharField(
         widget=forms.TextInput(attrs={
-            'id': 'id_name',
-            'placeholder': 'Enter product name',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    price = forms.IntegerField(
-        widget=forms.NumberInput(attrs={
-            'placeholder': 'Enter product price',
+            'id': 'id_prod_code',
+            'placeholder': 'Enter product code',
             'class': 'form-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
@@ -78,15 +70,18 @@ def index(request):
 
     # Initialize session variables if they do not exist
     if "products" not in request.session:
-        request.session["products"] = []  # 2D list to store [name, quantity, price, quantity_price]
+        request.session["products"] = []
+        # 2D list to store [                name,           quantity,        price,      quantity_price]
+        # 2D list to store [prod_code[0], prod_description[1], prod_quantity[2], prod_price[3], prod_quantity * prod_price quantity_price [4], updated_datetime[5]]
+
     if "total_price" not in request.session:
         request.session["total_price"] = 0
     if "customer_name" not in request.session:
         request.session["customer_name"] = None
     if "customer_email" not in request.session:
         request.session["customer_email"] = None
-    if "recipt_no" not in request.session:
-        request.session["recipt_no"] = generate_random_key()
+    if "recipt_code" not in request.session:
+        request.session["recipt_code"] = generate_random_key()
 
     return render(request, 'recipt/index.html', {
         "products": request.session["products"],
@@ -95,7 +90,7 @@ def index(request):
         "customer_email": request.session["customer_email"],
         'range_5': range(len(request.session["products"])),
         'now': datetime.now(),
-        'recipt_no': request.session["recipt_no"]
+        'recipt_code': request.session["recipt_code"]
     })
 
 # View to send email and handle success/error scenarios
@@ -111,11 +106,11 @@ def sendmail(request):
         'total_price': request.session.get("total_price"),
         'customer_name': request.session.get("customer_name"),
         'customer_email': request.session.get("customer_email"),
-        'recipt_no': request.session["recipt_no"]
+        'recipt_code': request.session["recipt_code"]
     }
     
     # Save customer data before sending email
-    save_customer(request,0)
+    save_customer_recipt(request,0)
     
     # Send email and handle response
     result = viewsdata(user_data)
@@ -149,12 +144,15 @@ def add(request):
         form = NewDataForm(request.POST)
         form_customer = CustomerForm(request.POST)
         if form.is_valid() and form_customer.is_valid():
-            name = form.cleaned_data['name']
-            price = form.cleaned_data['price']
+            prod_code = form.cleaned_data['prod_code']
             quantity = form.cleaned_data['quantity']
-            quantity_price = price * quantity
-            request.session["products"].append([name, quantity, price, quantity_price])
-            request.session['total_price'] += quantity_price
+            product_inventry=models.get_product(prod_code)
+            print(f"product inventry = {product_inventry}")
+            product_inventry=product_inventry[0]
+            if product_inventry[2] >= quantity:
+                quantity_price = product_inventry[3] * quantity
+                request.session["products"].append([prod_code, quantity, product_inventry[3], quantity_price])
+                request.session['total_price'] += quantity_price
 
             customer_name = form_customer.cleaned_data['customer_name']
             customer_email = form_customer.cleaned_data['customer_email']
@@ -177,9 +175,8 @@ def new_receipt(request):
     request.session["total_price"] = 0
     request.session["customer_name"] = None
     request.session["customer_email"] = None
-    request.session["recipt_no"] = generate_random_key()
+    request.session["recipt_code"] = generate_random_key()
     return redirect('recipt:add')
-
 # View to delete a product from the session
 def dele(request, id):
     if not request.user.is_authenticated:
@@ -192,7 +189,6 @@ def dele(request, id):
         pass  # Handle index errors if necessary
 
     return redirect('recipt:index')
-
 # View to edit customer details
 def edit_customer(request, customer_name, customer_email):
     if not request.user.is_authenticated:
@@ -210,7 +206,6 @@ def edit_customer(request, customer_name, customer_email):
         customer_form = CustomerForm(initial={'customer_name': customer_name, 'customer_email': customer_email})
 
     return render(request, 'recipt/edit_customer.html', {"customer_form": customer_form, "customer_name": customer_name, "customer_email": customer_email})
-
 # View to edit product details
 def edit_product(request, id):
     if not request.user.is_authenticated:
@@ -218,7 +213,7 @@ def edit_product(request, id):
 
     try:
         product = request.session["products"][id]
-        name, quantity, price, quantity_price = product
+        prod_code, quantity, price, quantity_price = product
     except IndexError:
         return redirect('recipt:index')  # Redirect if invalid ID
 
@@ -226,37 +221,36 @@ def edit_product(request, id):
         form = NewDataForm(request.POST)
         if form.is_valid():
             # Update session data
-            new_name = form.cleaned_data['name']
-            new_price = form.cleaned_data['price']
+            new_prod_code = form.cleaned_data['prod_code']
             new_quantity = form.cleaned_data['quantity']
-            new_quantity_price = new_price * new_quantity
+            new_quantity_price = price * new_quantity
 
             # Update the product
-            request.session["products"][id] = [new_name, new_quantity, new_price, new_quantity_price]
+            request.session["products"][id] = [new_prod_code, new_quantity, price, new_quantity_price]
 
             # Recalculate total price
             request.session['total_price'] = sum(p[3] for p in request.session["products"])
 
             return redirect('recipt:index')
     else:
-        form = NewDataForm(initial={'name': name, 'price': price, 'quantity': quantity})
+        form = NewDataForm(initial={'prod_code': prod_code, 'quantity': quantity})
 
-    return render(request, 'recipt/edit_product.html', {"form": form, 'id': id})
-
-
+    return render(request, 'recipt/add.html', {"form": form, 'is_editing': True, 'id': id})
 @csrf_exempt
-def save_customer(request, new_recipt):
+def save_customer_recipt(request, new_recipt):
     customer_name = request.session.get("customer_name")
     customer_email = request.session.get("customer_email")
-    recipt_no = request.session.get("recipt_no")
-    
+    recipt_code = request.session.get("recipt_code")
+    date_time = datetime.now()
+    total_price = request.session.get("total_price")
+    products = request.session.get("products")
     if request.user.first_name and request.user.last_name:
         Employ_name = f"{request.user.first_name} {request.user.last_name}"
     else:
         Employ_name = request.user.username
 
-    if recipt_no:
-        save_customer_to_db(customer_name, customer_email, Employ_name, recipt_no)
+    if recipt_code:
+        models.save_customer_recipt_to_db(customer_name, customer_email, Employ_name, recipt_code,date_time,total_price,products)
         
         # Redirect or return a valid response
         if new_recipt == 1:

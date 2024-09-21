@@ -13,5 +13,5 @@ urlpatterns = [
     path('sendmail/', views.sendmail, name='sendmail'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    path('save-customer/<int:new_recipt>', views.save_customer, name='save_customer'),
+    path('save-customer/<int:new_recipt>', views.save_customer_recipt, name='save_customer'),
 ]
