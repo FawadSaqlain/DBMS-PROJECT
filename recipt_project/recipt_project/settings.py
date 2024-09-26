@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'recipt_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
-        'NAME': 'reciptapp',  # Your database name
+        'NAME': 'GENERALSTORE_MS',  # Your database name
         'USER': '',  # Leave empty for Windows Authentication
         'PASSWORD': '',  # Leave empty for Windows Authentication
         'HOST': 'localhost',  # Or your server name
