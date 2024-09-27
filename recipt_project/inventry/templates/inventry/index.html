@@ -22,7 +22,7 @@
         <div class="receipt-section">
             <br>
             {% if products %}
-            <h3>Product description</h3>
+            <a href="{% url 'inventry:inventry_sort' 0 'product_description' %}"><h3>Product description</h3></a>
             {% for product in products %}
             {{ product.1 }}
             <br><br>
@@ -33,7 +33,7 @@
         <div class="receipt-section">
             <br>
             {% if products %}
-            <h3>Quantity</h3>
+            <a href="{% url 'inventry:inventry_sort' 0 'prod_quant' %}"><h3>Quantity</h3></a>
             {% for product in products %}
             {{ product.2 }}
             <br><br>
@@ -44,7 +44,7 @@
         <div class="receipt-section">
             <br>
             {% if products %}
-            <h3>Price</h3>
+            <a href="{% url 'inventry:inventry_sort' 0 'prod_sale_price' %}"><h3>Price</h3></a>
             {% for product in products %}
             {{ product.3 }}
             <br><br>
@@ -54,7 +54,7 @@
         <div class="receipt-section">
             <br>
             {% if products %}
-            <h3>Total for Each Item</h3>
+            <a href="{% url 'inventry:inventry_sort' 0 'quantity_price_sale' %}"><h3>Total for Each Item</h3></a>
             {% for product in products %}
             {{ product.4 }}
             <br><br>
@@ -64,7 +64,7 @@
         <div class="receipt-section">
             <br>
             {% if products %}
-            <h3>Date time</h3>
+            <a href="{% url 'inventry:inventry_sort' 0 'updated_datetime' %}"><h3>Date time</h3></a>
             {% for product in products %}
             {{ product.5 }}
             <br><br>
@@ -74,7 +74,7 @@
         <div class="receipt-section">
             <br>
             {% if products %}
-            <h3>Added / Updated by</h3>
+            <a href="{% url 'inventry:inventry_sort' 0 'added_by_employ' %}"><h3>Added / Updated by</h3></a>
             {% for product in products %}
             {{ product.6 }}
             <br><br>

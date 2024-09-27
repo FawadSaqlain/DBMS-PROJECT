@@ -88,6 +88,18 @@ def view_inventory(request):
     except Exception as e:
         print(f"Error fetching product data: {e}")
         return []
+def view_sorted_inventory(request, asc_decs, sort_by):
+    """Returns a list of sorted products in the inventory."""
+    try:
+        with connection.cursor() as cursor:
+            order = "ASC" if asc_decs == 0 else "DESC"
+            query = f"SELECT * FROM Product ORDER BY {sort_by} {order}"
+            cursor.execute(query)
+            products = cursor.fetchall()
+            return [list(product) for product in products]
+    except Exception as e:
+        print(f"Error fetching product data: {e}")
+        return []
 
 def delete_item(prod_code):
     """Deletes a product from the product table."""

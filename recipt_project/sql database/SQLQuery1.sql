@@ -37,6 +37,8 @@ USE GENERALSTORE_MS
 -- SELECT * FROM information_schema.tables WHERE table_name = 'product';
 -- SELECT * FROM information_schema.tables WHERE table_name = 'customers';
 
-SELECT * FROM product
-SELECT * FROM customers
+SELECT * FROM Product
+ORDER BY prod_code ASC;  -- Sorts the products by price in ascending order
+
+-- SELECT * FROM customers
 -- SELECT * FROM _CDKIB
