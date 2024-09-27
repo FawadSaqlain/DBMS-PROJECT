@@ -46,54 +46,33 @@ def get_product(prod_code):
     except Exception as e:
         print(f"Error fetching product data: {e}")
         return None
+from django.db import connection
 
-def create_table_recipt(recipt_code, products):
+def table_exists(table_name):
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM INFORMATION_SCHEMA.TABLES 
+            WHERE TABLE_NAME = %s;
+        """, [table_name])
+        exists = cursor.fetchone()[0]
+        return exists == 1  # Returns True if the table exists, False otherwise
+def update_quantity(quantity, prod_code):
     """
-    Creates a receipt-specific table and inserts product data.
+    Updates the quantity of a product in the inventory.
     """
     try:
-        for product in products:
-                prod_code = product['prod_code'] if isinstance(product, dict) else product[0]
-                quantity = product['quantity'] if isinstance(product, dict) else product[1]
-                
-                # Increase the inventory quantity back before dropping the table
-                inventry_product = get_product(prod_code)
-                print(f"inventry_product :: {inventry_product} and {prod_code}")
-                if inventry_product:
-                    current_quantity = inventry_product[2]  # Assuming this is `prod_quant`
-                    updated_quantity = current_quantity + quantity  # Add back the quantity
-
-                    # Update the product quantity in the inventory
-                    update_quantity(updated_quantity, prod_code)
-                else:
-                    print(f"Product with code {prod_code} not found in inventory. Cannot update quantity.")
-                    
         with connection.cursor() as cursor:
-            # Drop the table if it exists
-            
-            cursor.execute(f"""
-                IF OBJECT_ID(N'{recipt_code}', 'U') IS NOT NULL
-                DROP TABLE [{recipt_code}]
-            """)
-            
-            # Create the new table
-            cursor.execute(f"""
-                CREATE TABLE [{recipt_code}] (
-                    id INT PRIMARY KEY IDENTITY,
-                    prod_code NVARCHAR(100),
-                    prod_discreption NVARCHAR(1000),
-                    quantity INT,
-                    price FLOAT,
-                    price_quantity FLOAT
-                )
-            """)
-        print(f"table is created {recipt_code}")
-        # Insert data into the new table
-        insert_data(recipt_code, products)
-        print(f"data is inserting = {recipt_code},{products}")
+            cursor.execute("""
+                UPDATE product
+                SET prod_quant = %s
+                WHERE prod_code = %s
+            """, [quantity, prod_code])
+            print(f"update_quantity {quantity},{prod_code}")
     except Exception as e:
-        print(f"Error creating receipt table: {e}")
-
+        print(f"Error updating product quantity: {e}")
+# def return_product(recipt_code,prod_code,prod_quant):
+    
 def insert_data(recipt_code, products):
     """
     Inserts product data into the receipt-specific table and updates product quantities.
@@ -128,20 +107,64 @@ def insert_data(recipt_code, products):
                 """, [prod_code, inventry_product[1], quantity, price, price_quantity])
     except Exception as e:
         print(f"Error inserting data into receipt table: {e}")
-
-def update_quantity(quantity, prod_code):
+def table_exists(table_name):
     """
-    Updates the quantity of a product in the inventory.
+    Checks if a table exists in the database.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM INFORMATION_SCHEMA.TABLES 
+            WHERE TABLE_NAME = %s;
+        """, [table_name])
+        exists = cursor.fetchone()[0]
+        return exists == 1  # Returns True if the table exists, False otherwise
+
+def restore_inventory_from_receipt(recipt_code):
+    """
+    Restores the inventory quantities from an existing receipt before dropping the table.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT prod_code, quantity FROM [{recipt_code}]")
+        products = cursor.fetchall()
+        for product in products:
+            prod_code = product[0]
+            quantity = product[1]
+            # Fetch current inventory quantity
+            inventry_product = get_product(prod_code)
+            if inventry_product:
+                current_quantity = inventry_product[2]
+                updated_quantity = current_quantity + quantity
+                # Update the product quantity in the inventory
+                update_quantity(updated_quantity, prod_code)
+
+def create_table_recipt(recipt_code, products):
+    """
+    Creates a receipt-specific table and inserts product data.
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute("""
-                UPDATE product
-                SET prod_quant = %s
-                WHERE prod_code = %s
-            """, [quantity, prod_code])
-            print(f"update_quantity {quantity},{prod_code}")
+            # Check if the table exists
+            if table_exists(recipt_code):
+                # Restore inventory quantities from the existing receipt table
+                restore_inventory_from_receipt(recipt_code)
+                
+                # Drop the existing receipt table
+                cursor.execute(f"DROP TABLE [{recipt_code}]")
+            
+            # Create the new table
+            cursor.execute(f"""
+                CREATE TABLE [{recipt_code}] (
+                    id INT PRIMARY KEY IDENTITY,
+                    prod_code NVARCHAR(100),
+                    prod_discreption NVARCHAR(1000),
+                    quantity INT,
+                    price FLOAT,
+                    price_quantity FLOAT
+                )
+            """)
+        
+        # Insert data into the new table
+        insert_data(recipt_code, products)
     except Exception as e:
-        print(f"Error updating product quantity: {e}")
-def return_product(recipt_code,prod_code,prod_quant):
-    
+        print(f"Error creating receipt table: {e}")

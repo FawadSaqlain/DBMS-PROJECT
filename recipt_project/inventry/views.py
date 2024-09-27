@@ -137,6 +137,8 @@ def edit_product(request, prod_index,prod_code):
         'prod_code': prod_code  # Add this line
     })
 
+
+
 def login_view(request):
     if request.method == "POST":
         username = request.POST["username"]
