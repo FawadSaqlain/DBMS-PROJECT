@@ -59,7 +59,8 @@ def inventry_sort(request,asc_decs,sort_by):
     print(f"asc_decs,sortby :: {asc_decs},{sort_by}")
     return render(request, 'inventry/index.html', {
         "products": models.view_sorted_inventory(request,asc_decs,sort_by),
-        'length_products':range(len(models.view_inventory(request)))
+        'length_products':range(len(models.view_inventory(request))),
+        'sorted_as':f"{asc_decs}{sort_by}"
     })
 def add(request):
     if not request.user.is_authenticated:

@@ -8,7 +8,7 @@
                 <br>
 
                 {% if products %}
-                <h3 style="margin-top: 8px;">Product Code</h3>
+                <a href="{% url 'inventry:index' %}" class="hover-effect"><h3 style="margin-top: 8px;">Product Code</h3></a>
                 {% for product in products %}
                 <li style="margin-left: 15px;">{{ product.0 }}</li>
                 <br>
@@ -22,7 +22,11 @@
         <div class="receipt-section">
             <br>
             {% if products %}
-            <a href="{% url 'inventry:inventry_sort' 0 'product_description' %}"><h3>Product description</h3></a>
+            {% if sorted_as == '0product_description' %}
+            <a href="{% url 'inventry:inventry_sort' 1 'product_description' %}" class="hover-effect"><h3>Product description</h3></a>
+            {% else %}
+            <a href="{% url 'inventry:inventry_sort' 0 'product_description' %}" class="hover-effect"><h3>Product description</h3></a>
+            {% endif %}
             {% for product in products %}
             {{ product.1 }}
             <br><br>
@@ -33,7 +37,11 @@
         <div class="receipt-section">
             <br>
             {% if products %}
-            <a href="{% url 'inventry:inventry_sort' 0 'prod_quant' %}"><h3>Quantity</h3></a>
+            {% if sorted_as == '0prod_quant' %}
+            <a href="{% url 'inventry:inventry_sort' 1 'prod_quant' %}" class="hover-effect"><h3>Quantity</h3></a>
+            {% else %}
+            <a href="{% url 'inventry:inventry_sort' 0 'prod_quant' %}" class="hover-effect"><h3>Quantity</h3></a>
+            {% endif %}
             {% for product in products %}
             {{ product.2 }}
             <br><br>
@@ -44,53 +52,73 @@
         <div class="receipt-section">
             <br>
             {% if products %}
-            <a href="{% url 'inventry:inventry_sort' 0 'prod_sale_price' %}"><h3>Price</h3></a>
+            {% if sorted_as == '0prod_sale_price' %}
+            <a href="{% url 'inventry:inventry_sort' 1 'prod_sale_price' %}" class="hover-effect"><h3>Price</h3></a>
+            {% else %}
+            <a href="{% url 'inventry:inventry_sort' 0 'prod_sale_price' %}" class="hover-effect"><h3>Price</h3></a>
+            {% endif %}
             {% for product in products %}
             {{ product.3 }}
             <br><br>
             {% endfor %}
             {% endif %}
         </div>
+
         <div class="receipt-section">
             <br>
             {% if products %}
-            <a href="{% url 'inventry:inventry_sort' 0 'quantity_price_sale' %}"><h3>Total for Each Item</h3></a>
+            {% if sorted_as == '0quantity_price_sale' %}
+            <a href="{% url 'inventry:inventry_sort' 1 'quantity_price_sale' %}" class="hover-effect"><h3>Total for Each Item</h3></a>
+            {% else %}
+            <a href="{% url 'inventry:inventry_sort' 0 'quantity_price_sale' %}" class="hover-effect"><h3>Total for Each Item</h3></a>
+            {% endif %}
             {% for product in products %}
             {{ product.4 }}
             <br><br>
             {% endfor %}
             {% endif %}
         </div>
+
         <div class="receipt-section">
             <br>
             {% if products %}
-            <a href="{% url 'inventry:inventry_sort' 0 'updated_datetime' %}"><h3>Date time</h3></a>
+            {% if sorted_as == '0updated_datetime' %}
+            <a href="{% url 'inventry:inventry_sort' 1 'updated_datetime' %}" class="hover-effect"><h3>Date time</h3></a>
+            {% else %}
+            <a href="{% url 'inventry:inventry_sort' 0 'updated_datetime' %}" class="hover-effect"><h3>Date time</h3></a>
+            {% endif %}
             {% for product in products %}
             {{ product.5 }}
             <br><br>
             {% endfor %}
             {% endif %}
         </div>
+
         <div class="receipt-section">
             <br>
             {% if products %}
-            <a href="{% url 'inventry:inventry_sort' 0 'added_by_employ' %}"><h3>Added / Updated by</h3></a>
+            {% if sorted_as == '0added_by_employ' %}
+            <a href="{% url 'inventry:inventry_sort' 1 'added_by_employ' %}" class="hover-effect"><h3>Added / Updated by</h3></a>
+            {% else %}
+            <a href="{% url 'inventry:inventry_sort' 0 'added_by_employ' %}" class="hover-effect"><h3>Added / Updated by</h3></a>
+            {% endif %}
             {% for product in products %}
             {{ product.6 }}
             <br><br>
             {% endfor %}
             {% endif %}
         </div>
+
         <div class="receipt-actions">
             <br><br>
             {% for product in products %}
-            <a href="{% url 'inventry:dele' forloop.counter0 product.0 %}" class="delete-button"></a>
+            <a href="{% url 'inventry:dele' forloop.counter0 product.0 %}" class="delete-button">
                 <img src="https://icon-library.com/images/icon-remove/icon-remove-18.jpg" alt="DEL"
-                    style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
+                        style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
             </a>
             <a href="{% url 'inventry:edit_product' forloop.counter0 product.0 %}" class="edit-button">
                 <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain" alt="EDIT"
-                    style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
+                        style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
             </a>
             <br>
             {% endfor %}
@@ -105,17 +133,7 @@
 
 <script>
     function printReceipt() {
-        // Hide edit and delete buttons for printing
-        document.querySelectorAll('.delete-button').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.edit-button').forEach(el => el.style.display = 'none');
-
-        // Print the page
         window.print();
-
-        // Restore the visibility of the hidden elements
-        document.querySelectorAll('.delete-button').forEach(el => el.style.display = 'inline');
-        document.querySelectorAll('.edit-button').forEach(el => el.style.display = 'inline');
     }
 </script>
-</div>
 {% endblock %}
