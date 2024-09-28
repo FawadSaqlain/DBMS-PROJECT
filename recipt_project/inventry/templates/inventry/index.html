@@ -1,7 +1,31 @@
+
+
 {% extends "inventry/layout.html" %}
 
 {% block body %}
 <div>
+    <div class="search-bar-container">
+        <input type="text" id="searchInput" placeholder="Search...">
+        <select id="searchSection" onchange="autoSearch()">
+            <option value="" disabled selected>Search to select</option>
+            <option value="prod_code">Product Code</option>
+            <option value="product_description">Product Description</option>
+            <option value="prod_quant">Quantity</option>
+            <option value="prod_sale_price">Price</option>
+            <option value="quantity_price_sale">Total for Each Item</option>
+            <option value="updated_datetime">Date Time</option>
+            <option value="added_by_employ">Added / Updated by</option>
+        </select>
+        <div class="actions">
+    <a href="{% url 'inventry:add' %}" class="action-button">Add New Item</a>
+    <button onclick="printReceipt()" class="action-button print-button">Print Receipt</button>
+</div>
+
+    </div>
+    
+</div>
+
+
     <div id="index_outer_div" class="receipt-details">
         <div>
             <ol>
@@ -126,14 +150,35 @@
     </div>
 </div>
 
-<div class="actions">
-    <a href="{% url 'inventry:add' %}" class="action-button">Add New Item</a>
-    <button onclick="printReceipt()" class="action-button print-button">Print Receipt</button>
-</div>
 
 <script>
     function printReceipt() {
         window.print();
     }
 </script>
+<script>
+    const searchUrl = "{% url 'inventry:search_view' %}";  // Store the URL in a variable
+
+    function autoSearch() {
+        const query = document.getElementById('searchInput').value;
+        const section = document.getElementById('searchSection').value;
+        
+        // Check if the search input is not empty before redirecting
+        if (query.trim() !== "") {
+            window.location.href = `${searchUrl}?q=${query}&section=${section}`;  // Use the variable here
+        }
+    }
+
+    // Optional: Trigger search when pressing Enter in the input field
+    document.getElementById('searchInput').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            autoSearch();
+        }
+    });
+
+    function printReceipt() {
+        window.print();
+    }
+</script>
+
 {% endblock %}

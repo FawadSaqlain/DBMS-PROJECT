@@ -2,6 +2,24 @@ from django.db import connection
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 
+def search_products(search_column, search_value):
+    with connection.cursor() as cursor:
+        # Ensure the search column is valid to prevent SQL injection
+        valid_columns = ['prod_code', 'product_description', 'quantity', 'price', 'date_time', 'added_by']
+        
+        if search_column not in valid_columns:
+            raise ValueError("Invalid search column provided.")
+
+        # Prepare the SQL query
+        sql = f"SELECT * FROM product WHERE LOWER(CAST({search_column} AS NVARCHAR(50))) LIKE LOWER(%s)"
+        
+        # Execute the query with the provided search value
+        cursor.execute(sql, [f'%{search_value}%'])
+        results = cursor.fetchall()
+
+        return results
+
+
 @csrf_exempt
 def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime, username):
     product=get_product(prod_code)

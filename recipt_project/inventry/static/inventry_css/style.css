@@ -87,7 +87,7 @@ header {
 }
 
 .action-button {
-  color: brown;
+  color: hsl(0, 59%, 41%);
   text-decoration: none;
   margin-right: 10px;
 }
@@ -117,4 +117,53 @@ h1, h2, h3 {
 /* Add smooth transition effect */
 a.hover-effect:hover h3 {
   transition: font-size 0.3s ease;
+}
+/* Add your existing CSS styles here */
+
+/* Search Bar Container */
+.search-bar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar-container input[type="text"] {
+  width: 250px;
+  padding: 8px 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px 0 0 5px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-bar-container input[type="text"]:focus {
+  border-color: #007BFF;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.search-bar-container select {
+  padding: 8px 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-left: none;
+  border-radius: 0 5px 5px 0;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-bar-container select:focus {
+  border-color: hsl(211, 100%, 50%);
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Smooth transition on hover */
+.search-bar-container input[type="text"]:hover, 
+.search-bar-container select:hover {
+  box-shadow: 0 0 10px #007bff33;
 }

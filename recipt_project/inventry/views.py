@@ -62,6 +62,23 @@ def inventry_sort(request,asc_decs,sort_by):
         'length_products':range(len(models.view_inventory(request))),
         'sorted_as':f"{asc_decs}{sort_by}"
     })
+# views.py
+# views.py
+def search_view(request):
+    search_column = request.GET.get('section', 'product_code')  # Default search column
+    search_value = request.GET.get('q', '')  # Adjusted to match the sent parameter
+    print(f"search value :: {search_value} , search coloumn :: {search_column}")
+    results = []
+    
+    if search_value:
+        results = models.search_products(search_column, search_value)
+    
+    return render(request, 'inventry/index.html', {
+        "products": results,
+        'length_products': range(len(results))
+    })
+
+
 def add(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
