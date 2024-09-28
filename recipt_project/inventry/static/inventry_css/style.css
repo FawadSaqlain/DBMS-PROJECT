@@ -167,3 +167,19 @@ a.hover-effect:hover h3 {
 .search-bar-container select:hover {
   box-shadow: 0 0 10px #007bff33;
 }
+/* .description-preview {
+  cursor: pointer;
+  display: inline-block;
+  max-width: 200px; /* Adjust as needed */
+  /* overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}  */
+
+/* .description-preview:hover {
+  white-space: normal;
+  max-width: none;
+  background-color: #f9f9f9; /* Optional: to highlight the expanded text */
+  /* padding: 2px;
+  border-radius: 3px;
+}  */

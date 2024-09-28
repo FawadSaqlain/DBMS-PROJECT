@@ -52,7 +52,7 @@
             <a href="{% url 'inventry:inventry_sort' 0 'product_description' %}" class="hover-effect"><h3>Product description</h3></a>
             {% endif %}
             {% for product in products %}
-            {{ product.1 }}
+            <span class="description-preview" title="{{ product.1 }}">{{ product.1|truncatewords:2 }}</span>
             <br><br>
             {% endfor %}
             {% endif %}
@@ -138,11 +138,11 @@
             {% for product in products %}
             <a href="{% url 'inventry:dele' forloop.counter0 product.0 %}" class="delete-button">
                 <img src="https://icon-library.com/images/icon-remove/icon-remove-18.jpg" alt="DEL"
-                        style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
+                        style="width: 16px; height: 22px; margin-bottom: 10px; margin-right: 10px;">
             </a>
             <a href="{% url 'inventry:edit_product' forloop.counter0 product.0 %}" class="edit-button">
                 <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain" alt="EDIT"
-                        style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
+                        style="width: 16px; height: 22px; margin-bottom: 10px; margin-right: 10px;">
             </a>
             <br>
             {% endfor %}
