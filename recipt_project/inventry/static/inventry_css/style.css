@@ -87,7 +87,7 @@ header {
 }
 
 .action-button {
-  color: hsl(0, 59%, 41%);
+  color: rgb(166, 43, 43);
   text-decoration: none;
   margin-right: 10px;
 }
@@ -118,7 +118,6 @@ h1, h2, h3 {
 a.hover-effect:hover h3 {
   transition: font-size 0.3s ease;
 }
-/* Add your existing CSS styles here */
 
 /* Search Bar Container */
 .search-bar-container {
@@ -143,8 +142,8 @@ a.hover-effect:hover h3 {
 }
 
 .search-bar-container input[type="text"]:focus {
-  border-color: #007BFF;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  border-color: rgb(166, 42, 42);
+  box-shadow: 0 0 5px rgba(195, 195, 195, 0.76);
 }
 
 .search-bar-container select {
@@ -158,28 +157,47 @@ a.hover-effect:hover h3 {
 }
 
 .search-bar-container select:focus {
-  border-color: hsl(211, 100%, 50%);
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  border-color: rgb(166, 42, 42);;
+  box-shadow: 0 0 5px rgba(195, 195, 195, 0.76);
 }
 
 /* Smooth transition on hover */
 .search-bar-container input[type="text"]:hover, 
 .search-bar-container select:hover {
-  box-shadow: 0 0 10px #007bff33;
+  box-shadow: 0 0 10px rgb(166, 42, 42);
 }
-/* .description-preview {
-  cursor: pointer;
-  display: inline-block;
-  max-width: 200px; /* Adjust as needed */
-  /* overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}  */
 
-/* .description-preview:hover {
-  white-space: normal;
-  max-width: none;
-  background-color: #f9f9f9; /* Optional: to highlight the expanded text */
-  /* padding: 2px;
-  border-radius: 3px;
-}  */
+/* Table Styling */
+.product-table {
+  width: 100%;
+  border-collapse: collapse; /* Remove gaps between cells */
+  border-radius: 10px; /* Apply border radius to the table */
+  overflow: hidden; /* Ensure the border radius effect is visible */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Add shadow to the table */
+}
+
+.product-table th, .product-table td {
+  padding: 10px; /* Add padding for better spacing */
+  text-align: left; /* Align text to the left */
+}
+
+/* Alternating Row Colors */
+.product-table tbody tr:nth-child(even) {
+  background-color: #e8e8e8; /* Light gray for even rows */
+}
+
+.product-table tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* White for odd rows */
+}
+
+/* Optional: Highlight on hover */
+.product-table tbody tr:hover {
+  background-color: rgb(173, 173, 173); /* Light blue on hover */
+}
+.product-table thead tr{
+  background-color: rgb(166, 43, 43);
+  color:#ffffff
+}
+.product-table thead tr th:hover {
+  font-weight:bolder;
+}

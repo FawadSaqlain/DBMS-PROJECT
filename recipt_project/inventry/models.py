@@ -7,17 +7,35 @@ def search_products(search_column, search_value):
         # Ensure the search column is valid to prevent SQL injection
         valid_columns = ['prod_code', 'product_description', 'quantity', 'price', 'date_time', 'added_by']
         
-        if search_column not in valid_columns:
-            raise ValueError("Invalid search column provided.")
+        # If search_column is 'all', construct a different query
+        if search_column == 'all':
+            sql = """
+            SELECT * FROM product
+            WHERE LOWER(prod_code) LIKE LOWER(%s)
+            OR LOWER(product_description) LIKE LOWER(%s)
+            OR LOWER(CAST(prod_quant AS VARCHAR(50))) LIKE LOWER(%s)
+            OR LOWER(CAST(prod_sale_price AS VARCHAR(50))) LIKE LOWER(%s)
+            OR LOWER(CAST(quantity_price_sale AS VARCHAR(50))) LIKE LOWER(%s)
+            OR LOWER(CAST(updated_datetime AS VARCHAR(50))) LIKE LOWER(%s)
+            OR LOWER(CAST(added_by_employ AS VARCHAR(50))) LIKE LOWER(%s)
+            """
+            # Execute the query with the provided search value for all fields
+            like_value = f'%{search_value}%'
+            cursor.execute(sql, [like_value] * 7)  # Repeat the like_value for all 7 placeholders
+        else:
+            # Validate the search column
+            if search_column not in valid_columns:
+                raise ValueError("Invalid search column provided.")
 
-        # Prepare the SQL query
-        sql = f"SELECT * FROM product WHERE LOWER(CAST({search_column} AS NVARCHAR(50))) LIKE LOWER(%s)"
-        
-        # Execute the query with the provided search value
-        cursor.execute(sql, [f'%{search_value}%'])
+            # Prepare the SQL query for a specific column
+            sql = f"SELECT * FROM product WHERE LOWER(CAST({search_column} AS NVARCHAR(50))) LIKE LOWER(%s)"
+            
+            # Execute the query with the provided search value
+            cursor.execute(sql, [f'%{search_value}%'])
+
         results = cursor.fetchall()
-
         return results
+
 
 
 @csrf_exempt
