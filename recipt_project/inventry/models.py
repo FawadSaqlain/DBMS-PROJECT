@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 def search_products(search_column, search_value):
     with connection.cursor() as cursor:
         # Ensure the search column is valid to prevent SQL injection
-        valid_columns = ['prod_code', 'product_description', 'quantity', 'price', 'date_time', 'added_by']
+        valid_columns = ['prod_code', 'product_description', 'prod_quant', 'prod_sale_price', 'quantity_price_sale', 'updated_datetime', 'added_by_employ']
         
         # If search_column is 'all', construct a different query
         if search_column == 'all':
@@ -19,7 +19,6 @@ def search_products(search_column, search_value):
             OR LOWER(CAST(updated_datetime AS VARCHAR(50))) LIKE LOWER(%s)
             OR LOWER(CAST(added_by_employ AS VARCHAR(50))) LIKE LOWER(%s)
             """
-            # Execute the query with the provided search value for all fields
             like_value = f'%{search_value}%'
             cursor.execute(sql, [like_value] * 7)  # Repeat the like_value for all 7 placeholders
         else:
@@ -28,6 +27,13 @@ def search_products(search_column, search_value):
                 raise ValueError("Invalid search column provided.")
 
             # Prepare the SQL query for a specific column
+            if search_column == 'prod_quant':
+                # For numeric fields, we need to ensure we convert to int
+                try:
+                    search_value = int(search_value)  # Convert to int for numeric fields
+                except ValueError:
+                    raise ValueError("Search value for quantity must be a valid integer.")
+
             sql = f"SELECT * FROM product WHERE LOWER(CAST({search_column} AS NVARCHAR(50))) LIKE LOWER(%s)"
             
             # Execute the query with the provided search value

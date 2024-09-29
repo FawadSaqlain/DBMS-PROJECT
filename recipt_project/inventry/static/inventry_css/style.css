@@ -8,7 +8,7 @@
 /* Center the entire page content */
 body {
   min-height: 100vh;
-  background-image: url("https://th.bing.com/th/id/OIP.oJnD-qE_AcmVVeoB9YnPrAHaFj?rs=1&pid=ImgDetMain");
+  background-image: url("../inventry_css/assets/background.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   font-family: Arial, sans-serif;
@@ -62,13 +62,14 @@ header {
   margin-top: 10px;
 }
 
-.delete-button, .edit-button {
+ .delete-button, .edit-button {
   display: inline-block;
-  width: 15px;  /* Match the width of the image */
+  width: 15px; /* Match the width of the image */
   height: 20px; /* Match the height of the image */
   margin-bottom: 10px;
   margin-right: 10px;
-}
+  mix-blend-mode: color-burn;
+} 
 
 /* Hover effect for delete and edit buttons */
 .delete-button:hover img, 
@@ -79,11 +80,13 @@ header {
 
 /* Image swap on hover */
 .delete-button img:hover {
-  content: url('../inventry_css/assets/colore changed delete icon.jpg'); /* Change this to your hover image URL */
+  content: url('../inventry_css/assets/colore_changed_delete_icon.jpg' ); /* Change this to your hover image URL */
+  mix-blend-mode: color-burn;
 }
 
 .edit-button img:hover {
-  content: url('../inventry_css/assets/color changed editicon.jpg'); /* Change this to your hover image URL */
+  content: url('../inventry_css/assets/color_changed_edit_icon.jpg'); /* Change this to your hover image URL */
+  mix-blend-mode: color-burn;
 }
 
 .action-button {

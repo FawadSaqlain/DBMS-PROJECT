@@ -3,8 +3,8 @@
 {% block body %}
 <div>
     <div class="search-bar-container">
-        <input type="text" id="searchInput" placeholder="Search...">
-        <select id="searchSection" onchange="autoSearch()">
+        <input type="text" id="searchInput" required placeholder="Search...">
+        <select id="searchSection" required onchange="autoSearch()">
             <option value="" disabled selected>Search to select</option>
             <option value="prod_code">Product Code</option>
             <option value="product_description">Product Description</option>
@@ -19,6 +19,10 @@
             <a href="{% url 'inventry:add' %}" class="action-button">Add New Item</a>
             <button onclick="printReceipt()" class="action-button print-button">Print Receipt</button>
         </div>
+        {% if error_message %}
+    <div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+
     </div>
 </div>
 
@@ -108,13 +112,14 @@
                 <td>{{ product.5 }}</td>
                 <td>{{ product.6 }}</td>
                 <td>
+                    {% load static %}
                     <a href="{% url 'inventry:dele' forloop.counter0 product.0 %}" class="delete-button">
-                        <img src="https://icon-library.com/images/icon-remove/icon-remove-18.jpg" alt="DEL"
-                            style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
+                        <img src="../../static/inventry_css/assets/delete_icon.jpg" alt="DEL"
+                            style="width: 17px; height: 23px;  margin-right: 10px; ">
                     </a>
                     <a href="{% url 'inventry:edit_product' forloop.counter0 product.0 %}" class="edit-button">
-                        <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain"
-                            alt="EDIT" style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
+                        <img src="../../static/inventry_css/assets/edit_icon.jpeg"
+                            alt="EDIT" style="width: 17px; height: 23px;  margin-right: 10px;">
                     </a>
                 </td>
             </tr>
@@ -127,35 +132,34 @@
     {% endif %}
 </div>
 
-
 <script>
-    function printReceipt() {
-        window.print();
-    }
-</script>
-<script>
-    const searchUrl = "{% url 'inventry:search_view' %}";  // Store the URL in a variable
+    const searchUrl = "{% url 'inventry:search_view' %}";  // Search URL
 
     function autoSearch() {
         const query = document.getElementById('searchInput').value;
         const section = document.getElementById('searchSection').value;
 
-        // Check if the search input is not empty before redirecting
-        if (query.trim() !== "") {
-            window.location.href = `${searchUrl}?q=${query}&section=${section}`;  // Use the variable here
+        // Validate if both search input and section are provided
+        if (!query.trim()) {
+            alert("Please enter a search query.");
+            return;
         }
+
+        if (!section) {
+            alert("Please select a section to search.");
+            return;
+        }
+
+        // Redirect to the search URL with query and section parameters
+        window.location.href = `${searchUrl}?q=${encodeURIComponent(query)}&section=${encodeURIComponent(section)}`;
     }
 
-    // Optional: Trigger search when pressing Enter in the input field
+    // Trigger search when Enter is pressed in the input field
     document.getElementById('searchInput').addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-            autoSearch();
+            autoSearch();  // Call the search function
         }
     });
-
-    function printReceipt() {
-        window.print();
-    }
 </script>
 
 {% endblock %}

@@ -51,12 +51,13 @@ def index(request):
         return HttpResponseRedirect(reverse("inventry:login"))
     return render(request, 'inventry/index.html', {
         "products": models.view_inventory(request),
-        'length_products':range(len(models.view_inventory(request)))
+        # 'length_products':range(len(models.view_inventory(request)))
     })
+
 def inventry_sort(request,asc_decs,sort_by):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
-    print(f"asc_decs,sortby :: {asc_decs},{sort_by}")
+    # print(f"asc_decs,sortby :: {asc_decs},{sort_by}")
     return render(request, 'inventry/index.html', {
         "products": models.view_sorted_inventory(request,asc_decs,sort_by),
         'length_products':range(len(models.view_inventory(request))),
@@ -64,15 +65,37 @@ def inventry_sort(request,asc_decs,sort_by):
     })
 # views.py
 # views.py
+from django.shortcuts import render
+
 def search_view(request):
     search_column = request.GET.get('section', 'product_code')  # Default search column
-    search_value = request.GET.get('q', '')  # Adjusted to match the sent parameter
-    print(f"search value :: {search_value} , search coloumn :: {search_column}")
-    results = []
+    search_value = request.GET.get('q', '')  # Retrieved search value
     
+    # Convert search_value to string (if not already a string)
+    search_value = str(search_value)
+    
+    print(f"search value :: {search_value} , search column :: {search_column}")
+
+    results = []  # Initialize results list
+
+    # Check if search_value is not empty
     if search_value:
+        # If searching for quantity, check if it's a valid integer
+        if search_column == 'prod_quant':
+            try:
+                # Validate if search_value is a valid integer
+                int(search_value)
+            except ValueError:
+                return render(request, 'inventry/index.html', {
+                    "products": [],
+                    'length_products': range(0),
+                    'error_message': "Search value for quantity must be a valid integer."
+                })
+        
+        # Call the model method to perform the search based on column and value
         results = models.search_products(search_column, search_value)
-    
+
+    # Render the template with search results
     return render(request, 'inventry/index.html', {
         "products": results,
         'length_products': range(len(results))
