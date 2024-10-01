@@ -14,4 +14,5 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('save-customer/<int:new_recipt>', views.save_customer_recipt, name='save_customer'),
+    path('return-product/', views.return_product, name='return_product'),
 ]

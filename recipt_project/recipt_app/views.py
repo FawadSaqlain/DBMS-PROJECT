@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from datetime import datetime
-from .sendmail import viewsdata
+from .sendmail import sendmail_py
 import random
 import string
 from django.views.decorators.csrf import csrf_exempt
@@ -18,7 +18,7 @@ def generate_random_key(length=5):
     return "_" + random_key
 
 # Form for adding/editing products
-class NewDataForm(forms.Form):
+class ProductForm(forms.Form):
     def for_edit_product(self, code, quant, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['prod_code'].initial = code
@@ -28,14 +28,14 @@ class NewDataForm(forms.Form):
         widget=forms.TextInput(attrs={
             'id': 'id_prod_code',
             'placeholder': 'Enter product code',
-            'class': 'form-control',
+            'class': 'form_product-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
     quantity = forms.IntegerField(
         widget=forms.NumberInput(attrs={
             'placeholder': 'Enter product quantity',
-            'class': 'form-control',
+            'class': 'form_product-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
@@ -51,7 +51,7 @@ class CustomerForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             'placeholder': 'Customer name',
-            'class': 'form-control',
+            'class': 'form_product-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;',
         })
     )
@@ -59,10 +59,48 @@ class CustomerForm(forms.Form):
         required=False,
         widget=forms.EmailInput(attrs={
             'placeholder': 'Customer email',
-            'class': 'form-control',
+            'class': 'form_product-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;',
         })
     )
+
+class returnProduct(forms.Form):
+    def for_edit_return_product(self, prod_code, quantity, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['prod_code'].initial = prod_code
+        self.fields['quantity'].initial = quantity
+
+    prod_code = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'id': 'id_prod_code',
+            'placeholder': 'Enter product code',
+            'class': 'form_product-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    quantity = forms.IntegerField(
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'Enter product quantity',
+            'class': 'form_product-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+
+# Form for adding/editing customer details
+class return_product_recipt_code(forms.Form):
+    def for_edit_customer(self, recipt_code, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['recipt_code'].initial = recipt_code
+
+    recipt_code = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Customer name',
+            'class': 'form_product-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;',
+        })
+    )
+
 
 # Main view for displaying receipt details
 def index(request):
@@ -81,7 +119,7 @@ def index(request):
         request.session["customer_email"] = None
     if "recipt_code" not in request.session:
         request.session["recipt_code"] = generate_random_key()
-    print(f"line 84 recipt_app/views.py request.session[products] = {request.session["products"]}")
+    print(f"line 122 recipt_app/views.py request.session[products] = {request.session["products"]}")
     return render(request, 'recipt/index.html', {
         "products": request.session["products"],
         "total_price": request.session["total_price"],
@@ -113,9 +151,9 @@ def sendmail(request, new_recipt):
     if not user_data['products'] or not user_data['customer_name'] or not user_data['customer_email']:
         return HttpResponse("Required session data is missing.", status=400)
 
-    # Send email and handle response from viewsdata
-    result = viewsdata(user_data)
-    print(f"Result from viewsdata: {result}")  # Log the result for debugging
+    # Send email and handle response from sendmail_py
+    result = sendmail_py(user_data)
+    print(f"Result from sendmail_py: {result}")  # Log the result for debugging
 
     if result.startswith("Error"):
         # Redirect to edit_customer with the customer's name and email as URL parameters
@@ -142,11 +180,11 @@ def add(request):
         return HttpResponseRedirect(reverse("recipt:login"))
     
     if request.method == 'POST':
-        form = NewDataForm(request.POST)
+        form_product = ProductForm(request.POST)
         form_customer = CustomerForm(request.POST)
-        if form.is_valid() and form_customer.is_valid():
-            prod_code = form.cleaned_data['prod_code']
-            quantity = form.cleaned_data['quantity']
+        if form_product.is_valid() and form_customer.is_valid():
+            prod_code = form_product.cleaned_data['prod_code']
+            quantity = form_product.cleaned_data['quantity']
             product_inventry = models.get_product(prod_code)
             print(f"product inventry = {product_inventry}")
             # product_inventry = product_inventry[0]
@@ -163,7 +201,6 @@ def add(request):
 
                 if not product_found:
                     request.session["products"].append([prod_code, quantity, product_inventry[3], quantity_price,product_inventry[1]])
-
                 request.session['total_price'] += quantity_price
 
             customer_name = form_customer.cleaned_data['customer_name']
@@ -174,8 +211,8 @@ def add(request):
                 request.session["customer_email"] = customer_email
 
         else:
-            return render(request, 'recipt/add.html', {'form': form, 'form_customer': form_customer})
-    return render(request, 'recipt/add.html', {"form": NewDataForm(), 'form_customer': CustomerForm()})
+            return render(request, 'recipt/add.html', {'form_product': form_product, 'form_customer': form_customer})
+    return render(request, 'recipt/add.html', {"form_product": ProductForm(), 'form_customer': CustomerForm()})
 
 # View to start a new receipt
 def new_receipt(request):
@@ -233,11 +270,11 @@ def edit_product(request, id):
         return redirect('recipt:index')  # Redirect if invalid ID
 
     if request.method == 'POST':
-        form = NewDataForm(request.POST)
-        if form.is_valid():
+        form_product = ProductForm(request.POST)
+        if form_product.is_valid():
             # Update session data
-            new_prod_code = form.cleaned_data['prod_code']
-            new_quantity = form.cleaned_data['quantity']
+            new_prod_code = form_product.cleaned_data['prod_code']
+            new_quantity = form_product.cleaned_data['quantity']
             new_quantity_price = price * new_quantity
 
             # Update the product
@@ -248,9 +285,9 @@ def edit_product(request, id):
 
             return redirect('recipt:index')
     else:
-        form = NewDataForm(initial={'prod_code': prod_code, 'quantity': quantity})
+        form_product = ProductForm(initial={'prod_code': prod_code, 'quantity': quantity})
 
-    return render(request, 'recipt/add.html', {"form": form, 'is_editing': True, 'id': id})
+    return render(request, 'recipt/add.html', {"form_product": form_product, 'is_editing': True, 'id': id})
 
 @csrf_exempt
 def save_customer_recipt(request, new_recipt):
@@ -282,9 +319,45 @@ def save_customer_recipt(request, new_recipt):
     else:
         # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
-
+''''''
 def return_product(request):
-    pass
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("recipt:login"))
+    
+    if request.method == 'POST':
+        form_return_product = returnProduct(request.POST)
+        form_return_product_recipt_code = return_product_recipt_code(request.POST)
+        if form_return_product.is_valid() and form_return_product_recipt_code.is_valid():
+            
+            prod_code = form_return_product.cleaned_data['prod_code']
+            quantity = form_return_product.cleaned_data['quantity']
+            product_inventry = models.get_product(prod_code)
+            print(f"product inventry = {product_inventry}")
+            # product_inventry = product_inventry[0]
+            if product_inventry[2] >= quantity:
+                quantity_price = product_inventry[3] * quantity
+                product_found = False
+
+                for product in request.session["products"]:
+                    if product[0] == prod_code:
+                        product[1] += quantity
+                        product[3] += quantity_price
+                        product_found = True
+                        break
+
+                if not product_found:
+                    request.session["products"].append([prod_code, quantity, product_inventry[3], quantity_price,product_inventry[1]])
+
+                # request.session['total_price'] += quantity_price
+
+            recipt_code = form_return_product_recipt_code.cleaned_data['recipt_code']
+            if recipt_code:
+                request.session["recipt_code"] = recipt_code
+
+        else:
+            return render(request, 'recipt/return_product.html', {'form_product': form_return_product, 'form_recipt': form_return_product_recipt_code})
+    return render(request, 'recipt/return_product.html', {"form_product": returnProduct(), 'form_recipt': return_product_recipt_code()})
+
 # Login and logout views
 def login_view(request):
     if request.method == "POST":

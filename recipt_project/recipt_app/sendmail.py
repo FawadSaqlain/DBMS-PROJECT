@@ -21,7 +21,8 @@ class EmailSupportAgent:
         <h3>Products Purchased:</h3>
         <table border="1">
             <tr>
-                <th>Product</th>
+                <th>Product code</th>
+                <th>Product Discreption</th>
                 <th>Quantity</th>
                 <th>Price per Unit</th>
                 <th>Total</th>
@@ -29,10 +30,12 @@ class EmailSupportAgent:
         """
         
         for product in email_data['products']:
-            name, quantity, price, quantity_price = product
+            print(f"product :: {product}")
+            product_code, quantity, price, quantity_price,product_discreption = product
             body += f"""
             <tr>
-                <td>{name}</td>
+                <td>{product_code}</td>
+                <td>${product_discreption}</td>
                 <td>{quantity}</td>
                 <td>${price:.2f}</td>
                 <td>${quantity_price:.2f}</td>
@@ -87,5 +90,5 @@ support_agent = EmailSupportAgent(
     'saqlainfawad@gmail.com', 'jtpqvszrodmcarlt'  # Replace with your actual app password
 )
 
-def viewsdata(email_data):
+def sendmail_py(email_data):
     return support_agent.handle_incoming_email(email_data)
