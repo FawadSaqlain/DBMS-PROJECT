@@ -283,6 +283,8 @@ def save_customer_recipt(request, new_recipt):
         # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
 
+def return_product(request):
+    pass
 # Login and logout views
 def login_view(request):
     if request.method == "POST":

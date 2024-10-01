@@ -114,14 +114,16 @@
                 <td>
                     {% load static %}
                     <a href="{% url 'inventry:dele' forloop.counter0 product.0 %}" class="delete-button">
-                        <img src="../../static/inventry_css/assets/delete_icon.jpg" alt="DEL"
-                            style="width: 17px; height: 23px;  margin-right: 10px; ">
+                        <img src="{% static 'inventry_css/assets/delete_icon.jpg' %}" alt="DEL"
+                            style="width: 17px; height: 23px; margin-right: 10px;">
                     </a>
                     <a href="{% url 'inventry:edit_product' forloop.counter0 product.0 %}" class="edit-button">
-                        <img src="../../static/inventry_css/assets/edit_icon.jpeg"
-                            alt="EDIT" style="width: 17px; height: 23px;  margin-right: 10px;">
+                        <img src="{% static 'inventry_css/assets/edit_icon.jpeg' %}" alt="EDIT"
+                            style="width: 17px; height: 23px; margin-right: 10px;">
                     </a>
                 </td>
+                
+               
             </tr>
 
             {% endfor %}

@@ -8,7 +8,7 @@
 /* Center the entire page content */
 body {
   min-height: 100vh;
-  background-image: url("https://th.bing.com/th/id/OIP.oJnD-qE_AcmVVeoB9YnPrAHaFj?rs=1&pid=ImgDetMain");
+  background-image: url("../inventry_css/assets/background.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   font-family: Arial, sans-serif;
@@ -101,10 +101,13 @@ header {
 }
 
 /* Image swap on hover */
+
 .delete-button img:hover {
-  content: url('../inventry_css/assets/colore changed delete icon.jpg'); /* Change this to your hover image URL */
+  content: url('../recipt_css/assets/colore_changed_delete_icon.jpg' ); /* Change this to your hover image URL */
+
 }
 
 .edit-button img:hover {
-  content: url('../inventry_css/assets/color changed editicon.jpg'); /* Change this to your hover image URL */
+  content: url('../recipt_css/assets/color_changed_edit_icon.jpg'); /* Change this to your hover image URL */
+ 
 }

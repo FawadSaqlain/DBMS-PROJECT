@@ -100,12 +100,13 @@
             <div class="receipt-actions">
                 <br><br>
                 {% for id in range_5 %}
+                {% load static %}
                 <a href="{% url 'recipt:dele' id %}" class="delete-button">
-                    <img src="https://icon-library.com/images/icon-remove/icon-remove-18.jpg" alt="DEL"
+                    <img src="{% static 'recipt_css/assets/delete_icon.jpg' %}" alt="DEL"
                         style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
                 </a>
                 <a href="{% url 'recipt:edit_product' id %}" class="edit-button">
-                    <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain" alt="EDIT"
+                    <img src="{% static 'recipt_css/assets/edit_icon.jpeg' %}" alt="EDIT"
                         style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
                 </a>
                 <br>
