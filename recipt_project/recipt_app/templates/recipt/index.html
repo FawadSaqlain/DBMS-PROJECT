@@ -39,81 +39,46 @@
         <h6>recipt no :{{recipt_code}}</h6>
         {% endif %}
         <div id="index_outer_div" class="receipt-details">
-            <div>
-                <ol>
-                    <br>
-
-                    {% if products %}
-                    <h3 style="margin-top: 8px;">Product Name</h3>
+            {% if products %}
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>Index No</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total for Each Item</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
                     {% for product in products %}
-                    <li style="margin-left: 15px;">{{ product.0 }}</li>
-                    <br>
+                    <tr>
+                        <td>{{ forloop.counter0 }}</td>
+                        <td>{{ product.0 }}</td>
+                        <td>{{ product.1 }}</td>
+                        <td>{{ product.2 }}</td>
+                        <td>{{ product.3 }}</td>
+                        <td>{{ product.4 }}</td>
+                        <td>
+                            {% load static %}
+                            <a href="{% url 'recipt:dele' forloop.counter0 %}" class="delete-button">
+                                <img src="{% static 'recipt_css/assets/delete_icon.jpg' %}" alt="Delete" style="width: 15px; height: 20px;">
+                            </a>
+                            <a href="{% url 'recipt:edit_product' forloop.counter0 %}" class="edit-button">
+                                <img src="{% static 'recipt_css/assets/edit_icon.jpeg' %}" alt="Edit" style="width: 15px; height: 20px;">
+                            </a>
+                        </td>
+                    </tr>
                     {% endfor %}
-                    {% else %}
-                    <h1>No items added</h1>
-                    {% endif %}
-                </ol>
-            </div>
-
-            <div class="receipt-section">
-                <br>
-                {% if products %}
-                <h3>Quantity</h3>
-                {% for product in products %}
-                {{ product.1 }}
-                <br><br>
-                {% endfor %}
-                {% endif %}
-            </div>
-
-            <div class="receipt-section">
-                <br>
-                {% if products %}
-                <h3>Price</h3>
-                {% for product in products %}
-                {{ product.2 }}
-                <br><br>
-                {% endfor %}
-                {% endif %}
-            </div>
-
-            <div class="receipt-section">
-                <br>
-                {% if products %}
-                <h3>Total for Each Item</h3>
-                {% for product in products %}
-                {{ product.3 }}
-                <br><br>
-                {% endfor %}
-                {% endif %}
-            </div>
-            <div class="receipt-section">
-                <br>
-                {% if products %}
-                <h3>description for Each Item</h3>
-                {% for product in products %}
-                {{ product.4 }}
-                <br><br>
-                {% endfor %}
-                {% endif %}
-            </div>
-            <div class="receipt-actions">
-                <br><br>
-                {% for id in range_5 %}
-                {% load static %}
-                <a href="{% url 'recipt:dele' id %}" class="delete-button">
-                    <img src="{% static 'recipt_css/assets/delete_icon.jpg' %}" alt="DEL"
-                        style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
-                </a>
-                <a href="{% url 'recipt:edit_product' id %}" class="edit-button">
-                    <img src="{% static 'recipt_css/assets/edit_icon.jpeg' %}" alt="EDIT"
-                        style="width: 15px; height: 20px; margin-bottom: 10px; margin-right: 10px;">
-                </a>
-                <br>
-                {% endfor %}
-            </div>
+                </tbody>
+            </table>
+            {% else %}
+            <h1>No items added</h1>
+            {% endif %}
         </div>
-
+        
         <div>
             <h4>Total Price: {{ total_price }}</h4>
         </div>
