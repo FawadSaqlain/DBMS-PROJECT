@@ -168,3 +168,81 @@ def create_table_recipt(recipt_code, products):
         insert_data(recipt_code, products)
     except Exception as e:
         print(f"Error creating receipt table: {e}")
+
+def get_recipt_product(recipt_code, prod_code):
+    """
+    Get a receipt-specific product data as a single-dimensional list.
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Check if the table exists
+            if table_exists(recipt_code):
+                # Retrieve product data from the existing receipt table
+                cursor.execute(f"""
+                    SELECT * FROM [{recipt_code}]
+                    WHERE prod_code = %s
+                """, (prod_code,))
+                result = cursor.fetchone()  # Use fetchone() to get a single record
+                if result:
+                    return list(result)  # Convert tuple to list and return it
+                else:
+                    return None  # Return None if no result is found
+    except Exception as e:
+        print(f"Error fetching product data: {e}")
+        return None
+
+def get_customer_recipt(recipt_code):
+    """
+    Get a receipt-specific customer data as a single-dimensional list.
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Check if the table exists
+            cursor.execute("""
+                SELECT * FROM customers
+                WHERE recipt_code = %s
+            """, (recipt_code,))  # Include a comma to create a single-item tuple
+            result = cursor.fetchone()  # Use fetchone() to get a single record
+            if result:
+                return list(result)  # Convert tuple to list and return it
+            else:
+                return None  # Return None if no result is found
+    except Exception as e:
+        print(f"Error fetching customer data: {e}")
+        return None
+
+def insert_customer_return(name, email, employ_name, recipt_code_buy, recipt_code_return, total_price, date_time, products):
+    """
+    Insert a new customer return record into the customers_return table or update it if it exists.
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Check if the record already exists in customers_return
+            cursor.execute("SELECT COUNT(*) FROM customers_return WHERE recipt_code_return = %s", [recipt_code_return])
+            exists = cursor.fetchone()[0]
+
+            if exists:
+                # Update the existing record in customers_return
+                cursor.execute("""
+                    UPDATE customers_return
+                    SET name = %s, email = %s, Employ_name = %s, recipt_code_buy = %s, total_price = %s, date_time = %s
+                    WHERE recipt_code_return = %s
+                """, [name, email, employ_name, recipt_code_buy, total_price, date_time, recipt_code_return])
+            else:
+                # Insert a new record into customers_return
+                cursor.execute("""
+                    INSERT INTO customers_return (name, email, Employ_name, recipt_code_buy, recipt_code_return, total_price, date_time)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (name, email, employ_name, recipt_code_buy, recipt_code_return, total_price, date_time))
+
+            # Create a new receipt table for the returned products
+            create_table_recipt(recipt_code_return, products)
+
+    except Exception as e:
+        print(f"Error inserting customer return data: {e}")
+
+def save_customer_recipt_return_to_db(Employ_name, recipt_code_buy,recipt_code_return, date_time, total_price, products):
+    customer= get_customer_recipt(recipt_code_buy)
+    print(f"Employ_name::{Employ_name}, recipt_code_buy::{recipt_code_buy},recipt_code_return::{recipt_code_return}, date_time::{date_time}, total_price::{total_price}, products::{products}")
+    print(f"customer :: {customer}")
+    insert_customer_return(customer[1], customer[2], Employ_name, recipt_code_buy, recipt_code_return, total_price, date_time,products)

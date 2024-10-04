@@ -10,10 +10,21 @@ USE GENERALSTORE_MS
 
 -- CREATE TABLE customers (
 --     id INT PRIMARY KEY IDENTITY,
---     name NVARCHAR(1mp),
---     email NVARCHAR(1mp),
---     Employ_name NVARCHAR(1mp),
---     recipt_code NVARCHAR(1mp) NOT NULL UNIQUE,
+--     name NVARCHAR(100),
+--     email NVARCHAR(100),
+--     Employ_name NVARCHAR(100),
+--     recipt_code NVARCHAR(100) NOT NULL UNIQUE,
+--     total_price INT,
+--     date_time DATETIME
+-- );
+
+-- CREATE TABLE customers_return (
+--     id INT PRIMARY KEY IDENTITY,
+--     name NVARCHAR(100),
+--     email NVARCHAR(100),
+--     Employ_name NVARCHAR(100),
+--     recipt_code_buy NVARCHAR(100) NOT NULL,
+--     recipt_code_return NVARCHAR(100) NOT NULL UNIQUE,
 --     total_price INT,
 --     date_time DATETIME
 -- );
@@ -40,10 +51,11 @@ USE GENERALSTORE_MS
 
 -- SELECT * FROM Product
 -- ORDER BY prod_code ASC;  -- Sorts the products by price in ascending order
-SELECT * FROM product
--- SELECT * FROM customers
--- SELECT * FROM _CDKIB
-
+-- SELECT * FROM product
+SELECT * FROM customers
+SELECT * FROM customers_return
+SELECT * FROM _L1oKS
+-- SELECT * FROM customers WHERE recipt_code = '_d407j'
 -- SELECT * FROM Product
 -- WHERE LOWER(prod_code) LIKE LOWER('%mp%')
 --    OR LOWER(product_description) LIKE LOWER('%mp%')
@@ -53,5 +65,5 @@ SELECT * FROM product
 --    OR LOWER(CAST(updated_datetime  AS VARCHAR(50))) LIKE LOWER('%mp%')
 --    OR LOWER(CAST(added_by_employ AS VARCHAR(50))) LIKE LOWER('%mp%')
 
-SELECT * FROM Product
-WHERE LOWER(%s) LIKE LOWER('%s')
+-- SELECT * FROM Product
+-- WHERE LOWER(%s) LIKE LOWER('%s')
