@@ -51,10 +51,12 @@ USE GENERALSTORE_MS
 
 -- SELECT * FROM Product
 -- ORDER BY prod_code ASC;  -- Sorts the products by price in ascending order
--- SELECT * FROM product
+SELECT * FROM product
 SELECT * FROM customers
 SELECT * FROM customers_return
-SELECT * FROM _L1oKS
+SELECT * FROM _XCLsB
+SELECT * FROM _4AWX0
+drop table _4AWX0
 -- SELECT * FROM customers WHERE recipt_code = '_d407j'
 -- SELECT * FROM Product
 -- WHERE LOWER(prod_code) LIKE LOWER('%mp%')

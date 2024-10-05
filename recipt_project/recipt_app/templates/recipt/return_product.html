@@ -6,56 +6,36 @@
 {% endif %}
 
 <div>
-    <form
-        action="{% if is_editing %}{% url 'recipt:edit_product' id %}{% else %}{% url 'recipt:return_product' %}{% endif %}"
-        method="post">
+    <form action="{% if is_editing %}{% url 'recipt:edit_product' id %}{% else %}{% url 'recipt:return_product' %}{% endif %}" method="post">
         {% csrf_token %}
+        
         <!-- Dynamic heading based on whether you are editing or returning a product -->
         <h1>
             {% if is_editing %}
-            Please edit product details
+                Please edit product details
             {% else %}
-            Please return product details
+                Please return product details
             {% endif %}
         </h1>
 
-        <!-- Display the receipt code form only if it is not set in the session -->
-        <!--  if not request.session.recipt_code  -->
-        {{ form_recipt.as_p }}
-        <!--  endif  -->
-
+        <!-- Show the receipt code if not already set in session -->
+        <h6>Here is the receipt code: {{ request.session.recipt_code_buy }}</h6>
+        {% if not request.session.recipt_code_buy %}
+            {{ form_recipt.as_p }}
+        {% endif %}
+        
         <!-- Display the product form -->
-        <!-- {% if form_product %} -->
         {{ form_product.as_p }}
-        <!-- {% endif %} -->
 
         <!-- Submit button -->
-        <input type="submit"
-            style="width: fit-content; height: fit-content; background-color: brown; color: white; padding: 5px; margin-top: 7px; border-radius: 2px; border: 1px solid rgb(0, 0, 0);">
-
+        <input type="submit" style="width: fit-content; height: fit-content; background-color: brown; color: white; padding: 5px; margin-top: 7px; border-radius: 2px; border: 1px solid rgb(0, 0, 0);">
     </form>
 
     <!-- Button to view the receipt -->
     <a href="{% url 'recipt:index' %}">
-        <button
-            style="width: fit-content; height: fit-content; background-color: brown; color: white; padding: 5px; margin-top: -25px; border-radius: 2px; border: 1px solid rgb(0, 0, 0); float: right;">
+        <button style="width: fit-content; height: fit-content; background-color: brown; color: white; padding: 5px; margin-top: -25px; border-radius: 2px; border: 1px solid rgb(0, 0, 0); float: right;">
             Your receipt
         </button>
     </a>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Focus on the receipt code field if it's visible, otherwise focus on the product code field
-        const reciptCodeField = document.getElementById("id_recipt_code");
-
-        if (reciptCodeField && !reciptCodeField.closest("form").querySelector(".hidden")) {
-            // Focus on the receipt code field if it's visible
-            reciptCodeField.focus();
-        } else if (productCodeField) {
-            // Focus on the product code field otherwise
-            productCodeField.focus();
-        }
-    });
-</script>
 {% endblock %}

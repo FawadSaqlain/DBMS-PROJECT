@@ -88,55 +88,88 @@ class returnProduct(forms.Form):
 
 # Form for adding/editing customer details
 class return_product_recipt_code(forms.Form):
-    def for_edit_customer(self, recipt_code, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['recipt_code'].initial = recipt_code
-
-    recipt_code = forms.CharField(
-        required=True,
+    recipt_code_buy = forms.CharField(
+        required=False,  # Make it not required because it will only be asked once
         widget=forms.TextInput(attrs={
-            'placeholder': 'recipt code',
+            'placeholder': 'Receipt Code',
             'class': 'form_product-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;',
         })
     )
 
+    def for_edit_recipt_code(self, recipt_code_buy, *args, **kwargs):
+        """Set the receipt code if it's being edited or provided in the session."""
+        super().__init__(*args, **kwargs)
+        self.fields['recipt_code_buy'].initial = recipt_code_buy
+
 def return_product(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("recipt:login"))
+
+    # Get the receipt code from session or None
+    recipt_code_buy = request.session.get("recipt_code_buy", None)
+
     if request.method == 'POST':
         form_return_product = returnProduct(request.POST)
-        form_return_product_recipt_code = return_product_recipt_code(request.POST)
-        if form_return_product.is_valid() and form_return_product_recipt_code.is_valid():
+        
+        # If there's no receipt code in the session, process the receipt code form
+        if not recipt_code_buy:
+            form_return_product_recipt_code = return_product_recipt_code(request.POST)
+        else:
+            # Otherwise, use the receipt code from session and don't show the form
+            form_return_product_recipt_code = return_product_recipt_code()
+
+        # Validate both forms
+        if form_return_product.is_valid() and (form_return_product_recipt_code.is_valid() or recipt_code_buy):
+            # Get product code and quantity
             prod_code = form_return_product.cleaned_data['prod_code']
             quantity = form_return_product.cleaned_data['quantity']
-            recipt_code_buy = form_return_product_recipt_code.cleaned_data['recipt_code']
+
+            # Get or save the receipt code
+            if not recipt_code_buy:
+                recipt_code_buy = form_return_product_recipt_code.cleaned_data['recipt_code_buy']
+                request.session["recipt_code_buy"] = recipt_code_buy
+
+            # Fetch product receipt details based on receipt code and product code
             product_recipt = models.get_recipt_product(recipt_code_buy, prod_code)
-            print(f"product recipt return = {product_recipt}")
-            print(f"product recipt quantity return = {product_recipt[3]}")
-            print(f"product recipt quantity type return = {type(product_recipt[3])}")
             if product_recipt:
                 if product_recipt[3] >= quantity:
                     quantity_price = product_recipt[4] * quantity
                     product_found = False
 
-                for product in request.session["products"]:
-                    if product[0] == prod_code:
-                        product[1] += quantity
-                        product[3] += quantity_price
-                        product_found = True
-                        break
+                    # Check if the product already exists in the session products list
+                    for product in request.session["products"]:
+                        if product[0] == prod_code:
+                            product[1] += quantity  # Update quantity
+                            product[3] += quantity_price  # Update total price
+                            product_found = True
+                            break
 
-                if not product_found:
-                    request.session["products"].append([prod_code, quantity, product_recipt[4], quantity_price,product_recipt[2]])
-                request.session['total_price'] += quantity_price
+                    if not product_found:
+                        # Add the new product to the session list
+                        request.session["products"].append([prod_code, quantity, product_recipt[4], quantity_price, product_recipt[2]])
+                    
+                    # Update total price
+                    request.session['total_price'] += quantity_price
 
-            recipt_code_buy = form_return_product_recipt_code.cleaned_data['recipt_code']
+            # If the receipt code is present (from POST or session), save it in the session
             if recipt_code_buy:
                 request.session["recipt_code_buy"] = recipt_code_buy
+
         else:
-            return render(request, 'recipt/return_product.html', {'form_product': form_return_product, 'form_recipt': form_return_product_recipt_code})
-    return render(request, 'recipt/return_product.html', {"form_product": returnProduct(), 'form_recipt': return_product_recipt_code()})
+            # Render the form again with errors
+            return render(request, 'recipt/return_product.html', {
+                'form_product': form_return_product,
+                'form_recipt': form_return_product_recipt_code,
+                'error': 'Please provide valid product and receipt code.'
+            })
+
+    # Render the form for GET requests
+    return render(request, 'recipt/return_product.html', {
+        "form_product": returnProduct(),
+        'form_recipt': return_product_recipt_code(),
+        'recipt_code_buy': request.session.get("recipt_code_buy", None)  # Pass the receipt code if present
+    })
 
 # Main view for displaying receipt details
 def index(request):
@@ -153,6 +186,8 @@ def index(request):
         request.session["customer_name"] = None
     if "customer_email" not in request.session:
         request.session["customer_email"] = None
+    if "recipt_code_buy" not in request.session:
+        request.session["recipt_code_buy"] = None
     if "recipt_code" not in request.session:
         request.session["recipt_code"] = generate_random_key()
     print(f"line 122 recipt_app/views.py request.session[products] = {request.session["products"]}")
@@ -163,7 +198,8 @@ def index(request):
         "customer_email": request.session["customer_email"],
         'range_5': range(len(request.session["products"])),
         'now': datetime.now(),
-        'recipt_code': request.session["recipt_code"]
+        'recipt_code': request.session["recipt_code"],
+        'recipt_code_buy':request.session["recipt_code_buy"]
     })
 
 # View to send email and handle success/error scenarios
@@ -257,6 +293,7 @@ def new_receipt(request,return_product=0):
     # Reset session data for a new receipt
     request.session["products"] = []
     request.session["total_price"] = 0
+    request.session["recipt_code_buy"]=None
     request.session["customer_name"] = None
     request.session["customer_email"] = None
     request.session["recipt_code"] = generate_random_key()
@@ -353,8 +390,9 @@ def save_customer_recipt(request, new_recipt):
     # Redirect or return a valid response
     if new_recipt == 1:
         print('Going to new receipt after saving data')
-        # return redirect("recipt:new_receipt 0")
-        return new_receipt(request,0)
+        return redirect("recipt:new_receipt", kwargs={'return_product': 0})
+
+        # return new_receipt(request,0)
     else:
         # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
@@ -386,7 +424,7 @@ def save_customer_recipt_return(request, new_recipt):
     # Redirect or return a valid response
     if new_recipt == 1:
         print('Going to new receipt after saving data')
-        return redirect("recipt:new_receipt 1")
+        return redirect("recipt:new_receipt", kwargs={'return_product': 1})
     else:
         # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
@@ -402,7 +440,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'This is a success TEST message!')
-            return HttpResponseRedirect(reverse("recipt:new_receipt"))
+            return HttpResponseRedirect(reverse("recipt:new_receipt", kwargs={'return_product': 0}))
         else:
             return render(request, "recipt/login.html", {
                 "message": "Invalid credentials.",
