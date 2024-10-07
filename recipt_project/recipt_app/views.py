@@ -9,6 +9,7 @@ import random
 import string
 from django.views.decorators.csrf import csrf_exempt
 from . import models  # Assuming this function saves customer data to DB
+from . import models_return  # Assuming this function saves customer data to DB
 from django.contrib import messages
 
 # Helper function to generate a random receipt number
@@ -417,7 +418,7 @@ def save_customer_recipt_return(request, new_recipt):
         Employ_name = request.user.username
 
     try:
-        models.save_customer_recipt_return_to_db( Employ_name, recipt_code_buy,recipt_code, date_time, total_price, products)
+        models_return.save_customer_recipt_return_to_db( Employ_name, recipt_code_buy,recipt_code, date_time, total_price, products)
     except Exception as e:
         print(f"line 421 Error saving receipt: {e}")
         return HttpResponse("Error saving data to the database.", status=500)
