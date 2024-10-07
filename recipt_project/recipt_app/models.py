@@ -31,7 +31,7 @@ def save_customer_recipt_to_db(customer_name, customer_email, employ_name, recip
     
     except IntegrityError as e:
         # Handle any integrity errors
-        print(f"Error inserting/updating record: {e}")
+        print(f"line 34 Error inserting/updating record: {e}")
 def get_product(prod_code):
     """Retrieves product data from the product table and returns the first product found."""
     try:
@@ -43,7 +43,7 @@ def get_product(prod_code):
             else:
                 return None  # Return None if no product is found
     except Exception as e:
-        print(f"Error fetching product data: {e}")
+        print(f"line 46 Error fetching product data: {e}")
         return None
 def table_exists(table_name):
     with connection.cursor() as cursor:
@@ -66,9 +66,9 @@ def update_quantity(quantity,update_quantity_price, prod_code):
                 quantity_price_sale = %s
                 WHERE prod_code = %s
             """, [quantity,update_quantity_price, prod_code])
-            print(f"update_quantity {quantity},{update_quantity_price},{prod_code}")
+            print(f"line 69 update_quantity {quantity},{update_quantity_price},{prod_code}")
     except Exception as e:
-        print(f"Error updating product quantity: {e}")
+        print(f"line 71 Error updating product quantity: {e}")
 def insert_data(recipt_code, products):
     """
     Inserts product data into the receipt-specific table and updates product quantities.
@@ -82,30 +82,31 @@ def insert_data(recipt_code, products):
             price_quantity = product['price_quantity'] if isinstance(product, dict) else product[3]
             
             inventry_product = get_product(prod_code)
+            print(f"line 85 inventry_product :: {inventry_product}")
             if not inventry_product:
-                print(f"Product with code {prod_code} not found.")
+                print(f"line 86 Product with code {prod_code} not found.")
                 continue  # Skip if product not found
             
             # inventry_product = inventry_product[0]
             current_quantity = inventry_product[2]  # Assuming this is prod_quant
-            print(f"current quantity  {current_quantity}")
+            print(f"line 91 current quantity  {current_quantity}")
             updated_quantity = current_quantity - quantity
-            print(f"updated quantity  {updated_quantity}")
+            print(f"line 93 updated quantity  {updated_quantity}")
 
             update_quantity_price = inventry_product[4] - price_quantity
-            print(f"updated quantity price ::  {update_quantity_price}")
+            print(f"line 96 updated quantity price ::  {update_quantity_price}")
 
             # Update the product quantity in the inventory
-            print(f"inventry before updated {updated_quantity} , {prod_code}")
+            print(f"line 99 inventry before updated {updated_quantity} , {prod_code}")
             update_quantity(updated_quantity,update_quantity_price, prod_code)
-            print(f"inventry after updated {updated_quantity} , {prod_code}")
+            print(f"line 101 inventry after updated {updated_quantity} , {prod_code}")
             with connection.cursor() as cursor:
                 cursor.execute(f"""
                     INSERT INTO [{recipt_code}] (prod_code, prod_discreption, quantity, price, price_quantity) 
                     VALUES (%s, %s, %s, %s, %s)
                 """, [prod_code, inventry_product[1], quantity, price, price_quantity])
     except Exception as e:
-        print(f"Error inserting data into receipt table: {e}")
+        print(f"line 108 Error inserting data into receipt table: {e}")
 def update_recipt_customer(recipt_code_buy, total_price):
     """
     Updates the total_price for a customer based on their recipt_code.
@@ -119,10 +120,10 @@ def update_recipt_customer(recipt_code_buy, total_price):
                 WHERE recipt_code = %s
             """, [total_price, recipt_code_buy])
 
-            print(f"Updated total_price to {total_price} for recipt_code {recipt_code_buy}")
+            print(f"line 122 Updated total_price to {total_price} for recipt_code {recipt_code_buy}")
 
     except Exception as e:
-        print(f"Error updating recipt customer: {e}")
+        print(f"line 125 Error updating recipt customer: {e}")
 def insert_quantity_inventry_subtract_recipt_quantity_return(recipt_code, products, recipt_code_buy):
     """
     Inserts product quantity into the inventory table and updates product quantities.
@@ -136,38 +137,34 @@ def insert_quantity_inventry_subtract_recipt_quantity_return(recipt_code, produc
             
             # Get inventory details for the product
             inventry_product = get_product(prod_code)
-            print(f"inventry_product :: {inventry_product}")
+            print(f"line 139 inventry_product :: {inventry_product}")
             if not inventry_product:
-                print(f"Product with code {prod_code} not found in inventory.")
+                print(f"line 141 Product with code {prod_code} not found in inventory.")
                 continue
-
+            
             current_quantity = inventry_product[2]  # Assuming index 2 is prod_quant in the inventory
             updated_quantity = current_quantity + quantity
             update_quantity_price=price_quantity + inventry_product[4]
-            print(f"updated quantity * price  {update_quantity_price}")
-            print(f"Updating inventory for product {prod_code}: current {current_quantity}, updated {updated_quantity}")
+            print(f"line 147 updated quantity * price  {update_quantity_price}")
+            print(f"line 148 Updating inventory for product {prod_code}: current {current_quantity}, updated {updated_quantity}")
             update_quantity(updated_quantity,update_quantity_price, prod_code)
-            
+
             # Get receipt details for the product (the one they bought from originally)
             inventry_product_recipt = get_recipt_product(recipt_code_buy, prod_code)
-            print(f"inventry_product_recipt :: {inventry_product_recipt}|| recipt_code_buy,:: {recipt_code_buy},|| prod_code :: {prod_code},")
+            print(f"line 153 inventry_product_recipt :: {inventry_product_recipt}|| recipt_code_buy,:: {recipt_code_buy},|| prod_code :: {prod_code},")
             if not inventry_product_recipt:
-                print(f"Product with code {prod_code} not found in receipt.")
+                print(f"line 155 Product with code {prod_code} not found in receipt.")
                 continue
-
+            
             current_quantity_recipt = inventry_product_recipt[3]  # Assuming index 3 is prod_quant in the receipt
-            print(f"current_quantity_recipt :: {current_quantity_recipt}")
-            print(f"quantity ::{quantity}")
+            print(f"line 159 current_quantity_recipt :: {current_quantity_recipt}")
+            print(f"line 160 quantity ::{quantity}")
             updated_quantity_recipt = current_quantity_recipt - quantity
-            print(f"updated_quantity_recipt ::{updated_quantity_recipt}")
+            print(f"line 162 updated_quantity_recipt ::{updated_quantity_recipt}")
             update_quantity_price_recipt=inventry_product_recipt[5] - price_quantity
-            print(f"update_quantity_price_recipt {update_quantity_price_recipt} # inventry_product_recipt[5] {inventry_product_recipt[5]} # price_quantity {price_quantity}")
-            customer= get_customer_recipt(recipt_code_buy)
-            total_price=customer[5]-update_quantity_price_recipt
-            update_recipt_customer(recipt_code_buy,total_price)
-            # print(f"Updating receipt for product {prod_code}: current {current_quantity_recipt}, updated {updated_quantity_recipt}")
-            # update_quantity(updated_quantity_recipt, prod_code,recipt_code_buy)  # This will subtract the returned quantity from the receipt
+            print(f"line 164 update_quantity_price_recipt {update_quantity_price_recipt} # inventry_product_recipt[5] {inventry_product_recipt[5]} # price_quantity {price_quantity}")
             update_recipt_product_quantity(recipt_code_buy, prod_code,updated_quantity_recipt,update_quantity_price_recipt)
+
             # Insert into the return receipt table
             with connection.cursor() as cursor:
                 cursor.execute(f"""
@@ -175,43 +172,57 @@ def insert_quantity_inventry_subtract_recipt_quantity_return(recipt_code, produc
                     VALUES (%s, %s, %s, %s, %s)
                 """, [prod_code, inventry_product[1], quantity, price, price_quantity])
 
+        customer_buy_data=get_customer_recipt(recipt_code_buy) 
+        total_price_buy=customer_buy_data[5]
+        customer_return_buy_data=get_customer_return_recipt(recipt_code)
+        total_return_buy=customer_return_buy_data[6]
+        updated_total_price=total_price_buy-total_return_buy
+        print(f"line 179 updated_total_price=total_price_buy + total_return_buy")
+        print(f"{updated_total_price} = {total_price_buy} - {total_return_buy}")
+        update_recipt_customer(recipt_code_buy, updated_total_price)
+
     except Exception as e:
-        print(f"Error inserting data into receipt table: {e}")
+        print(f"line 184 Error inserting data into receipt table: {e}")
 def restore_inventory_from_receipt(recipt_code):
     """
     Restores the inventory quantities from an existing receipt before dropping the table.
     """
     with connection.cursor() as cursor:
-        cursor.execute(f"SELECT prod_code, quantity FROM [{recipt_code}]")
+        cursor.execute(f"SELECT * FROM [{recipt_code}]")
         products = cursor.fetchall()
         for product in products:
-            prod_code = product[0]
-            quantity = product[1]
+            print(f"line 193 product :: {product}")
+            prod_code = product[1]
+            quantity = product[3]
+            quanitiy_price=product[5]
             # Fetch current inventory quantity
             inventry_product = get_product(prod_code)
+            print(f"line 200 inventry_product :: {inventry_product}")
             if inventry_product:
                 current_quantity = inventry_product[2]
                 updated_quantity = current_quantity + quantity
+                updated_quantity_price=inventry_product[4]+quanitiy_price
                 # Update the product quantity in the inventory
-                update_quantity(updated_quantity, prod_code)
+                update_quantity(updated_quantity,updated_quantity_price, prod_code)
+                print(f"line 207 get updated inventry {get_product(prod_code)}")
 def restore_inventory_from_receipt_return(recipt_code):
     """
     Restores the inventory quantities from an existing return receipt before dropping the table.
     """
-    print("restore_inventory_from_receipt_return")
+    print("line 207 restore_inventory_from_receipt_return")
     with connection.cursor() as cursor:
         cursor.execute(f"SELECT * FROM [{recipt_code}]")
         products = cursor.fetchall()
-        print(f"products 205::{products}")
+        print(f"line 211 products ::{products}")
         for product in products:
             prod_code = product[1]
             quantity = product[3]
             quantity_price=product[5]
-            print(f'product line 210 :: {product}')
+            print(f'line 216 product :: {product}')
             # Fetch current inventory quantity
             inventry_product = get_product(prod_code)
             if inventry_product:
-                print(f'inventry_product line 214 :: {inventry_product}')
+                print(f'line 220 inventry_product :: {inventry_product}')
                 current_quantity = inventry_product[2]
                 updated_quantity = current_quantity - quantity
                 updated_quantity_price=inventry_product[4]-quantity_price
@@ -221,28 +232,35 @@ def restore_buy_recipt_from_receipt_return(recipt_code,recipt_code_buy):
     """
     Restores the inventory quantities from an existing return receipt before dropping the table.
     """
-    print("restore_inventory_from_receipt_return")
+    print("line 230 restore_inventory_from_receipt_return")
     with connection.cursor() as cursor:
         cursor.execute(f"SELECT * FROM [{recipt_code}]")
         products = cursor.fetchall()
-        print(f"products 228::{products}")
-        total_price=0.0
+        print(f"line 234 products ::{products}")
         for product in products:
             prod_code = product[1]
             quantity = product[3]
             quantity_price=product[5]
-            print(f'product line 189 :: {product}')
+            print(f'line 239 product :: {product}')
             # Fetch current inventory quantity
             buy_recipt_product = get_recipt_product(recipt_code_buy, prod_code)
             if buy_recipt_product:
-                print(f'buy_recipt_product line 238 :: {buy_recipt_product}')
+                print(f'line 243 buy_recipt_product :: {buy_recipt_product}')
                 current_quantity = buy_recipt_product[3]
                 updated_quantity = current_quantity + quantity
                 updated_quantity_price=buy_recipt_product[5]+quantity_price
-                total_price= total_price + updated_quantity_price
                 # Update the product quantity in the inventory
-                update_quantity(updated_quantity,updated_quantity_price, prod_code)
-        update_recipt_customer(recipt_code_buy, total_price)
+                update_recipt_product_quantity(recipt_code_buy,prod_code, updated_quantity,updated_quantity_price)
+
+        customer_buy_data=get_customer_recipt(recipt_code_buy) 
+        total_price_buy=customer_buy_data[5]
+        customer_return_buy_data=get_customer_return_recipt(recipt_code)
+        total_return_buy=customer_return_buy_data[6]
+        updated_total_price=total_price_buy+total_return_buy
+        print(f"line 254 updated_total_price=total_price_buy + total_return_buy")
+        print(f"line 255 {updated_total_price} = {total_price_buy} + {total_return_buy}")
+        update_recipt_customer(recipt_code_buy, updated_total_price)
+
 def create_table_recipt(recipt_code, products):
     """
     Creates a receipt-specific table and inserts product data.
@@ -272,7 +290,7 @@ def create_table_recipt(recipt_code, products):
         # Insert data into the new table
         insert_data(recipt_code, products)
     except Exception as e:
-        print(f"Error creating receipt table: {e}")
+        print(f"line 286 Error creating receipt table: {e}")
 def create_table_recipt_return(recipt_code, products,recipt_code_buy):
     """
     Creates a receipt-specific table and inserts product data.
@@ -302,7 +320,7 @@ def create_table_recipt_return(recipt_code, products,recipt_code_buy):
         # Insert data into the new table
         insert_quantity_inventry_subtract_recipt_quantity_return(recipt_code, products,recipt_code_buy)
     except Exception as e:
-        print(f"Error creating receipt return table: {e}")
+        print(f"line 316 Error creating receipt return table: {e}")
 def update_recipt_product_quantity(recipt_code, prod_code, prod_quant,update_quantity_price_recipt):
     """
     Update the quantity of a specific product in a specific receipt.
@@ -319,11 +337,11 @@ def update_recipt_product_quantity(recipt_code, prod_code, prod_quant,update_qua
                     WHERE prod_code = %s
                 """
                 cursor.execute(query, [prod_quant,update_quantity_price_recipt, prod_code])  # Use placeholders for prod_quant and prod_code
-                print(f"Updated quantity for product {prod_code} to {prod_quant} in receipt {recipt_code}")
+                print(f"line 333 Updated quantity for product {prod_code} to {prod_quant} in receipt {recipt_code}")
             else:
-                print(f"Receipt table {recipt_code} does not exist.")
+                print(f"line 335 Receipt table {recipt_code} does not exist.")
     except Exception as e:
-        print(f"Error updating product quantity in receipt {recipt_code}: {e}")
+        print(f"line 337 Error updating product quantity in receipt {recipt_code}: {e}")
 def get_recipt_product(recipt_code, prod_code):
     """
     Get a receipt-specific product data as a single-dimensional list.
@@ -345,7 +363,26 @@ def get_recipt_product(recipt_code, prod_code):
                 else:
                     return None  # Return None if no result is found
     except Exception as e:
-        print(f"Error fetching product data: {e}")
+        print(f"line 359 Error fetching product data: {e}")
+        return None
+def get_customer_return_recipt(recipt_code_return):
+    """
+    Get a receipt-specific customer return data as a single-dimensional list.
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Check if the table exists
+            cursor.execute("""
+                SELECT * FROM customers_return
+                WHERE recipt_code_return = %s
+            """, (recipt_code_return,))  # Include a comma to create a single-item tuple
+            result = cursor.fetchone()  # Use fetchone() to get a single record
+            if result:
+                return list(result)  # Convert tuple to list and return it
+            else:
+                return None  # Return None if no result is found
+    except Exception as e:
+        print(f"line 378 Error fetching customer data: {e}")
         return None
 def get_customer_recipt(recipt_code):
     """
@@ -364,7 +401,7 @@ def get_customer_recipt(recipt_code):
             else:
                 return None  # Return None if no result is found
     except Exception as e:
-        print(f"Error fetching customer data: {e}")
+        print(f"line 397 Error fetching customer data: {e}")
         return None
 def insert_customer_return(name, email, employ_name, recipt_code_buy, recipt_code_return, total_price, date_time, products):
     """
@@ -394,9 +431,18 @@ def insert_customer_return(name, email, employ_name, recipt_code_buy, recipt_cod
             create_table_recipt_return(recipt_code_return, products,recipt_code_buy)
 
     except Exception as e:
-        print(f"Error inserting customer return data: {e}")
+        print(f"line 427 Error inserting customer return data: {e}")
 def save_customer_recipt_return_to_db(Employ_name, recipt_code_buy,recipt_code_return, date_time, total_price, products):
     customer= get_customer_recipt(recipt_code_buy)
-    print(f"Employ_name::{Employ_name}, recipt_code_buy::{recipt_code_buy},recipt_code_return::{recipt_code_return}, date_time::{date_time}, total_price::{total_price}, products::{products}")
-    print(f"customer :: {customer}")
+    print(f"line 430 Employ_name::{Employ_name}, recipt_code_buy::{recipt_code_buy},recipt_code_return::{recipt_code_return}, date_time::{date_time}, total_price::{total_price}, products::{products}")
+    print(f"line 431 customer :: {customer}")
     insert_customer_return(customer[1], customer[2], Employ_name, recipt_code_buy, recipt_code_return, total_price, date_time,products)
+
+    # customer_buy_data=get_customer_recipt(recipt_code_buy) 
+    # total_price_buy=customer_buy_data[5]
+    # customer_return_buy_data=get_customer_return_recipt(recipt_code_return)
+    # total_return_buy=customer_return_buy_data[6]
+    # updated_total_price=total_price_buy+total_return_buy
+    # print(f"@ @ updated_total_price=total_price_buy + total_return_buy")
+    # print(f"{updated_total_price} = {total_price_buy} + {total_return_buy}")
+    # update_recipt_customer(recipt_code_buy, updated_total_price)

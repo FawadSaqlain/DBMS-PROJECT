@@ -78,9 +78,9 @@ def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, q
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """, [prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime, username])
     except IntegrityError as e:
-        print(f"Error inserting/updating record: {e}")
+        print(f"line 81 Error inserting/updating record: {e}")
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(f"line 83 An unexpected error occurred: {e}")
 
 @csrf_exempt
 def get_product(prod_code):
@@ -91,7 +91,7 @@ def get_product(prod_code):
             products = cursor.fetchall()
             return [list(product) for product in products]
     except Exception as e:
-        print(f"Error fetching product data: {e}")
+        print(f"line 94 Error fetching product data: {e}")
         return []
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
@@ -108,7 +108,7 @@ def get_product(prod_code):
             else:
                 return None  # Return None if no product is found
     except Exception as e:
-        print(f"Error fetching product data: {e}")
+        print(f"line  111 Error fetching product data: {e}")
         return None
 
 # Usage
@@ -128,7 +128,7 @@ def view_inventory(request):
             products = cursor.fetchall()
             return [list(product) for product in products]
     except Exception as e:
-        print(f"Error fetching product data: {e}")
+        print(f"line 131 Error fetching product data: {e}")
         return []
 def view_sorted_inventory(request, asc_decs, sort_by):
     """Returns a list of sorted products in the inventory."""
@@ -140,7 +140,7 @@ def view_sorted_inventory(request, asc_decs, sort_by):
             products = cursor.fetchall()
             return [list(product) for product in products]
     except Exception as e:
-        print(f"Error fetching product data: {e}")
+        print(f"line 143 Error fetching product data: {e}")
         return []
 
 def delete_item(prod_code):
@@ -150,5 +150,5 @@ def delete_item(prod_code):
             cursor.execute("DELETE FROM dbo.product WHERE prod_code = %s", [prod_code])
         connection.commit()
     except Exception as e:
-        print(f"Error while deleting product: {e}")
+        print(f"line 153 Error while deleting product: {e}")
         connection.rollback()

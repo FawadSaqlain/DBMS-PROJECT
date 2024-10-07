@@ -175,6 +175,7 @@ def return_product(request):
 def index(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("recipt:login"))
+    print(f"178 request :: {request}")
 
     # Initialize session variables if they do not exist
     if "products" not in request.session:
@@ -190,7 +191,7 @@ def index(request):
         request.session["recipt_code_buy"] = None
     if "recipt_code" not in request.session:
         request.session["recipt_code"] = generate_random_key()
-    print(f"line 122 recipt_app/views.py request.session[products] = {request.session["products"]}")
+    print(f"line 193 recipt_app/views.py request.session[products] = {request.session["products"]}")
     return render(request, 'recipt/index.html', {
         "products": request.session["products"],
         "total_price": request.session["total_price"],
@@ -225,7 +226,7 @@ def sendmail(request, new_recipt):
 
     # Send email and handle response from sendmail_py
     result = sendmail_py(user_data)
-    print(f"Result from sendmail_py: {result}")  # Log the result for debugging
+    print(f"line 228 Result from sendmail_py: {result}")  # Log the result for debugging
 
     if result.startswith("Error"):
         # Redirect to edit_customer with the customer's name and email as URL parameters
@@ -258,7 +259,7 @@ def add(request):
             prod_code = form_product.cleaned_data['prod_code']
             quantity = form_product.cleaned_data['quantity']
             product_inventry = models.get_product(prod_code)
-            print(f"product inventry = {product_inventry}")
+            print(f"line 261 product inventry = {product_inventry}")
             if product_inventry[2] >= quantity:
                 quantity_price = product_inventry[3] * quantity
                 product_found = False
@@ -384,12 +385,12 @@ def save_customer_recipt(request, new_recipt):
     try:
         models.save_customer_recipt_to_db(customer_name, customer_email, Employ_name, recipt_code, date_time, total_price, products)
     except Exception as e:
-        print(f"Error saving receipt: {e}")
+        print(f"line 387 Error saving receipt: {e}")
         return HttpResponse("Error saving data to the database.", status=500)
         
     # Redirect or return a valid response
     if new_recipt == 1:
-        print('Going to new receipt after saving data')
+        print('line 392 Going to new receipt after saving data')
         return redirect("recipt:new_receipt", kwargs={'return_product': 0})
 
         # return new_receipt(request,0)
@@ -418,13 +419,13 @@ def save_customer_recipt_return(request, new_recipt):
     try:
         models.save_customer_recipt_return_to_db( Employ_name, recipt_code_buy,recipt_code, date_time, total_price, products)
     except Exception as e:
-        print(f"Error saving receipt: {e}")
+        print(f"line 421 Error saving receipt: {e}")
         return HttpResponse("Error saving data to the database.", status=500)
         
     # Redirect or return a valid response
     if new_recipt == 1:
-        print('Going to new receipt after saving data')
-        return redirect("recipt:new_receipt", kwargs={'return_product': 1})
+        print('line 426 Going to new receipt after saving data')
+        return redirect("recipt:new_receipt", return_product=1)
     else:
         # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
@@ -434,7 +435,7 @@ def login_view(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
-        print(f"user name :: {username}")
+        print(f"line 437 user name :: {username}")
         # , password :: {password}")
         user = authenticate(request, username=username, password=password)
         if user is not None:

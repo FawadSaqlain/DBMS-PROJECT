@@ -74,7 +74,7 @@ def search_view(request):
     # Convert search_value to string (if not already a string)
     search_value = str(search_value)
     
-    print(f"search value :: {search_value} , search column :: {search_column}")
+    print(f"line 77 search value :: {search_value} , search column :: {search_column}")
 
     results = []  # Initialize results list
 
@@ -135,7 +135,7 @@ def delet(request, prod_index,prod_code):
         return HttpResponseRedirect(reverse("inventry:login"))
 
     models.delete_item(prod_code)
-    print("deleted the product")
+    print("line 138 deleted the product")
     return redirect('inventry:index')
 
 def edit_product(request, prod_index,prod_code):
@@ -168,7 +168,7 @@ def edit_product(request, prod_index,prod_code):
                 models.add_each_item(prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,f" - - ({request.user.username})")
             return redirect('inventry:index')
         else:
-            print(f"Form is invalid: {form.errors}")
+            print(f"line 171 Form is invalid: {form.errors}")
 
     else:
         # If GET request, prepopulate the form with existing product details

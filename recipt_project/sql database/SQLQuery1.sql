@@ -46,6 +46,11 @@ USE GENERALSTORE_MS
 -- END
 -- DROP TABLE product;
 
+DROP TABLE customers;
+DROP TABLE customers_return;
+DROP TABLE _gvmm0
+DROP TABLE _RmnrO
+
 -- SELECT * FROM information_schema.tables WHERE table_name = 'product';
 -- SELECT * FROM information_schema.tables WHERE table_name = 'customers';
 
@@ -54,8 +59,9 @@ USE GENERALSTORE_MS
 -- SELECT * FROM product
 SELECT * FROM customers
 SELECT * FROM customers_return
-SELECT * FROM _tAuvf
-SELECT * FROM _PriRD
+SELECT * FROM _gvmm0
+SELECT * FROM _RmnrO
+SELECT * FROM _7wf36
 -- drop table _4AWX0
 -- update _XCLsB set quantity=20 where prod_code='iQz22'
 -- SELECT * FROM customers WHERE recipt_code = '_d407j'
