@@ -11,6 +11,7 @@ urlpatterns = [
     path('edit_product/<int:id>/', views.edit_product, name='edit_product'),
     path('edit_customer/<str:customer_name>/<str:customer_email>/', views.edit_customer, name='edit_customer'),
     path('sendmail/<int:new_recipt>', views.sendmail, name='sendmail'),
+    path('sendmail_return/<int:new_recipt>', views.sendmail_return, name='sendmail_return'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('save-customer/<int:new_recipt>/', views.save_customer_recipt, name='save_customer'),

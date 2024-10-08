@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from datetime import datetime
 from .sendmail import sendmail_py
+from .sendmail_return import sendmail_return_py
 import random
 import string
 from django.views.decorators.csrf import csrf_exempt
@@ -17,7 +18,6 @@ def generate_random_key(length=5):
     characters = string.ascii_letters + string.digits
     random_key = ''.join(random.choices(characters, k=length))
     return "_" + random_key
-
 # Form for adding/editing products
 class ProductForm(forms.Form):
     def for_edit_product(self, code, quant, *args, **kwargs):
@@ -40,7 +40,6 @@ class ProductForm(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
-
 # Form for adding/editing customer details
 class CustomerForm(forms.Form):
     def for_edit_customer(self, customer_name, customer_email, *args, **kwargs):
@@ -64,7 +63,6 @@ class CustomerForm(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;',
         })
     )
-
 class returnProduct(forms.Form):
     def for_edit_return_product(self, prod_code, quantity, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -86,7 +84,6 @@ class returnProduct(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
-
 # Form for adding/editing customer details
 class return_product_recipt_code(forms.Form):
     recipt_code_buy = forms.CharField(
@@ -102,7 +99,6 @@ class return_product_recipt_code(forms.Form):
         """Set the receipt code if it's being edited or provided in the session."""
         super().__init__(*args, **kwargs)
         self.fields['recipt_code_buy'].initial = recipt_code_buy
-
 def return_product(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("recipt:login"))
@@ -130,6 +126,10 @@ def return_product(request):
             if not recipt_code_buy:
                 recipt_code_buy = form_return_product_recipt_code.cleaned_data['recipt_code_buy']
                 request.session["recipt_code_buy"] = recipt_code_buy
+                customer=models.get_customer_recipt(request.session["recipt_code_buy"])
+                request.session["customer_name"]=customer[1]
+                request.session["customer_email"]=customer[2]
+
 
             # Fetch product receipt details based on receipt code and product code
             product_recipt = models.get_recipt_product(recipt_code_buy, prod_code)
@@ -156,7 +156,9 @@ def return_product(request):
             # If the receipt code is present (from POST or session), save it in the session
             if recipt_code_buy:
                 request.session["recipt_code_buy"] = recipt_code_buy
-
+                customer=models.get_customer_recipt(request.session["recipt_code_buy"])
+                request.session["customer_name"]=customer[1]
+                request.session["customer_email"]=customer[2]
         else:
             # Render the form again with errors
             return render(request, 'recipt/return_product.html', {
@@ -171,7 +173,6 @@ def return_product(request):
         'form_recipt': return_product_recipt_code(),
         'recipt_code_buy': request.session.get("recipt_code_buy", None)  # Pass the receipt code if present
     })
-
 # Main view for displaying receipt details
 def index(request):
     if not request.user.is_authenticated:
@@ -192,6 +193,7 @@ def index(request):
         request.session["recipt_code_buy"] = None
     if "recipt_code" not in request.session:
         request.session["recipt_code"] = generate_random_key()
+
     print(f"line 193 recipt_app/views.py request.session[products] = {request.session["products"]}")
     return render(request, 'recipt/index.html', {
         "products": request.session["products"],
@@ -203,7 +205,6 @@ def index(request):
         'recipt_code': request.session["recipt_code"],
         'recipt_code_buy':request.session["recipt_code_buy"]
     })
-
 # View to send email and handle success/error scenarios
 def sendmail(request, new_recipt):
     if not request.user.is_authenticated:
@@ -247,7 +248,52 @@ def sendmail(request, new_recipt):
 
     # Catch-all return, ensuring we never return None
     return HttpResponse("Unexpected error.", status=500)
+# View to send email and handle success/error scenarios
+def sendmail_return(request, new_recipt):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("recipt:login"))
 
+    # Retrieve user and session data
+    user_data = {
+        'username': request.user.username,
+        'first_name': request.user.first_name,
+        'last_name': request.user.last_name,
+        'products': request.session.get("products"),
+        'total_price': request.session.get("total_price"),
+        'total_price_bought': models.get_customer_recipt(request.session["recipt_code_buy"])[5],
+        'customer_name': request.session.get("customer_name"),
+        'customer_email': request.session.get("customer_email"),
+        'recipt_code': request.session.get("recipt_code"),
+        'recipt_code_buy':request.session.get("recipt_code_buy"),
+        'bought_product':models.get_product(request.session["recipt_code_buy"])
+    }
+
+    # Ensure session data exists
+    if not user_data['products'] or not user_data['customer_name'] or not user_data['customer_email']:
+        return HttpResponse("Required session data is missing.", status=400)
+
+    # Send email and handle response from sendmail_py
+    result = sendmail_return_py(user_data)
+    print(f"line 228 Result from sendmail_py: {result}")  # Log the result for debugging
+
+    if result.startswith("Error"):
+        # Redirect to edit_customer with the customer's name and email as URL parameters
+        return redirect('recipt:edit_customer', customer_name=user_data['customer_name'], customer_email=user_data['customer_email'])
+
+    elif result == "Success":
+        # Save customer data before sending email
+        return save_customer_recipt_return(request, new_recipt)
+
+    else:
+        # Handle unexpected issues during email sending
+        return render(request, 'recipt/redirect_popup.html', {
+            'customer_name': user_data['customer_name'],
+            'customer_email': user_data['customer_email'],
+            'error': 'An unexpected issue occurred while sending the email.'
+        })
+
+    # Catch-all return, ensuring we never return None
+    return HttpResponse("Unexpected error.", status=500)
 # View to add new product and customer data to session
 def add(request):
     if not request.user.is_authenticated:
@@ -286,7 +332,6 @@ def add(request):
         else:
             return render(request, 'recipt/add.html', {'form_product': form_product, 'form_customer': form_customer})
     return render(request, 'recipt/add.html', {"form_product": ProductForm(), 'form_customer': CustomerForm()})
-
 # View to start a new receipt
 def new_receipt(request,return_product=0):
     if not request.user.is_authenticated:
@@ -303,7 +348,6 @@ def new_receipt(request,return_product=0):
         return redirect('recipt:return_product')
     else:
         return redirect('recipt:add')
-
 # View to delete a product from the session
 def dele(request, id):
     if not request.user.is_authenticated:
@@ -316,7 +360,6 @@ def dele(request, id):
         pass  # Handle index errors if necessary
 
     return redirect('recipt:index')
-
 # View to edit customer details
 def edit_customer(request, customer_name, customer_email):
     if not request.user.is_authenticated:
@@ -334,7 +377,6 @@ def edit_customer(request, customer_name, customer_email):
         customer_form = CustomerForm(initial={'customer_name': customer_name, 'customer_email': customer_email})
 
     return render(request, 'recipt/edit_customer.html', {"customer_form": customer_form, "customer_name": customer_name, "customer_email": customer_email})
-
 # View to edit product details
 def edit_product(request, id):
     if not request.user.is_authenticated:
@@ -365,7 +407,6 @@ def edit_product(request, id):
         form_product = ProductForm(initial={'prod_code': prod_code, 'quantity': quantity})
 
     return render(request, 'recipt/add.html', {"form_product": form_product, 'is_editing': True, 'id': id})
-
 @csrf_exempt
 def save_customer_recipt(request, new_recipt):
     customer_name = request.session.get("customer_name")
@@ -392,14 +433,11 @@ def save_customer_recipt(request, new_recipt):
     # Redirect or return a valid response
     if new_recipt == 1:
         print('line 392 Going to new receipt after saving data')
-        return redirect("recipt:new_receipt", kwargs={'return_product': 0})
-
+        return HttpResponseRedirect(reverse("recipt:new_receipt", kwargs={'return_product': 0}))
         # return new_receipt(request,0)
     else:
         # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
-
-
 def save_customer_recipt_return(request, new_recipt):
     # customer_name = request.session.get("customer_name")
     # customer_email = request.session.get("customer_email")
@@ -430,6 +468,7 @@ def save_customer_recipt_return(request, new_recipt):
     else:
         # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
+
 
 # Login and logout views
 def login_view(request):

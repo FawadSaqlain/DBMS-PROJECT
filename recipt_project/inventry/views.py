@@ -13,7 +13,6 @@ def generate_random_key(length=5):
     characters = string.ascii_letters + string.digits
     random_key = ''.join(random.choices(characters, k=length))
     return random_key
-
 # Form for adding/editing products
 class NewDataForm(forms.Form):
     def for_edit_product(self,prod_desc ,pric, quant, *args, **kwargs):
@@ -45,7 +44,6 @@ class NewDataForm(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
-
 def index(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
@@ -53,7 +51,6 @@ def index(request):
         "products": models.view_inventory(request),
         # 'length_products':range(len(models.view_inventory(request)))
     })
-
 def inventry_sort(request,asc_decs,sort_by):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
@@ -63,10 +60,6 @@ def inventry_sort(request,asc_decs,sort_by):
         'length_products':range(len(models.view_inventory(request))),
         'sorted_as':f"{asc_decs}{sort_by}"
     })
-# views.py
-# views.py
-from django.shortcuts import render
-
 def search_view(request):
     search_column = request.GET.get('section', 'product_code')  # Default search column
     search_value = request.GET.get('q', '')  # Retrieved search value
@@ -100,8 +93,6 @@ def search_view(request):
         "products": results,
         'length_products': range(len(results))
     })
-
-
 def add(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
@@ -129,7 +120,6 @@ def add(request):
             return render(request, 'inventry/add.html', {'form': form})
     
     return render(request, 'inventry/add.html', {"form": NewDataForm()})
-
 def delet(request, prod_index,prod_code):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
@@ -137,7 +127,6 @@ def delet(request, prod_index,prod_code):
     models.delete_item(prod_code)
     print("line 138 deleted the product")
     return redirect('inventry:index')
-
 def edit_product(request, prod_index,prod_code):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
@@ -184,9 +173,6 @@ def edit_product(request, prod_index,prod_code):
         'prod_index': prod_index,
         'prod_code': prod_code  # Add this line
     })
-
-
-
 def login_view(request):
     if request.method == "POST":
         username = request.POST["username"]
@@ -201,7 +187,6 @@ def login_view(request):
                 "username": username  # Retain the entered username
             })
     return render(request, "inventry/login.html") 
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("inventry:login"))

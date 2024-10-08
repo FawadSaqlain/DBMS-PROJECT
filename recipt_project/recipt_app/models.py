@@ -124,7 +124,6 @@ def update_recipt_customer(recipt_code_buy, total_price):
 
     except Exception as e:
         print(f"line 125 Error updating recipt customer: {e}")
-
 def restore_inventory_from_receipt(recipt_code):
     """
     Restores the inventory quantities from an existing receipt before dropping the table.
@@ -147,10 +146,9 @@ def restore_inventory_from_receipt(recipt_code):
                 # Update the product quantity in the inventory
                 update_quantity(updated_quantity,updated_quantity_price, prod_code)
                 print(f"line 207 get updated inventry {get_product(prod_code)}")
-
 def create_table_recipt(recipt_code, products):
     """
-    Creates a receipt-specific table and inserts product data.
+    Creates a receipt-specific table and inserts bought product data.
     """
     try:
         with connection.cursor() as cursor:
@@ -178,7 +176,6 @@ def create_table_recipt(recipt_code, products):
         insert_data(recipt_code, products)
     except Exception as e:
         print(f"line 286 Error creating receipt table: {e}")
-
 def update_recipt_product_quantity(recipt_code, prod_code, prod_quant,update_quantity_price_recipt):
     """
     Update the quantity of a specific product in a specific receipt.
@@ -223,7 +220,6 @@ def get_recipt_product(recipt_code, prod_code):
     except Exception as e:
         print(f"line 359 Error fetching product data: {e}")
         return None
-
 def get_customer_recipt(recipt_code):
     """
     Get a receipt-specific customer data as a single-dimensional list.
@@ -243,6 +239,8 @@ def get_customer_recipt(recipt_code):
     except Exception as e:
         print(f"line 397 Error fetching customer data: {e}")
         return None
+
+
 
 # '''
 # def insert_quantity_inventry_subtract_recipt_quantity_return(recipt_code, products, recipt_code_buy):

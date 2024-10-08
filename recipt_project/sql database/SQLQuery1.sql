@@ -46,10 +46,10 @@ USE GENERALSTORE_MS
 -- END
 -- DROP TABLE product;
 
-DROP TABLE customers;
-DROP TABLE customers_return;
-DROP TABLE _gvmm0
-DROP TABLE _RmnrO
+-- DROP TABLE customers;
+-- DROP TABLE customers_return;
+-- DROP TABLE _gvmm0
+-- DROP TABLE _RmnrO
 
 -- SELECT * FROM information_schema.tables WHERE table_name = 'product';
 -- SELECT * FROM information_schema.tables WHERE table_name = 'customers';
