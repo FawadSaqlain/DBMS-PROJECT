@@ -21,5 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('recipt_app/',include("recipt_app.urls")),
     path('inventry/',include("inventry.urls")),
-    # path('management/',include("management.urls")),
+    path('management/',include("management.urls")),
 ]

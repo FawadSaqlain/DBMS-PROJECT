@@ -48,7 +48,7 @@ def search_products(search_column, search_value):
 def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime, username):
     product=get_product(prod_code)
     # product=product[0]
-    # print(f"condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
+    print(f"condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
     """Inserts or updates product data in the product table."""
     try:
         with connection.cursor() as cursor:
@@ -58,8 +58,9 @@ def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, q
             if exists:
                 # Update the existing record
                 product=get_product(prod_code)
-                product=product[0]
-                # print(f"condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
+                print(f"line 63 models.py product :: {product}")
+                # product=product[0]
+                print(f"condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
                 if product[1] != prod_description or product[4] != quantity_price_sale :
                     cursor.execute("""
                         UPDATE dbo.product
@@ -84,40 +85,19 @@ def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, q
 
 @csrf_exempt
 def get_product(prod_code):
-    """Retrieves product data from the product table."""
+    """Retrieves product data from the product table and returns a 1D list of the first product."""
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM dbo.product WHERE prod_code = %s", [prod_code])
             products = cursor.fetchall()
-            return [list(product) for product in products]
-    except Exception as e:
-        print(f"line 94 Error fetching product data: {e}")
-        return []
-from django.db import connection
-from django.views.decorators.csrf import csrf_exempt
-
-@csrf_exempt
-def get_product(prod_code):
-    """Retrieves product data from the product table and returns the first product found."""
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM dbo.product WHERE prod_code = %s", [prod_code])
-            product = cursor.fetchone()  # Fetch the first result directly
-            if product:
-                return list(product)  # Return the product as a list
+            if products:
+                products =products[0]
+                return products # Return the 1D list of the first product (index 0)
             else:
-                return None  # Return None if no product is found
+                return []  # Return an empty list if no products are found
     except Exception as e:
-        print(f"line  111 Error fetching product data: {e}")
-        return None
-
-# Usage
-# product = get_product(prod_code)
-# if product:
-#     # `product` is now the first item found with the given `prod_code`
-#     print(product)
-# else:
-#     print("Product not found.")
+        print(f"Error fetching product data: {e}")
+        return []
 
 @csrf_exempt
 def view_inventory(request):

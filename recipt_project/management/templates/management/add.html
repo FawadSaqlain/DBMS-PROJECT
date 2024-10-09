@@ -1,0 +1,40 @@
+{% extends "management/layout.html" %}
+
+{% block body %}
+<div>
+    <form action="{% if is_editing %} {% url 'management:edit_user' user.username %} {% else %}{% url 'management:add_user' %}{% endif %}" method="post">
+        {% csrf_token %}
+        <!-- Dynamic heading based on whether you are adding or editing an item -->
+        <h1>
+            {% if is_editing %}
+                Please edit user details
+            {% else %}
+                Please add user details
+            {% endif %}
+        </h1>
+
+        {% if form %}
+            {{ form.as_p }}
+        {% endif %}
+        
+        <input type="submit" style="width: fit-content; height: fit-content; background-color: brown; color: white; padding: 5px; margin-top: 7px; border-radius: 2px; border: 1px solid rgb(0, 0, 0);">
+    </form>
+
+    <a href="{% url 'management:index' %}">
+        <button style="width: fit-content; height: fit-content; background-color: brown; color: white; padding: 5px; margin-top: -25px; border-radius: 2px; border: 1px solid rgb(0, 0, 0); float: right;">
+            Management
+        </button>
+    </a>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Focus on the first input field when the page loads
+        const firstInputField = document.querySelector('input[type="text"], input[type="email"], textarea');
+
+        if (firstInputField) {
+            firstInputField.focus();
+        }
+    });
+</script>
+{% endblock %}
