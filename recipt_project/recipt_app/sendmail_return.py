@@ -13,56 +13,79 @@ class EmailSupportAgent:
         body = f"""
         <html>
         <body>
-        <h1>WORKING ON IT</h1>
-        <h2>E-RETURN RECEIPT</h2>
-        <p>Receipt code (Return): {email_data['recipt_code']}</p>
-        <p>Original Receipt code (Purchase): {email_data['recipt_code_buy']}</p>
-        <h3>Customer Details:</h3>
-        <p>Name: {email_data['customer_name']}</p>
-        <p>Email: {email_data['customer_email']}</p>
-        <h3>Returned Products:</h3>
-        <table border="1" cellpadding="5" cellspacing="0">
+        <h1>E-RETURN RECEIPT</h1>
+        <p><strong>Receipt Code (Return):</strong> {email_data['recipt_code']}</p>
+        <p><strong>Original Receipt Code (Purchase):</strong> {email_data['recipt_code_buy']}</p>
+        
+        <h2>Customer Details</h2>
+        <p><strong>Name:</strong> {email_data['customer_name']}</p>
+        <p><strong>Email:</strong> {email_data['customer_email']}</p>
+        
+        <h2>Returned Products</h2>
+        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse;">
             <tr>
                 <th>Product Code</th>
                 <th>Product Description</th>
-                <th>Quantity Bought</th>
+                <th>Quantity now in Bought recipt</th>
                 <th>Quantity Returned</th>
-                <th>Quantity Remaining</th>
                 <th>Price per Unit</th>
                 <th>Refund Amount</th>
             </tr>
         """
-        
-        for product in email_data['products']:
-            product_code, quantity_bought, quantity_returned, price, product_description = product
-            quantity_remaining = quantity_bought - quantity_returned
-            refund_amount = quantity_returned * price
-            
+
+        total_refund = 0.0  # Initialize total refund
+
+        # Loop over bought products and match with returned products
+        for product_bought in email_data['bought_product']:
+            prod_id_bought, prod_code_bought, prod_description_bought, quantity_bought, price_bought, price_quantity_bought = product_bought
+
+            # Convert price_bought to float if necessary
+            try:
+                price_bought = float(price_bought)
+            except ValueError:
+                price_bought = 0.0  # Handle invalid price conversion
+
+            # Find matching returned product
+            matching_returned_product = next((p for p in email_data['products'] if p[0] == prod_code_bought), None)
+
+            if matching_returned_product:
+                # Unpacking returned product details
+                product_code_return, quantity_return, price_returned, quantity_price_return, product_description_return = matching_returned_product
+                quantity_was_bought = quantity_bought + quantity_return
+                refund_amount = quantity_return * price_bought  # Calculate refund amount
+                total_refund += refund_amount  # Accumulate total refund
+            else:
+                quantity_return = 0
+                refund_amount = 0
+                quantity_was_bought = quantity_bought
+
             body += f"""
             <tr>
-                <td>{product_code}</td>
-                <td>{product_description}</td>
+                <td>{prod_code_bought}</td>
+                <td>{prod_description_bought}</td>
                 <td>{quantity_bought}</td>
-                <td>{quantity_returned}</td>
-                <td>{quantity_remaining}</td>
-                <td>${price:.2f}</td>
+                <td>{quantity_return}</td>
+                <td>${price_bought:.2f}</td>
                 <td>${refund_amount:.2f}</td>
             </tr>
             """
-        
+
         body += f"""
         </table>
-        <h3>Total Refund: ${email_data['total_price']:.2f}</h3>
-        <h3>User Information:</h3>
-        <p>First Name: {email_data['first_name']}</p>
-        <p>Last Name: {email_data['last_name']}</p>
-        <p>Username: {email_data['username']}</p>
-        <p>Date of Return: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
+        <h3>Total Refund: ${total_refund:.2f}</h3>
+
+        <h2>User Information</h2>
+        {"<p><strong>First Name:</strong> " + email_data['first_name'] + "</p>" if email_data.get('first_name') else ""}
+        {"<p><strong>Last Name:</strong> " + email_data['last_name'] + "</p>" if email_data.get('last_name') else ""}
+        <p><strong>Username:</strong> {email_data['username']}</p>
+        <p><strong>Date of Return:</strong> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
+
         <p>Thank you for your return. We hope to serve you again!</p>
         </body>
         </html>
         """
         return body
+
 
     def send_email(self, subject, body, to_email):
         msg = MIMEText(body, 'html', 'utf-8')

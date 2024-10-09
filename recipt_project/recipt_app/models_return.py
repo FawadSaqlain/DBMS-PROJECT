@@ -30,11 +30,11 @@ def insert_customer_return(name, email, employ_name, recipt_code_buy, recipt_cod
 
     except Exception as e:
         print(f"line 427 Error inserting customer return data: {e}")
-def save_customer_recipt_return_to_db(Employ_name, recipt_code_buy,recipt_code_return, date_time, total_price, products):
-    customer= models.get_customer_recipt(recipt_code_buy)
+def save_customer_recipt_return_to_db(customer_name,customer_email,Employ_name, recipt_code_buy,recipt_code_return, date_time, total_price, products):
+    
     print(f"line 430 Employ_name::{Employ_name}, recipt_code_buy::{recipt_code_buy},recipt_code_return::{recipt_code_return}, date_time::{date_time}, total_price::{total_price}, products::{products}")
-    print(f"line 431 customer :: {customer}")
-    insert_customer_return(customer[1], customer[2], Employ_name, recipt_code_buy, recipt_code_return, total_price, date_time,products)
+
+    insert_customer_return(customer_name, customer_email, Employ_name, recipt_code_buy, recipt_code_return, total_price, date_time,products)
 
     # customer_buy_data=get_customer_recipt(recipt_code_buy) 
     # total_price_buy=customer_buy_data[5]

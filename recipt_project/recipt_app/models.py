@@ -38,6 +38,7 @@ def get_product(prod_code):
         with connection.cursor() as cursor:
             cursor.execute("SELECT * FROM dbo.product WHERE prod_code = %s", [prod_code])
             product = cursor.fetchone()  # Fetch the first result directly
+            print(f"## line 42 models.py product :: {product}")
             if product:
                 return list(product)  # Return the product as a list
             else:
@@ -45,6 +46,20 @@ def get_product(prod_code):
     except Exception as e:
         print(f"line 46 Error fetching product data: {e}")
         return None
+def get_table(table_name):
+    try:
+        with connection.cursor() as cursor:
+            query = f"SELECT * FROM {table_name}"
+            cursor.execute(query)
+            table_data = cursor.fetchall()
+            if table_data:
+                return [list(row) for row in table_data]  
+            else:
+                return None  
+    except Exception as e:
+        print(f"line 64 Error fetching table data: {e}")
+        return None
+
 def table_exists(table_name):
     with connection.cursor() as cursor:
         cursor.execute("""

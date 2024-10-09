@@ -265,8 +265,12 @@ def sendmail_return(request, new_recipt):
         'customer_email': request.session.get("customer_email"),
         'recipt_code': request.session.get("recipt_code"),
         'recipt_code_buy':request.session.get("recipt_code_buy"),
-        'bought_product':models.get_product(request.session["recipt_code_buy"])
+        'bought_product':models.get_table(request.session["recipt_code_buy"])
     }
+    
+    print(f"270 recipt buy :: {request.session["recipt_code_buy"]} model bought :: {models.get_table(request.session["recipt_code_buy"])}")
+    print(f"271 product return :: {user_data['products']}")
+    print(f"272 product bought :: {user_data['bought_product']}")
 
     # Ensure session data exists
     if not user_data['products'] or not user_data['customer_name'] or not user_data['customer_email']:
@@ -439,8 +443,8 @@ def save_customer_recipt(request, new_recipt):
         # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
 def save_customer_recipt_return(request, new_recipt):
-    # customer_name = request.session.get("customer_name")
-    # customer_email = request.session.get("customer_email")
+    customer_name = request.session.get("customer_name")
+    customer_email = request.session.get("customer_email")
     recipt_code = request.session.get("recipt_code")
     recipt_code_buy=request.session.get("recipt_code_buy")
     date_time = datetime.now()
@@ -456,7 +460,7 @@ def save_customer_recipt_return(request, new_recipt):
         Employ_name = request.user.username
 
     try:
-        models_return.save_customer_recipt_return_to_db( Employ_name, recipt_code_buy,recipt_code, date_time, total_price, products)
+        models_return.save_customer_recipt_return_to_db(customer_name,customer_email,Employ_name, recipt_code_buy,recipt_code, date_time, total_price, products)
     except Exception as e:
         print(f"line 421 Error saving receipt: {e}")
         return HttpResponse("Error saving data to the database.", status=500)
@@ -468,8 +472,6 @@ def save_customer_recipt_return(request, new_recipt):
     else:
         # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
-
-
 # Login and logout views
 def login_view(request):
     if request.method == "POST":
@@ -488,7 +490,6 @@ def login_view(request):
                 "username": username  # Retain the entered username
             })
     return render(request, "recipt/login.html")
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("recipt:login"))

@@ -105,8 +105,8 @@
     <a href="{% url 'recipt:new_receipt' 1 %}" class="action-button">new return product</a>
     {% if recipt_code_buy and products%}
     <a href="{% url 'recipt:return_product' %}" class="action-button">add return product</a>
-    <a href="{% url 'recipt:sendmail_return' 1 %}" class="action-button">send E.recipt & new receipt</a>
-    <a href="{% url 'recipt:sendmail_return' 0 %}" class="action-button">send E.recipt & no new receipt</a>
+    <a href="{% url 'recipt:sendmail_return' 1 %}" class="action-button">send return E.recipt & new receipt</a>
+    <a href="{% url 'recipt:sendmail_return' 0 %}" class="action-button">send return E.recipt & no new receipt</a>
     <a href="{% url 'recipt:save_customer_return' 1 %}" class="action-button">Save E.recipt & new return receipt</a>
     <a href="{% url 'recipt:save_customer_return' 0 %}" class="action-button">Save E.recipt & no new return receipt</a>
     {% endif %}
