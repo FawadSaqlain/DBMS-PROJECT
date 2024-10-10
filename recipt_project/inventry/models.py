@@ -46,9 +46,10 @@ def search_products(search_column, search_value):
 
 @csrf_exempt
 def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime, username):
-    product=get_product(prod_code)
+    # product=get_product(prod_code)
     # product=product[0]
-    print(f"condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
+    # print(f"line 51 product {product}")
+    # print(f"line 63 condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
     """Inserts or updates product data in the product table."""
     try:
         with connection.cursor() as cursor:
@@ -60,7 +61,7 @@ def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, q
                 product=get_product(prod_code)
                 print(f"line 63 models.py product :: {product}")
                 # product=product[0]
-                print(f"condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
+                print(f"line 64 condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
                 if product[1] != prod_description or product[4] != quantity_price_sale :
                     cursor.execute("""
                         UPDATE dbo.product
@@ -91,6 +92,7 @@ def get_product(prod_code):
             cursor.execute("SELECT * FROM dbo.product WHERE prod_code = %s", [prod_code])
             products = cursor.fetchall()
             if products:
+                print(f"live 95 product :: {products}")
                 products =products[0]
                 return products # Return the 1D list of the first product (index 0)
             else:

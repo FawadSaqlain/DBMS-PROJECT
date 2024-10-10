@@ -30,12 +30,12 @@
         <thead>
             <tr>
                 <th>Index</th>
-                <th><a href="{% url 'management:index' %}" class="hover-effect">Username</a></th>
-                <th><a href="{% url 'management:index' %}" class="hover-effect">First Name</a></th>
-                <th><a href="{% url 'management:index' %}" class="hover-effect">Last Name</a></th>
-                <th><a href="{% url 'management:index' %}" class="hover-effect">Email</a></th>
-                <th><a href="{% url 'management:index' %}" class="hover-effect">Phone Number</a></th>
-                <th><a href="{% url 'management:index' %}" class="hover-effect">Address</a></th>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Address</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -52,10 +52,10 @@
                 <td>
                     {% load static %}
                     <a href="{% url 'management:remove_user' forloop.counter0 user.username %}" class="delete-button">
-                        <img src="{% static 'management_css/assets/delete_icon.jpg' %}" alt="Delete" style="width: 17px; height: 23px; margin-right: 10px;">
+                        <img src="{% static 'management_css/assets/delete_icon.jpg' %}" alt="Delete" style="width: 17px; height: 23px;">
                     </a>
                     <a href="{% url 'management:edit_user' forloop.counter0 user.username %}" class="edit-button">
-                        <img src="{% static 'management_css/assets/edit_icon.jpeg' %}" alt="Edit" style="width: 17px; height: 23px; margin-right: 10px;">
+                        <img src="{% static 'management_css/assets/edit_icon.jpeg' %}" alt="Edit" style="width: 17px; height: 23px;">
                     </a>
                 </td>
             </tr>
@@ -68,13 +68,12 @@
 </div>
 
 <script>
-    const searchUrl = "{% url 'management:search_view' %}";  // Search URL
+    const searchUrl = "{% url 'management:search_view' %}";
 
     function autoSearch() {
         const query = document.getElementById('searchInput').value;
         const section = document.getElementById('searchSection').value;
 
-        // Validate if both search input and section are provided
         if (!query.trim()) {
             alert("Please enter a search query.");
             return;
@@ -85,14 +84,12 @@
             return;
         }
 
-        // Redirect to the search URL with query and section parameters
         window.location.href = `${searchUrl}?q=${encodeURIComponent(query)}&section=${encodeURIComponent(section)}`;
     }
 
-    // Trigger search when Enter is pressed in the input field
     document.getElementById('searchInput').addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-            autoSearch();  // Call the search function
+            autoSearch();
         }
     });
 </script>

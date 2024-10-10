@@ -8,7 +8,7 @@
 /* Center the entire page content */
 body {
   min-height: 100vh;
-  background-image: url("../inventry_css/assets/background.jpeg");
+  background-image: url("../recipt_css/assets/background.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   font-family: Arial, sans-serif;
@@ -104,12 +104,10 @@ header {
 
 .delete-button img:hover {
   content: url('../recipt_css/assets/colore_changed_delete_icon.jpg' ); /* Change this to your hover image URL */
-
 }
 
 .edit-button img:hover {
   content: url('../recipt_css/assets/color_changed_edit_icon.jpg'); /* Change this to your hover image URL */
- 
 }
 /* Add padding to the table headers and cells */
 .product-table th,

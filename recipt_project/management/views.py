@@ -7,8 +7,23 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from datetime import datetime
 from django import forms
-
+from . import models
 class NewDataForm(forms.Form):
+    def for_edit_user(self,first_name ,last_name, cnic,phone_number,email,username,user_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'].initial = first_name
+        self.fields['last_name'].initial = last_name
+        self.fields['cnic'].initial = cnic
+        self.fields['phone_number'].initial = phone_number
+        self.fields['email'].initial = email
+        self.fields['username'].initial = username
+        self.fields['user_type'].initial = user_type
+
+    USER_TYPE_CHOICES = [
+        ('inventory_manager', 'Inventory Manager'),
+        ('counter_manager', 'Counter Manager'),
+        ('administration_manager', 'Administration Manager'),
+    ]
     first_name = forms.CharField(
         max_length=100,
         widget=forms.TextInput(attrs={
@@ -61,6 +76,13 @@ class NewDataForm(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
+    user_type = forms.ChoiceField(
+        choices=USER_TYPE_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-input',
+            'style': 'margin-right: 10px; margin-bottom: 10px;'
+        })
+    )
     address = forms.CharField(
         widget=forms.Textarea(attrs={
             'id': 'id_address',
@@ -95,6 +117,7 @@ def add_user(request):
             email = form.cleaned_data['email']
             username = form.cleaned_data['username']
             address = form.cleaned_data['address']
+            user_type = form.cleaned_data['user_type']
 
             try:
                 # Create the user
@@ -106,11 +129,12 @@ def add_user(request):
                     password='defaultpassword123'  # For demo; ideally generate/send password securely
                 )
                 user.save()
+                models.save_userdata(username,cnic,phone_number,address,user_type)
 
                 messages.success(request, 'User created successfully!')
 
                 # Redirect to the index page
-                return redirect(reverse("management:index"))
+                # return redirect(reverse("management:index"))
             except Exception as e:
                 messages.error(request, f'Error creating user: {str(e)}')
                 return render(request, 'management/add.html', {'form': form})
@@ -120,7 +144,7 @@ def add_user(request):
 
     return render(request, 'management/add.html', {"form": NewDataForm()})
 
-def edit_user(request, username):
+def edit_user(request, user_index,username):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("management:login"))
 
@@ -152,12 +176,14 @@ def edit_user(request, username):
             # Fetch other fields as needed
         })
 
-    return render(request, 'management/edit.html', {
+    return render(request, 'management/add.html', {
         "form": form,
-        'is_editing': True
+        'is_editing': True,
+        'user_index': user_index,
+        'usename': username  # Add this line
     })
 
-def remove_user(request, username):
+def remove_user(request, user_index,username):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("management:login"))
 

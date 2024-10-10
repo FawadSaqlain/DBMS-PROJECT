@@ -40,6 +40,15 @@ USE GENERALSTORE_MS
 --     added_by_employ NVARCHAR(100),
 -- )
 
+-- CREATE TABLE Employ (
+--     username NVARCHAR(100) PRIMARY KEY,
+--     user_type NVARCHAR(1000),
+--     cnic INT,
+--     phone_number INT,
+--     updated_datetime DATETIME,
+--     address NVARCHAR(1000),
+-- )
+
 -- IF OBJECT_ID('customers', 'U') IS NOT NULL
 -- BEGIN
     -- DROP TABLE customers;

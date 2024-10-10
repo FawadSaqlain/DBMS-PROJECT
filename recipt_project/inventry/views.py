@@ -127,6 +127,7 @@ def delet(request, prod_index,prod_code):
     models.delete_item(prod_code)
     print("line 138 deleted the product")
     return redirect('inventry:index')
+
 def edit_product(request, prod_index,prod_code):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
