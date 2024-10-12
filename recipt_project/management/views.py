@@ -9,6 +9,96 @@ from datetime import datetime
 from django import forms
 from . import models
 class NewDataForm(forms.Form):
+    USER_TYPE_CHOICES = [
+        ('inventory manager', 'Inventory Manager'),
+        ('counter manager', 'Counter Manager'),
+        ('administration manager', 'Administration Manager'),
+    ]
+    first_name = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'id': 'id_first_name',
+            'placeholder': 'Enter first name',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    last_name = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'id': 'id_last_name',
+            'placeholder': 'Enter last name',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    cnic = forms.CharField(
+        max_length=15,
+        widget=forms.TextInput(attrs={
+            'id': 'id_cnic',
+            'placeholder': 'Enter CNIC',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    phone_number = forms.CharField(
+        max_length=15,
+        widget=forms.TextInput(attrs={
+            'id': 'id_phone_number',
+            'placeholder': 'Enter Phone Number',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'id': 'id_email',
+            'placeholder': 'Enter Email',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'id': 'id_username',
+            'placeholder': 'Enter username',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'id': 'id_password',
+            'placeholder': 'Enter password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'  
+        })
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'id': 'id_confirm_password',
+            'placeholder': 'Enter confirm password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'  
+        })
+    )
+    user_type = forms.ChoiceField(
+        choices=USER_TYPE_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-input',
+            'style': 'margin-right: 10px; margin-bottom: 10px;'
+        })
+    )
+    address = forms.CharField(
+        widget=forms.Textarea(attrs={
+            'id': 'id_address',
+            'placeholder': 'Enter Address',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px; height: 100px;'  
+        })
+    )
+
+class NewDataForm_edit(forms.Form):
     def for_edit_user(self,first_name ,last_name, cnic,phone_number,email,username,user_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['first_name'].initial = first_name
@@ -90,6 +180,7 @@ class NewDataForm(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px; height: 100px;'  
         })
     )
+
 def index(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("management:login"))
@@ -117,21 +208,25 @@ def add_user(request):
             address = form.cleaned_data['address']
             user_type = form.cleaned_data['user_type']
 
+            password=form.cleaned_data['password']
+            confirm_password=form.cleaned_data['confirm_password']
             try:
                 # Create the user
-                user = User.objects.create_user(
-                    username=username,
-                    first_name=first_name,
-                    last_name=last_name,
-                    email=email,
-                    password='defaultpassword123'  # For demo; ideally generate/send password securely
-                )
-                
-                models.save_userdata(username,cnic,phone_number,address,user_type)
-                user.save()
+                if(password==confirm_password):
+                    user = User.objects.create_user(
+                        username=username,
+                        first_name=first_name,
+                        last_name=last_name,
+                        email=email,
+                        password=password  # For demo; ideally generate/send password securely
+                    )
+                    
+                    models.save_userdata(username,cnic,phone_number,address,user_type)
+                    user.save()
 
-                messages.success(request, 'User created successfully!')
-
+                    messages.success(request, 'User created successfully!')
+                else:
+                    messages.error(request, 'Passwords do not match!')
                 # Redirect to the index page
                 # return redirect(reverse("management:index"))
             except Exception as e:
@@ -153,7 +248,7 @@ def edit_user(request, user_index, username):
     # print(f"line 153 before saving {user}")
     user_data = models.select_userdata(username)  # Assuming this function retrieves user data including cnic, phone_number, user_type, etc.
     if request.method == 'POST':
-        form = NewDataForm(request.POST)
+        form = NewDataForm_edit(request.POST)
         if form.is_valid():
             user.username=username
             user.first_name = form.cleaned_data['first_name']
@@ -183,7 +278,7 @@ def edit_user(request, user_index, username):
             'username': user.username
         })
         else:
-            form = NewDataForm(initial={
+            form = NewDataForm_edit(initial={
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'email': user.email,
@@ -200,7 +295,6 @@ def edit_user(request, user_index, username):
         'user_index': user_index,
         'username': username  # Fixed typo: 'usename' -> 'username'
     })
-
 def remove_user(request, user_index,username):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("management:login"))
