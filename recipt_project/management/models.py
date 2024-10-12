@@ -1,6 +1,9 @@
 from django.db import models
 from django.db import connection, DatabaseError
 from datetime import datetime
+from django.contrib.auth.models import User
+from django.db.models import Q
+
 # Function to select all user data
 def select_alluserdata():
     try:
@@ -133,42 +136,55 @@ def save_userdata(username, cnic, phone_number, address, user_type):
     except Exception as e:
         print(f"line 83 An unexpected error occurred: {e}")
 
+
 def search_user(search_column, search_value):
+    employ_usernames = []
+    user_usernames = []
+    result=[]
+    # Search in the custom Employ table for usernames
     with connection.cursor() as cursor:
-        # Ensure the search column is valid to prevent SQL injection
-        valid_columns = ['prod_code', 'product_description', 'prod_quant', 'prod_sale_price', 'quantity_price_sale', 'updated_datetime', 'added_by_employ']
-        
-        # If search_column is 'all', construct a different query
+        valid_columns = ['username', 'user_type', 'cnic', 'phone_number', 'updated_datetime', 'address']
+
         if search_column == 'all':
             sql = """
-            SELECT * FROM Employ
-            WHERE LOWER(prod_code) LIKE LOWER(%s)
-            OR LOWER(product_description) LIKE LOWER(%s)
-            OR LOWER(CAST(prod_quant AS VARCHAR(50))) LIKE LOWER(%s)
-            OR LOWER(CAST(prod_sale_price AS VARCHAR(50))) LIKE LOWER(%s)
-            OR LOWER(CAST(quantity_price_sale AS VARCHAR(50))) LIKE LOWER(%s)
+            SELECT username FROM Employ
+            WHERE LOWER(username) LIKE LOWER(%s)
+            OR LOWER(user_type) LIKE LOWER(%s)
+            OR LOWER(cnic) LIKE LOWER(%s)
+            OR LOWER(phone_number) LIKE LOWER(%s)
             OR LOWER(CAST(updated_datetime AS VARCHAR(50))) LIKE LOWER(%s)
-            OR LOWER(CAST(added_by_employ AS VARCHAR(50))) LIKE LOWER(%s)
+            OR LOWER(address) LIKE LOWER(%s)
             """
             like_value = f'%{search_value}%'
-            cursor.execute(sql, [like_value] * 7)  # Repeat the like_value for all 7 placeholders
+            cursor.execute(sql, [like_value] * 6)
         else:
-            # Validate the search column
             if search_column not in valid_columns:
                 raise ValueError("Invalid search column provided.")
-
-            # Prepare the SQL query for a specific column
-            if search_column == 'prod_quant':
-                # For numeric fields, we need to ensure we convert to int
-                try:
-                    search_value = int(search_value)  # Convert to int for numeric fields
-                except ValueError:
-                    raise ValueError("Search value for quantity must be a valid integer.")
-
-            sql = f"SELECT * FROM product WHERE LOWER(CAST({search_column} AS NVARCHAR(50))) LIKE LOWER(%s)"
             
-            # Execute the query with the provided search value
+            sql = f"SELECT username FROM Employ WHERE LOWER({search_column}) LIKE LOWER(%s)"
             cursor.execute(sql, [f'%{search_value}%'])
+        
+        employ_usernames = [row[0] for row in cursor.fetchall()]
+        if employ_usernames[0] not in result:
+            result.append(employ_usernames[0])
 
-        results = cursor.fetchall()
-        return results
+    # Search in the Django User model for usernames
+    if search_column in ['username', 'first_name', 'last_name', 'email', 'all']:
+        if search_column == 'all':
+            user_results = User.objects.filter(
+                Q(username__icontains=search_value) |
+                Q(first_name__icontains=search_value) |
+                Q(last_name__icontains=search_value) |
+                Q(email__icontains=search_value)
+            ).values_list('username', flat=True)
+        else:
+            filter_kwargs = {f"{search_column}__icontains": search_value}
+            user_results = User.objects.filter(**filter_kwargs).values_list('username', flat=True)
+        
+        user_usernames = list(user_results)
+        p
+        if user_usernames[0] not in result:
+            result.append(user_usernames[0])
+    
+    # Return a combined list of usernames from both Employ and User models
+    return result

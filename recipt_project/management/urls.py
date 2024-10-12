@@ -10,7 +10,7 @@ urlpatterns = [
     path('edit_user/<int:user_index>/<str:username>/', views.edit_user, name='edit_user'),  # Edit user URL
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
-    path('search_view/', views.search_user, name='search_view'),
+    path('search_user/', views.search_user, name='search_user'),
     path('profile/', views.profile, name='profile'),
-    path('inventry_sort/<int:asc_decs>/<str:sort_by>/', views.inventry_sort, name='inventry_sort'),
+    # path('inventry_sort/<int:asc_decs>/<str:sort_by>/', views.inventry_sort, name='inventry_sort'),
     ]

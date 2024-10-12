@@ -403,9 +403,23 @@ def search_user(request):
     # Check if search_value is not empty
     if search_value:
         results = models.search_user(search_column, search_value)
-
+        databasedata , users =arange_user(results)
+        print(f"line 408 ::{databasedata} {users}")
     # Render the template with search results
     return render(request, 'management/index.html', {
-        "user": results,
+        "results":results,
+        "databasedata":databasedata,
+        "users": users,
         'length_user': range(len(results))
     })
+def arange_user(results):
+    users=[]
+    databasedata=[]
+    for username in results:
+        print(username)
+        user_django = User.objects.get(username=username)
+        user_database=models.select_userdata(username)
+        users.append(user_django)
+        databasedata.append(user_database)
+
+    return databasedata, users

@@ -75,10 +75,13 @@
     {% else %}
         <h1>No users added</h1>
     {% endif %}
+    {% if results %}
+    {{results}}
+    {% endif %}
 </div>
 
 <script>
-    const searchUrl = "{% url 'management:search_view' %}";
+    const searchUrl = "{% url 'management:search_user' %}";
 
     function autoSearch() {
         const query = document.getElementById('searchInput').value;
