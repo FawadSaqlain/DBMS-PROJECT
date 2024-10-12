@@ -8,6 +8,8 @@ from django.contrib import messages
 from datetime import datetime
 from django import forms
 from . import models
+from django.contrib.auth.hashers import check_password
+
 class NewDataForm(forms.Form):
     USER_TYPE_CHOICES = [
         ('inventory manager', 'Inventory Manager'),
@@ -97,7 +99,6 @@ class NewDataForm(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px; height: 100px;'  
         })
     )
-
 class NewDataForm_edit(forms.Form):
     def for_edit_user(self,first_name ,last_name, cnic,phone_number,email,username,user_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -180,6 +181,29 @@ class NewDataForm_edit(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px; height: 100px;'  
         })
     )
+class changepassword(forms.Form):
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'id': 'id_old_password',
+            'placeholder': 'Enter old password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Enter new password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    confirm_new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Enter confirm new password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
 
 def index(request):
     if not request.user.is_authenticated:
@@ -237,7 +261,6 @@ def add_user(request):
             return render(request, 'management/add.html', {'form': form})
 
     return render(request, 'management/add.html', {"form": NewDataForm()})
-
 def edit_user(request, user_index, username):
     # username = 'hamza'  # For testing
     if not request.user.is_authenticated:
@@ -329,5 +352,60 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("management:login"))
-def search_view():
+def profile(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("management:login"))
+    user_data=models.select_userdata(request.user.username)
+    if request.method == 'POST':
+        form = changepassword(request.POST)
+        if form.is_valid():
+            old_password = form.cleaned_data['old_password']
+            new_password = form.cleaned_data['new_password']
+            confirm_new_password = form.cleaned_data['confirm_new_password']
+            if check_password(old_password, request.user.password):
+                if new_password==confirm_new_password:
+                    request.user.set_password(new_password)
+                    request.user.save()
+                    print("line 214 :: password is changed ")
+                    # request.user.save() 
+                    return redirect('management:logout')
+                else:
+                    return render(request, 'management/profile.html', {
+                        "form": form,
+                        "message": "Passwords do not match",
+                        "user_data":user_data
+                        })
+            else:
+                return render(request, 'management/profile.html', {
+                    "form": form,
+                    "message": "Old password is incorrect",
+                    "user_data":user_data
+                    })
+    return render(request, 'management/profile.html', {
+                    "message": "you are not changing the password",
+                    "form": changepassword(),
+                    "user_data":user_data
+                    })
+def user_sort():
+    
     pass
+def search_user(request):
+    search_column = request.GET.get('section', 'username')  # Default search column
+    search_value = request.GET.get('q', '')  # Retrieved search value
+    
+    # Convert search_value to string (if not already a string)
+    search_value = str(search_value)
+    
+    print(f"line 399 search value :: {search_value} , search column :: {search_column}")
+
+    results = []  # Initialize results list
+
+    # Check if search_value is not empty
+    if search_value:
+        results = models.search_user(search_column, search_value)
+
+    # Render the template with search results
+    return render(request, 'management/index.html', {
+        "user": results,
+        'length_user': range(len(results))
+    })

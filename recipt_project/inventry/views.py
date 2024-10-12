@@ -7,6 +7,7 @@ from datetime import datetime
 import random
 import string
 from . import models
+from django.contrib.auth.hashers import check_password
 
 # Helper function to generate a random receipt number
 def generate_random_key(length=5):
@@ -26,7 +27,7 @@ class NewDataForm(forms.Form):
             'id': 'id_name',
             'placeholder': 'Enter product Description',
             'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;height:100px'
         })
     )
     prod_sale_price = forms.IntegerField(
@@ -40,6 +41,29 @@ class NewDataForm(forms.Form):
     prod_quantity = forms.IntegerField(
         widget=forms.NumberInput(attrs={
             'placeholder': 'Enter product quantity',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+class changepassword(forms.Form):
+    old_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'id': 'id_old_password',
+            'placeholder': 'Enter old password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Enter new password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    confirm_new_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'Enter confirm new password',
             'class': 'form-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
@@ -127,7 +151,6 @@ def delet(request, prod_index,prod_code):
     models.delete_item(prod_code)
     print("line 138 deleted the product")
     return redirect('inventry:index')
-
 def edit_product(request, prod_index,prod_code):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("inventry:login"))
@@ -174,7 +197,40 @@ def edit_product(request, prod_index,prod_code):
         'prod_index': prod_index,
         'prod_code': prod_code  # Add this line
     })
-
+def profile(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("inventry:login"))
+    user_data=models.select_userdata(request.user.username)
+    if request.method == 'POST':
+        form = changepassword(request.POST)
+        if form.is_valid():
+            old_password = form.cleaned_data['old_password']
+            new_password = form.cleaned_data['new_password']
+            confirm_new_password = form.cleaned_data['confirm_new_password']
+            if check_password(old_password, request.user.password):
+                if new_password==confirm_new_password:
+                    request.user.set_password(new_password)
+                    request.user.save()
+                    print("line 214 :: password is changed ")
+                    # request.user.save() 
+                    return redirect('inventry:logout')
+                else:
+                    return render(request, 'inventry/profile.html', {
+                        "form": form,
+                        "message": "Passwords do not match",
+                        "user_data":user_data
+                        })
+            else:
+                return render(request, 'inventry/profile.html', {
+                    "form": form,
+                    "message": "Old password is incorrect",
+                    "user_data":user_data
+                    })
+    return render(request, 'inventry/profile.html', {
+                    "message": "you are not changing the password",
+                    "form": changepassword(),
+                    "user_data":user_data
+                    })
 def login_view(request):
     if request.method == "POST":
         username = request.POST["username"]
@@ -182,7 +238,7 @@ def login_view(request):
         print(f" models.select_userdata(username) :: {models.select_userdata(username)}")
         user = authenticate(request, username=username, password=password)
         if (user is not None):
-            if (models.select_userdata(username) == "inventory manager" or models.select_userdata(username) == "administration manager"):
+            if (models.select_userdata(username)[1] == "inventory manager" or models.select_userdata(username)[1] == "administration manager"):
                 login(request, user)
                 return HttpResponseRedirect(reverse("inventry:add"))
             else:

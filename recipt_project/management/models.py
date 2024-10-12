@@ -133,3 +133,42 @@ def save_userdata(username, cnic, phone_number, address, user_type):
     except Exception as e:
         print(f"line 83 An unexpected error occurred: {e}")
 
+def search_user(search_column, search_value):
+    with connection.cursor() as cursor:
+        # Ensure the search column is valid to prevent SQL injection
+        valid_columns = ['prod_code', 'product_description', 'prod_quant', 'prod_sale_price', 'quantity_price_sale', 'updated_datetime', 'added_by_employ']
+        
+        # If search_column is 'all', construct a different query
+        if search_column == 'all':
+            sql = """
+            SELECT * FROM Employ
+            WHERE LOWER(prod_code) LIKE LOWER(%s)
+            OR LOWER(product_description) LIKE LOWER(%s)
+            OR LOWER(CAST(prod_quant AS VARCHAR(50))) LIKE LOWER(%s)
+            OR LOWER(CAST(prod_sale_price AS VARCHAR(50))) LIKE LOWER(%s)
+            OR LOWER(CAST(quantity_price_sale AS VARCHAR(50))) LIKE LOWER(%s)
+            OR LOWER(CAST(updated_datetime AS VARCHAR(50))) LIKE LOWER(%s)
+            OR LOWER(CAST(added_by_employ AS VARCHAR(50))) LIKE LOWER(%s)
+            """
+            like_value = f'%{search_value}%'
+            cursor.execute(sql, [like_value] * 7)  # Repeat the like_value for all 7 placeholders
+        else:
+            # Validate the search column
+            if search_column not in valid_columns:
+                raise ValueError("Invalid search column provided.")
+
+            # Prepare the SQL query for a specific column
+            if search_column == 'prod_quant':
+                # For numeric fields, we need to ensure we convert to int
+                try:
+                    search_value = int(search_value)  # Convert to int for numeric fields
+                except ValueError:
+                    raise ValueError("Search value for quantity must be a valid integer.")
+
+            sql = f"SELECT * FROM product WHERE LOWER(CAST({search_column} AS NVARCHAR(50))) LIKE LOWER(%s)"
+            
+            # Execute the query with the provided search value
+            cursor.execute(sql, [f'%{search_value}%'])
+
+        results = cursor.fetchall()
+        return results

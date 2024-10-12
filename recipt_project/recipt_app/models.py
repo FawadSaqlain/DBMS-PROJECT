@@ -257,20 +257,16 @@ def get_customer_recipt(recipt_code):
 def select_userdata(username):
     try:
         with connection.cursor() as cursor:
-            query = "SELECT user_type FROM Employ WHERE username = %s"
+            query = "SELECT * FROM Employ WHERE username = %s"
             cursor.execute(query, [username])
             result = cursor.fetchone()  # Fetch the first row of the result
             if result:
-                user_type = result[0]  # Extract the string from the tuple
-                print("Data selected successfully:", user_type)
-                return user_type
+                print("Data selected successfully:", result)
             else:
                 print("No data found for the given username.")
-                return ""  # Return an empty string if no data is found
+            return result
     except DatabaseError as e:
         print(f"Error selecting data: {e}")
-        return ""
-
 # '''
 # def insert_quantity_inventry_subtract_recipt_quantity_return(recipt_code, products, recipt_code_buy):
 #     """
