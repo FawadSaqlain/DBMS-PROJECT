@@ -137,9 +137,12 @@ def select_userdata(username):
             cursor.execute(query, [username])
             result = cursor.fetchone()  # Fetch the first row of the result
             if result:
-                print("Data selected successfully:", result)
+                user_type = result[0]  # Extract the string from the tuple
+                print("Data selected successfully:", user_type)
+                return user_type
             else:
                 print("No data found for the given username.")
-            return result
+                return ""  # Return an empty string if no data is found
     except DatabaseError as e:
         print(f"Error selecting data: {e}")
+        return ""

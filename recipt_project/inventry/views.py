@@ -179,10 +179,17 @@ def login_view(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
+        print(f" models.select_userdata(username) :: {models.select_userdata(username)}")
         user = authenticate(request, username=username, password=password)
-        if (user is not None) and (models.select_userdata(username) == "inventory manager" or models.select_userdata(username) == "administration manager"):
-            login(request, user)
-            return HttpResponseRedirect(reverse("inventry:add"))
+        if (user is not None):
+            if (models.select_userdata(username) == "inventory manager" or models.select_userdata(username) == "administration manager"):
+                login(request, user)
+                return HttpResponseRedirect(reverse("inventry:add"))
+            else:
+                return render(request, "inventry/login.html", {
+                "message": "invalit permisions",
+                "username": username  # Retain the entered username
+            })
         else:
             return render(request, "inventry/login.html", {
                 "message": "Invalid credentials.",
