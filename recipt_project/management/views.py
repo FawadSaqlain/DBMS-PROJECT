@@ -19,9 +19,9 @@ class NewDataForm(forms.Form):
         self.fields['username'].initial = username
         self.fields['user_type'].initial = user_type
     USER_TYPE_CHOICES = [
-        ('inventory_manager', 'Inventory Manager'),
-        ('counter_manager', 'Counter Manager'),
-        ('administration_manager', 'Administration Manager'),
+        ('inventory manager', 'Inventory Manager'),
+        ('counter manager', 'Counter Manager'),
+        ('administration manager', 'Administration Manager'),
     ]
     first_name = forms.CharField(
         max_length=100,
@@ -90,7 +90,6 @@ class NewDataForm(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px; height: 100px;'  
         })
     )
-
 def index(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("management:login"))
@@ -102,7 +101,6 @@ def index(request):
         "users": users,
         'length_users': len(users)
     })
-
 def add_user(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("management:login"))
@@ -145,26 +143,19 @@ def add_user(request):
 
     return render(request, 'management/add.html', {"form": NewDataForm()})
 
-# from django.shortcuts import render, redirect
-# from django.http import HttpResponseRedirect
-# from django.urls import reverse
-# from django.contrib import messages
-# from .models import User  # Import your User model
-
-# @csrf_exempt
 def edit_user(request, user_index, username):
     # username = 'hamza'  # For testing
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("management:login"))
     
-    print(f"line 151 data is coming in edit_user {user_index} , {username}")
+    # print(f"line 151 data is coming in edit_user {user_index} , {username}")
     user = User.objects.get(username=username)
-    print(f"line 153 before saving {user}")
+    # print(f"line 153 before saving {user}")
     user_data = models.select_userdata(username)  # Assuming this function retrieves user data including cnic, phone_number, user_type, etc.
-    
     if request.method == 'POST':
         form = NewDataForm(request.POST)
         if form.is_valid():
+            user.username=username
             user.first_name = form.cleaned_data['first_name']
             user.last_name = form.cleaned_data['last_name']
             user.email = form.cleaned_data['email']
@@ -184,17 +175,25 @@ def edit_user(request, user_index, username):
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        form = NewDataForm(initial={
+        if not user_data:
+            form = NewDataForm(initial={
             'first_name': user.first_name,
             'last_name': user.last_name,
             'email': user.email,
-            'username': user.username,
-            'cnic': user_data[2],  # Assuming cnic is the 3rd column
-            'phone_number': user_data[3],  # Assuming phone_number is the 4th column
-            'user_type': user_data[1],  # Assuming user_type is the 2nd column
-            'address': user_data[5],  # Assuming address is the 5th column
+            'username': user.username
         })
-    
+        else:
+            form = NewDataForm(initial={
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'username': user.username,
+                'cnic': user_data[2],  # Assuming cnic is the 3rd column
+                'phone_number': user_data[3],  # Assuming phone_number is the 4th column
+                'user_type': user_data[1],  # Assuming user_type is the 2nd column
+                'address': user_data[5],  # Assuming address is the 5th column
+            })
+    print(f"line 196 username :: {username}")
     return render(request, 'management/add.html', {
         "form": form,
         'is_editing': True,
@@ -207,7 +206,11 @@ def remove_user(request, user_index,username):
         return HttpResponseRedirect(reverse("management:login"))
 
     try:
+        print(f"line 210 data is coming in edit_user {user_index} , {username}")
         user = User.objects.get(username=username)
+    
+        user = User.objects.get(username=username)
+        print(f"line 214 before saving {user}")
         models.delete_userdata(username)
         user.delete()
         messages.success(request, f"User '{username}' has been deleted.")
@@ -215,13 +218,12 @@ def remove_user(request, user_index,username):
         messages.error(request, f"User '{username}' not found.")
     
     return redirect('management:index')
-
 def login_view(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-        if user is not None:
+        if user is not None and models.select_userdata(username)[1] == "administration manager":
             login(request, user)
             return HttpResponseRedirect(reverse("management:index"))
         else:
@@ -230,10 +232,8 @@ def login_view(request):
                 "username": username
             })
     return render(request, "management/login.html")
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("management:login"))
-
 def search_view():
     pass

@@ -1,6 +1,6 @@
 # models.py
 
-from django.db import connection
+from django.db import connection , DatabaseError
 from django.db import IntegrityError
 
 def save_customer_recipt_to_db(customer_name, customer_email, employ_name, recipt_code, date_time, total_price, products):
@@ -255,7 +255,19 @@ def get_customer_recipt(recipt_code):
         print(f"line 397 Error fetching customer data: {e}")
         return None
 
-
+def select_userdata(username):
+    try:
+        with connection.cursor() as cursor:
+            query = "SELECT user_type FROM Employ WHERE username = %s"
+            cursor.execute(query, [username])
+            result = cursor.fetchone()  # Fetch the first row of the result
+            if result:
+                print("Data selected successfully:", result)
+            else:
+                print("No data found for the given username.")
+            return result
+    except DatabaseError as e:
+        print(f"Error selecting data: {e}")
 
 # '''
 # def insert_quantity_inventry_subtract_recipt_quantity_return(recipt_code, products, recipt_code_buy):

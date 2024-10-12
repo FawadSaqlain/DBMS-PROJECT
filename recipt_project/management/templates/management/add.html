@@ -2,13 +2,13 @@
 
 {% block body %}
 <div>
-    <form action="{% if is_editing %} {% url 'management:edit_user' user_index user.username %} {% else %}{% url 'management:add_user' %}{% endif %}" method="post">
+    <form action="{% if is_editing %} {% url 'management:edit_user' user_index username %} {% else %}{% url 'management:add_user' %}{% endif %}" method="post">
         {% csrf_token %}
         <!-- Dynamic heading based on whether you are adding or editing an item -->
         <h1>
             {% if is_editing %}
                 Please edit user details
-                user index :: {{user_index}} ||| user name :: {{user.username}}
+                user index :: {{user_index}} ||| user name :: {{username}}
             {% else %}
                 Please add user details
             {% endif %}

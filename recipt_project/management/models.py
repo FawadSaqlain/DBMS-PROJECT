@@ -78,6 +78,7 @@ def delete_userdata(username):
         connection.rollback()  # Rollback in case of error
 
 # Function to select user data
+
 def select_userdata(username):
     try:
         with connection.cursor() as cursor:

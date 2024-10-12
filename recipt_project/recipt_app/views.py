@@ -480,7 +480,7 @@ def login_view(request):
         print(f"line 437 user name :: {username}")
         # , password :: {password}")
         user = authenticate(request, username=username, password=password)
-        if user is not None:
+        if (user is not None) and (models.select_userdata(username) == "counter manager" or models.select_userdata(username) == "administration manager"):
             login(request, user)
             messages.success(request, 'This is a success TEST message!')
             return HttpResponseRedirect(reverse("recipt:new_receipt", kwargs={'return_product': 0}))
@@ -493,3 +493,4 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("recipt:login"))
+

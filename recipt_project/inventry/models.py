@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection , DatabaseError
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 
@@ -80,7 +80,6 @@ def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, q
         print(f"line 81 Error inserting/updating record: {e}")
     except Exception as e:
         print(f"line 83 An unexpected error occurred: {e}")
-
 @csrf_exempt
 def get_product(prod_code):
     """Retrieves product data from the product table and returns a 1D list of the first product."""
@@ -97,7 +96,6 @@ def get_product(prod_code):
     except Exception as e:
         print(f"Error fetching product data: {e}")
         return []
-
 @csrf_exempt
 def view_inventory(request):
     """Returns a list of products in the inventory."""
@@ -121,7 +119,6 @@ def view_sorted_inventory(request, asc_decs, sort_by):
     except Exception as e:
         print(f"line 143 Error fetching product data: {e}")
         return []
-
 def delete_item(prod_code):
     """Deletes a product from the product table."""
     try:
@@ -131,3 +128,18 @@ def delete_item(prod_code):
     except Exception as e:
         print(f"line 153 Error while deleting product: {e}")
         connection.rollback()
+
+
+def select_userdata(username):
+    try:
+        with connection.cursor() as cursor:
+            query = "SELECT user_type FROM Employ WHERE username = %s"
+            cursor.execute(query, [username])
+            result = cursor.fetchone()  # Fetch the first row of the result
+            if result:
+                print("Data selected successfully:", result)
+            else:
+                print("No data found for the given username.")
+            return result
+    except DatabaseError as e:
+        print(f"Error selecting data: {e}")

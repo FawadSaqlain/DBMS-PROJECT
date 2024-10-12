@@ -39,12 +39,12 @@ USE GENERALSTORE_MS
 --     updated_datetime DATETIME,
 --     added_by_employ NVARCHAR(100),
 -- )
-
+-- drop table Employ
 -- CREATE TABLE Employ (
 --     username NVARCHAR(100) PRIMARY KEY,
 --     user_type NVARCHAR(1000),
---     cnic INT,
---     phone_number INT,
+--     cnic NVARCHAR(1000),
+--     phone_number NVARCHAR(1000),
 --     updated_datetime DATETIME,
 --     address NVARCHAR(1000),
 -- )
