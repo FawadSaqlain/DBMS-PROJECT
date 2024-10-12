@@ -34,7 +34,10 @@
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Email</th>
+                <th>User Type</th>
+                <th>CNIC</th>
                 <th>Phone Number</th>
+                <th>date joined</th>
                 <th>Address</th>
                 <th>Actions</th>
             </tr>
@@ -47,8 +50,15 @@
                 <td>{{ user.first_name }}</td>
                 <td>{{ user.last_name }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.phone_number }}</td>
-                <td>{{ user.address }}</td>
+                {% for userdata in databasedata %}
+                {% if userdata.0 == user.username %}
+                <td>{{ userdata.1 }}</td>
+                <td>{{ userdata.2 }}</td>
+                <td>{{ userdata.3 }}</td>
+                <td>{{ userdata.4 }}</td>
+                <td>{{ userdata.5 }}</td>
+                {% endif %}
+                {% endfor %}
                 <td>
                     {% load static %}
                     <a href="{% url 'management:remove_user' forloop.counter0 user.username %}" class="delete-button">

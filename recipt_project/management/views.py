@@ -18,7 +18,6 @@ class NewDataForm(forms.Form):
         self.fields['email'].initial = email
         self.fields['username'].initial = username
         self.fields['user_type'].initial = user_type
-
     USER_TYPE_CHOICES = [
         ('inventory_manager', 'Inventory Manager'),
         ('counter_manager', 'Counter Manager'),
@@ -97,8 +96,9 @@ def index(request):
         return HttpResponseRedirect(reverse("management:login"))
 
     users = User.objects.all()
-
+    databasedata=models.select_alluserdata()
     return render(request, 'management/index.html', {
+        "databasedata":databasedata,
         "users": users,
         'length_users': len(users)
     })
@@ -128,8 +128,9 @@ def add_user(request):
                     email=email,
                     password='defaultpassword123'  # For demo; ideally generate/send password securely
                 )
-                user.save()
+                
                 models.save_userdata(username,cnic,phone_number,address,user_type)
+                user.save()
 
                 messages.success(request, 'User created successfully!')
 
@@ -144,25 +145,40 @@ def add_user(request):
 
     return render(request, 'management/add.html', {"form": NewDataForm()})
 
-def edit_user(request, user_index,username):
+# from django.shortcuts import render, redirect
+# from django.http import HttpResponseRedirect
+# from django.urls import reverse
+# from django.contrib import messages
+# from .models import User  # Import your User model
+
+# @csrf_exempt
+def edit_user(request, user_index, username):
+    # username = 'hamza'  # For testing
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("management:login"))
-
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        messages.error(request, 'User not found.')
-        return redirect('management:index')
-
+    
+    print(f"line 151 data is coming in edit_user {user_index} , {username}")
+    user = User.objects.get(username=username)
+    print(f"line 153 before saving {user}")
+    user_data = models.select_userdata(username)  # Assuming this function retrieves user data including cnic, phone_number, user_type, etc.
+    
     if request.method == 'POST':
         form = NewDataForm(request.POST)
         if form.is_valid():
             user.first_name = form.cleaned_data['first_name']
             user.last_name = form.cleaned_data['last_name']
             user.email = form.cleaned_data['email']
-            # Other fields to update can be added here
+            cnic = form.cleaned_data['cnic']
+            phone_number = form.cleaned_data['phone_number']
+            address = form.cleaned_data['address']
+            user_type = form.cleaned_data['user_type']
+            
+            print(f"before updating in edit_user models.save_userdata({username}, {cnic}, {phone_number}, {address}, {user_type})")
+            models.save_userdata(username, cnic, phone_number, address, user_type)  # Update User and custom Employ model
+            
+            print(f"line 169 before saving {user}")
             user.save()
-
+            
             messages.success(request, 'User updated successfully!')
             return redirect('management:index')
         else:
@@ -173,14 +189,17 @@ def edit_user(request, user_index,username):
             'last_name': user.last_name,
             'email': user.email,
             'username': user.username,
-            # Fetch other fields as needed
+            'cnic': user_data[2],  # Assuming cnic is the 3rd column
+            'phone_number': user_data[3],  # Assuming phone_number is the 4th column
+            'user_type': user_data[1],  # Assuming user_type is the 2nd column
+            'address': user_data[5],  # Assuming address is the 5th column
         })
-
+    
     return render(request, 'management/add.html', {
         "form": form,
         'is_editing': True,
         'user_index': user_index,
-        'usename': username  # Add this line
+        'username': username  # Fixed typo: 'usename' -> 'username'
     })
 
 def remove_user(request, user_index,username):
@@ -189,6 +208,7 @@ def remove_user(request, user_index,username):
 
     try:
         user = User.objects.get(username=username)
+        models.delete_userdata(username)
         user.delete()
         messages.success(request, f"User '{username}' has been deleted.")
     except User.DoesNotExist:

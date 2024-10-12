@@ -41,9 +41,6 @@ def search_products(search_column, search_value):
 
         results = cursor.fetchall()
         return results
-
-
-
 @csrf_exempt
 def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime, username):
     # product=get_product(prod_code)
