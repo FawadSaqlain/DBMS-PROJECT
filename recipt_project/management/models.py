@@ -138,9 +138,8 @@ def save_userdata(username, cnic, phone_number, address, user_type):
 
 
 def search_user(search_column, search_value):
-    employ_usernames = []
-    user_usernames = []
-    result=[]
+    result = []
+    
     # Search in the custom Employ table for usernames
     with connection.cursor() as cursor:
         valid_columns = ['username', 'user_type', 'cnic', 'phone_number', 'updated_datetime', 'address']
@@ -164,9 +163,9 @@ def search_user(search_column, search_value):
             sql = f"SELECT username FROM Employ WHERE LOWER({search_column}) LIKE LOWER(%s)"
             cursor.execute(sql, [f'%{search_value}%'])
         
+        # Fetch and add unique usernames from the Employ table
         employ_usernames = [row[0] for row in cursor.fetchall()]
-        if employ_usernames[0] not in result:
-            result.append(employ_usernames[0])
+        result.extend([username for username in employ_usernames if username not in result])
 
     # Search in the Django User model for usernames
     if search_column in ['username', 'first_name', 'last_name', 'email', 'all']:
@@ -181,10 +180,9 @@ def search_user(search_column, search_value):
             filter_kwargs = {f"{search_column}__icontains": search_value}
             user_results = User.objects.filter(**filter_kwargs).values_list('username', flat=True)
         
+        # Fetch and add unique usernames from the User model
         user_usernames = list(user_results)
-        p
-        if user_usernames[0] not in result:
-            result.append(user_usernames[0])
-    
-    # Return a combined list of usernames from both Employ and User models
+        result.extend([username for username in user_usernames if username not in result])
+
+    # Return the combined unique usernames list
     return result

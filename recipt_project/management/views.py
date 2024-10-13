@@ -407,7 +407,6 @@ def search_user(request):
         print(f"line 408 ::{databasedata} {users}")
     # Render the template with search results
     return render(request, 'management/index.html', {
-        "results":results,
         "databasedata":databasedata,
         "users": users,
         'length_user': range(len(results))
