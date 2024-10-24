@@ -49,6 +49,7 @@ USE GENERALSTORE_MS
 --     address NVARCHAR(1000),
 -- )
 
+-- INSERT INTO Employ (username, user_type, cnic, phone_number, updated_datetime, address)VALUES ('fawad', 'administration manager', '3660302698539', '03316963802', '2020-04-12', 'mumtazgarden');
 -- IF OBJECT_ID('customers', 'U') IS NOT NULL
 -- BEGIN
     -- DROP TABLE customers;
@@ -87,3 +88,4 @@ SELECT * FROM EMPLOY
 
 -- SELECT * FROM Product
 -- WHERE LOWER(%s) LIKE LOWER('%s')
+

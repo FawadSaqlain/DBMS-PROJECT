@@ -12,5 +12,5 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('search_user/', views.search_user, name='search_user'),
     path('profile/', views.profile, name='profile'),
-    # path('inventry_sort/<int:asc_decs>/<str:sort_by>/', views.inventry_sort, name='inventry_sort'),
+    path('user_sort/<int:asc_decs>/<str:sort_by>/', views.user_sort, name='user_sort'),
     ]

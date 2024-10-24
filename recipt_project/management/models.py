@@ -186,3 +186,17 @@ def search_user(search_column, search_value):
 
     # Return the combined unique usernames list
     return result
+
+def view_sorted_user(request, asc_decs, sort_by):
+    """Returns a list of sorted Employs in the user."""
+    try:
+        with connection.cursor() as cursor:
+            order = "ASC" if asc_decs == 0 else "DESC"
+            query = f"SELECT * FROM Employ ORDER BY {sort_by} {order}"
+            cursor.execute(query)
+            Employs = cursor.fetchall()
+            
+            return [list(Employ) for Employ in Employs]
+    except Exception as e:
+        print(f"line 200 Error fetching Employ data: {e}")
+        return []

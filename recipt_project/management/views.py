@@ -386,9 +386,16 @@ def profile(request):
                     "form": changepassword(),
                     "user_data":user_data
                     })
-def user_sort():
-    
-    pass
+def user_sort(request,asc_decs,sort_by):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("inventry:login"))
+    return redirect('management:index')
+    # print(f"asc_decs,sortby :: {asc_decs},{sort_by}")
+    # return render(request, 'inventry/index.html', {
+    #     "products": models.view_sorted_user(request,asc_decs,sort_by),
+    #     'length_products':range(len(models.select_alluserdata(request))),
+    #     'sorted_as':f"{asc_decs}{sort_by}"
+    # })
 def search_user(request):
     search_column = request.GET.get('section', 'username')  # Default search column
     search_value = request.GET.get('q', '')  # Retrieved search value
