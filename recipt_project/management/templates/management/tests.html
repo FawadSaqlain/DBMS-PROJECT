@@ -1,0 +1,16 @@
+{% extends "inventry/layout.html" %}
+
+{% block body %}
+sorted as {{sorted_as}}
+<br>
+current order {{current_order}}
+<br>
+{% for user in django %}
+user :: {{user}}
+<br>
+{% endfor %}
+{% for data in database %}
+data :: {{data}}
+<br>
+{%endfor%}
+{% endblock %}

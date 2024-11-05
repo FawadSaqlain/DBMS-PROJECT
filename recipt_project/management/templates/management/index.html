@@ -23,29 +23,12 @@
         {% endif %}
     </div>
 </div>
-
 <div id="index_outer_div" class="user-details">
     {% if users %}
     <table class="user-table">
-        <!-- <thead>
-            <tr>
-                <th>Index</th>
-                <th>Username</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>User Type</th>
-                <th>CNIC</th>
-                <th>Phone Number</th>
-                <th>date joined</th>
-                <th>Address</th>
-                <th>Actions</th>
-            </tr>
-        </thead> -->
         <thead>
             <tr>
                 <th>index no</th>
-
                 <th><a href="{% url 'management:index' %}" class="hover-effect">Username</a>
                 </th>
                 <th>{% if sorted_as == '0prod_quant' %}
@@ -165,12 +148,9 @@
     {% else %}
         <h1>No users added</h1>
     {% endif %}
-
 </div>
-
 <script>
     const searchUrl = "{% url 'management:search_user' %}";
-
     function autoSearch() {
         const query = document.getElementById('searchInput').value;
         const section = document.getElementById('searchSection').value;

@@ -7,14 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel="stylesheet" type="text/css" href="{% static 'inventry_css/style.css' %}">
-    <link rel="icon" type="image/x-icon" href="https://th.bing.com/th/id/OIG1.y_2amRAytZhrAjPsZA6Y?w=173&h=173&c=6&r=0&o=5&pid=ImgGn" alt="BUGS">
+    <link rel="icon" type="image/x-icon" href="{% static 'inventry_css/assets/BUGS logo.jpeg' %}" alt="BUGS">
     <title>B U G S</title>
 </head>
 
 <body>
     <header>
         <h1>Bhatti Union General Store </h1>
-        <h1>Inventry Section</h1>
+        <h1 style="display: inline;">Inventory</h1>
         <a href="{% url 'inventry:logout' %}">
             <button type="button" class="logout-button"
                 style="float: right;width: 100px;height: 30px; color: brown; "><strong>Log out</strong></button>

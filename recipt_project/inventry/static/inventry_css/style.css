@@ -201,6 +201,7 @@ a.hover-effect:hover h3 {
   background-color: rgb(166, 43, 43);
   color:#ffffff
 }
+
 .product-table thead tr th:hover {
   font-weight:bolder;
 }

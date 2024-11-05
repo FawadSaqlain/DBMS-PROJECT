@@ -5,37 +5,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <link rel="stylesheet" type="text/css" href="{% static 'management_css/style.css' %}">
-    <link rel="icon" type="image/x-icon" href="https://th.bing.com/th/id/OIG1.y_2amRAytZhrAjPsZA6Y?w=173&h=173&c=6&r=0&o=5&pid=ImgGn" alt="BUGS">
+    <link rel="icon" type="image/x-icon" href="{% static 'management_css/assets/BUGS logo.jpeg' %}" alt="BUGS">
     <title>B U G S</title>
 </head>
 
 <body>
     <header>
-        <h1>Bhatti Union General Store </h1>
-        <h1>Inventry Section</h1>
-        <a href="{% url 'management:logout' %}">
-            <button type="button" class="logout-button"
-                style="float: right;width: 100px;height: 30px; color: brown; "><strong>Log out</strong></button>
-        </a>
-        <a href="{% url 'management:profile' %}">
-            <button type="button" class="logout-button"
-                style="float: right;width: 100px;height: 30px; color: brown; "><strong>profile</strong></button>
-        </a>
-        <a href="{% url 'recipt:index' %}">
-            <button type="button" class="logout-button"
-                style="float: right;width: 100px;height: 30px; color: brown; "><strong>counter</strong></button>
-        </a>
-        <a href="{% url 'inventry:index' %}">
-            <button type="button" class="logout-button"
-                style="float: right;width: 100px;height: 30px; color: brown; "><strong>inventry</strong></button>
-        </a>
-        <a href="{% url 'management:index' %}">
-            <button type="button" class="logout-button"
-                style="float: right;width: 100px;height: 30px; color: brown; "><strong>management</strong></button>
-        </a>
-    </header>
+        <div class="header-row">
+            <div class="header-title">Bhatti Union General Store</div>
+            <div class="header-buttons">
+                <a href="{% url 'management:logout' %}">
+                    <button type="button" class="logout-button">Log out</button>
+                </a>
+                <a href="{% url 'management:profile' %}">
+                    <button type="button" class="logout-button">Profile</button>
+                </a>
+            </div>
+        </div>
+    
+        <!-- Centered Management Section title -->
+        <div class="line2">
+            <div class="section-title">Management Section</div>
+            <div class="right-buttons">
+                <a href="{% url 'recipt:index' %}">
+                    <button type="button" class="logout-button">Counter</button>
+                </a>
+                <a href="{% url 'inventry:index' %}">
+                    <button type="button" class="logout-button">Management</button>
+                </a>
+            </div>
+        </div>
+    </header>    
+    
     <div id="outerContainer">
         <div id="container">
             {% block body %}

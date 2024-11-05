@@ -5,24 +5,80 @@
   box-sizing: border-box;
 }
 
-/* Center the entire page content */
+/* Body styling */
 body {
   min-height: 100vh;
   background-image: url("../management_css/assets/background.jpeg");
   background-size: cover;
   background-repeat: no-repeat;
   font-family: Arial, sans-serif;
+  color: rgb(0, 0, 0);
 }
 
 /* Header styling */
 header {
   width: 100%;
-  height: 100px;
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding-top: 30px;
-  padding-bottom: 30px;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 20px;
   color: aliceblue;
+}
+
+/* First Row: Title and Profile/Logout Buttons */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.header-title {
+  font-size: 1.8em;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+/* Centered Inventory Section title and right-aligned buttons */
+.line2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.section-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+  flex-grow: 1; /* Centers the title */
+}
+
+.right-buttons {
+  display: flex;
+  gap: 15px;
+  margin-right: 20px; /* Optional: adds spacing from the right edge */
+}
+
+/* Button styling */
+.logout-button {
+  width: 100px;
+  height: 35px;
+  background-color: #f1f1f1;
+  color: brown;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #ddd;
 }
 
 /* Centered container */
@@ -30,7 +86,7 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  min-height: calc(100vh - 500px); /* Adjusted for header height */
 }
 
 #container {
@@ -80,12 +136,13 @@ header {
 
 /* Image swap on hover */
 .delete-button img:hover {
-  content: url('../management_css/assets/colore_changed_delete_icon.jpg' ); /* Change this to your hover image URL */
+  content: url('../management_css/assets/colore_changed_delete_icon.jpg'); /* Change this to your hover image URL */
 }
 
 .edit-button img:hover {
   content: url('../management_css/assets/color_changed_edit_icon.jpg'); /* Change this to your hover image URL */
 }
+
 /* Other styling */
 .action-button {
   color: rgb(166, 43, 43);
@@ -156,7 +213,7 @@ a.hover-effect:hover h3 {
   box-shadow: 0 0 10px rgb(166, 42, 42);
 }
 
-.product-table {
+.user-table {
   width: 100%;
   border-collapse: collapse;
   border-radius: 10px;
@@ -164,24 +221,24 @@ a.hover-effect:hover h3 {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.product-table th, .product-table td {
+.user-table th, .user-table td {
   padding: 10px;
   text-align: left;
 }
 
-.product-table tbody tr:nth-child(even) {
+.user-table tbody tr:nth-child(even) {
   background-color: #e8e8e8;
 }
 
-.product-table tbody tr:nth-child(odd) {
+.user-table tbody tr:nth-child(odd) {
   background-color: #ffffff;
 }
 
-.product-table tbody tr:hover {
+.user-table tbody tr:hover {
   background-color: rgb(173, 173, 173);
 }
 
-.product-table thead tr {
+.user-table thead tr {
   background-color: rgb(166, 43, 43);
   color: #ffffff;
 }
