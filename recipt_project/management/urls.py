@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from . import tests
 
 app_name = 'management'
 
@@ -14,5 +13,4 @@ urlpatterns = [
     path('search_user/', views.search_user, name='search_user'),
     path('profile/', views.profile, name='profile'),
     path('user_sort/<int:asc_decs>/<str:sort_by>/', views.user_sort, name='user_sort'),
-    path('test_user_sort/<str:sort_by>/<str:order>', tests.sorted_user_list, name='test_user_sort'),
     ]

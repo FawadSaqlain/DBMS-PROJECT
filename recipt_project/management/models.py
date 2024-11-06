@@ -191,7 +191,7 @@ def view_sorted_user(request, asc_decs, sort_by):
     """Returns a list of sorted Employs in the user."""
     try:
         with connection.cursor() as cursor:
-            order = "ASC" if asc_decs == 'asc' else "DESC"
+            order = "ASC" if asc_decs == 0 else "DESC"
             query = f"SELECT username FROM Employ ORDER BY {sort_by} {order}"
             cursor.execute(query)
             Employs = cursor.fetchall()

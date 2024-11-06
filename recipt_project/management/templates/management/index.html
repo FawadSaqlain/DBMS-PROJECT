@@ -31,32 +31,32 @@
                 <th>index no</th>
                 <th><a href="{% url 'management:index' %}" class="hover-effect">Username</a>
                 </th>
-                <th>{% if sorted_as == '0prod_quant' %}
-                    <a href="{% url 'management:user_sort' 1 'prod_quant' %}" class="hover-effect">
+                <th>{% if sorted_as == '0first_name' %}
+                    <a href="{% url 'management:user_sort' 1 'first_name' %}" class="hover-effect">
                         <h3>First Name</h3>
                     </a>
                     {% else %}
-                    <a href="{% url 'management:user_sort' 0 'prod_quant' %}" class="hover-effect">
+                    <a href="{% url 'management:user_sort' 0 'first_name' %}" class="hover-effect">
                         <h3>First Name</h3>
                     </a>
                     {% endif %}
                 </th>
-                <th>{% if sorted_as == '0prod_sale_price' %}
-                    <a href="{% url 'management:user_sort' 1 'prod_sale_price' %}" class="hover-effect">
+                <th>{% if sorted_as == '0last_name' %}
+                    <a href="{% url 'management:user_sort' 1 'last_name' %}" class="hover-effect">
                         <h3>Last Name</h3>
                     </a>
                     {% else %}
-                    <a href="{% url 'management:user_sort' 0 'prod_sale_price' %}" class="hover-effect">
+                    <a href="{% url 'management:user_sort' 0 'last_name' %}" class="hover-effect">
                         <h3>Last Name</h3>
                     </a>
                     {% endif %}
                 </th>
-                <th>{% if sorted_as == '0quantity_price_sale' %}
-                    <a href="{% url 'management:user_sort' 1 'quantity_price_sale' %}" class="hover-effect">
+                <th>{% if sorted_as == '0email' %}
+                    <a href="{% url 'management:user_sort' 1 'email' %}" class="hover-effect">
                         <h3>Email</h3>
                     </a>
                     {% else %}
-                    <a href="{% url 'management:user_sort' 0 'quantity_price_sale' %}" class="hover-effect">
+                    <a href="{% url 'management:user_sort' 0 'email' %}" class="hover-effect">
                         <h3>Email</h3>
                     </a>
                     {% endif %}
@@ -124,13 +124,13 @@
                 <td>{{ user.last_name }}</td>
                 <td>{{ user.email }}</td>
                 {% for userdata in databasedata %}
-                {% if userdata.0 == user.username %}
-                <td>{{ userdata.1 }}</td>
-                <td>{{ userdata.2 }}</td>
-                <td>{{ userdata.3 }}</td>
-                <td>{{ userdata.4 }}</td>
-                <td>{{ userdata.5 }}</td>
-                {% endif %}
+                    {% if userdata.0 == user.username %}
+                        <td>{{ userdata.1 }}</td>
+                        <td>{{ userdata.2 }}</td>
+                        <td>{{ userdata.3 }}</td>
+                        <td>{{ userdata.4 }}</td>
+                        <td>{{ userdata.5 }}</td>
+                    {% endif %}
                 {% endfor %}
                 <td>
                     {% load static %}
@@ -149,6 +149,7 @@
         <h1>No users added</h1>
     {% endif %}
 </div>
+
 <script>
     const searchUrl = "{% url 'management:search_user' %}";
     function autoSearch() {
