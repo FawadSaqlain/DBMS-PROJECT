@@ -19,10 +19,10 @@ def get_sales_data(start_date, end_date):
         """, [start_date, end_date])
         return cursor.fetchall()
 
-def plot_sales_data(dates, total_prices, frequency):
+def plot_sales_data(dates, total_prices, frequency,start_date, end_date):
     plt.figure(figsize=(10, 5))
     plt.plot(dates, total_prices, marker='o')
-    plt.title(f'Sales Report ({frequency.capitalize()})')
+    plt.title(f'Sales Report ({frequency.capitalize()} :: {start_date} to {end_date})')
     plt.xlabel('Date')
     plt.ylabel('Total Price')
     plt.xticks(rotation=45)
@@ -58,7 +58,7 @@ def generate_report(frequency, start_date, end_date):
         dates = resampled_data.index
         total_prices = resampled_data['total_price']
 
-        chart_url = plot_sales_data(dates, total_prices, frequency)
+        chart_url = plot_sales_data(dates, total_prices, frequency,start_date, end_date)
 
     return chart_url
 
@@ -69,13 +69,28 @@ def sales_report_view(request):
         frequency = request.POST.get('frequency')
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
-
+        print(f"line 72 :: {frequency}  {start_date}  {end_date}")
         if frequency and start_date and end_date:
             # Convert date strings to actual date objects
             start_date = pd.to_datetime(start_date)
             end_date = pd.to_datetime(end_date)
 
-            # Generate report based on the form inputs
+            # Check the frequency and adjust the end date accordingly
+            if frequency == 'daily':
+                # Keep the time as the last moment of the day (23:59:59)
+                end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+            elif frequency == 'monthly':
+                # Set to the last day of the month and the last moment of that day
+                end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+                # Adjust the date to the last day of the month
+                end_date = end_date + pd.offsets.MonthEnd(0)
+            elif frequency == 'yearly':
+                # Set to December 31st of the year and the last moment of that day
+                end_date = end_date.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
+
+            # Now end_date will reflect the end of the given day, month, or year
+                print(f"line 92 :: {frequency}  {start_date}  {end_date}")
+                # Generate report based on the form inputs
             chart_url = generate_report(frequency, start_date, end_date)
 
     return render(request, 'management/tests.html', {'chart_url': chart_url})

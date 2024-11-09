@@ -1,9 +1,34 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Report</title>
+{% extends "management/layout.html" %}
+
+{% block body %}
+    <h1 style="text-align: center; font-weight: bold; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">Sales Report</h1>
+
+    <form method="POST" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
+        {% csrf_token %}
+        
+        <label for="frequency" style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">Frequency:</label>
+        <select name="frequency" id="id_frequency" onchange="updateDateInputs()" class="form-control" style="padding: 8px 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; width: 200px; margin-bottom: 15px;">
+            <option value="daily">Daily</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select>
+
+        <label for="start_date" style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">Start Date:</label>
+        <input type="date" name="start_date" id="id_start_date" class="form-control" style="padding: 8px 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; width: 200px; margin-bottom: 15px;"><br><br>
+
+        <label for="end_date" style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">End Date:</label>
+        <input type="date" name="end_date" id="id_end_date" class="form-control" style="padding: 8px 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; width: 200px; margin-bottom: 15px;"><br><br>
+
+        <button type="submit" style="background-color: rgb(166, 43, 43); color: #fff; font-weight: bold; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">
+            Generate Report
+        </button>
+    </form>
+    
+    {% if chart_url %}
+        <h2 style="text-align: center; font-weight: bold; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; margin-top: 30px;">Sales Graph</h2>
+        <img src="{{ chart_url }}" alt="Sales Graph" style="display: block; margin: 20px auto; max-width: 100%; border-radius: 10px;">
+    {% endif %}
+
     <script>
         function updateDateInputs() {
             const frequencySelect = document.getElementById('id_frequency');
@@ -26,31 +51,4 @@
             }
         }
     </script>
-</head>
-<body>
-    <h1>Sales Report</h1>
-    
-    <form method="POST">
-        {% csrf_token %}
-        <label for="frequency">Frequency:</label>
-        <select name="frequency" id="id_frequency" onchange="updateDateInputs()" class="form-control">
-            <option value="daily">Daily</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select><br><br>
-
-        <label for="start_date">Start Date:</label>
-        <input type="date" name="start_date" id="id_start_date" class="form-control"><br><br>
-
-        <label for="end_date">End Date:</label>
-        <input type="date" name="end_date" id="id_end_date" class="form-control"><br><br>
-
-        <button type="submit">Generate Report</button>
-    </form>
-    
-    {% if chart_url %}
-        <h2>Sales Graph</h2>
-        <img src="{{ chart_url }}" alt="Sales Graph">
-    {% endif %}
-</body>
-</html>
+{% endblock %}
