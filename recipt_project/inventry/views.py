@@ -69,14 +69,14 @@ class changepassword(forms.Form):
         })
     )
 def index(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
     return render(request, 'inventry/index.html', {
         "products": models.view_inventory(request),
         # 'length_products':range(len(models.view_inventory(request)))
     })
 def inventry_sort(request,asc_decs,sort_by):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
     # print(f"asc_decs,sortby :: {asc_decs},{sort_by}")
     return render(request, 'inventry/index.html', {
@@ -118,7 +118,7 @@ def search_view(request):
         'length_products': range(len(results))
     })
 def add(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
     
     # Ensure the session key 'products' is initialized
@@ -145,14 +145,14 @@ def add(request):
     
     return render(request, 'inventry/add.html', {"form": NewDataForm()})
 def delet(request, prod_index,prod_code):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
 
     models.delete_item(prod_code)
     print("line 138 deleted the product")
     return redirect('inventry:index')
 def edit_product(request, prod_index,prod_code):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
 
     try:
@@ -198,7 +198,7 @@ def edit_product(request, prod_index,prod_code):
         'prod_code': prod_code  # Add this line
     })
 def profile(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
     user_data=models.select_userdata(request.user.username)
     if request.method == 'POST':
@@ -240,6 +240,7 @@ def login_view(request):
         if (user is not None):
             if (models.select_userdata(username)[1] == "inventory manager" or models.select_userdata(username)[1] == "administration manager"):
                 login(request, user)
+
                 return HttpResponseRedirect(reverse("inventry:add"))
             else:
                 return render(request, "inventry/login.html", {

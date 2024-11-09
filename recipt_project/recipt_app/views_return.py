@@ -45,7 +45,7 @@ class return_product_recipt_code(forms.Form):
         self.fields['recipt_code_buy'].initial = recipt_code_buy
 
 def save_customer_recipt_return(request, new_recipt):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
     customer_name = request.session.get("customer_name")
     customer_email = request.session.get("customer_email")
@@ -78,7 +78,7 @@ def save_customer_recipt_return(request, new_recipt):
         return redirect("recipt:index")
 # View to send email and handle success/error scenarios
 def sendmail_return(request, new_recipt):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
 
     # Retrieve user and session data
@@ -127,7 +127,7 @@ def sendmail_return(request, new_recipt):
     # Catch-all return, ensuring we never return None
     return HttpResponse("Unexpected error.", status=500)
 def return_product(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
 
     # Get the receipt code from session or None

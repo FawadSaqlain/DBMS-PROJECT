@@ -41,7 +41,7 @@
         window.onload = function() {
             // Redirect after 3 seconds
             setTimeout(function() {
-                window.location.href = "{% url 'recipt:new_receipt' %}";
+                window.location.href = "{% url 'recipt:new_receipt' 0 %}";
             }, 3000); // 3000 milliseconds = 3 seconds
         };
     </script>

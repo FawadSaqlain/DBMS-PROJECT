@@ -85,7 +85,7 @@ class CustomerForm(forms.Form):
         })
     )
 def index(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
     print(f"178 request :: {request}")
 
@@ -117,7 +117,7 @@ def index(request):
     })
 # View to send email and handle success/error scenarios
 def sendmail(request, new_recipt):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
 
     # Retrieve user and session data
@@ -160,7 +160,7 @@ def sendmail(request, new_recipt):
     return HttpResponse("Unexpected error.", status=500)
 # View to add new product and customer data to session
 def add(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
     
     if request.method == 'POST':
@@ -198,7 +198,7 @@ def add(request):
     return render(request, 'recipt/add.html', {"form_product": ProductForm(), 'form_customer': CustomerForm()})
 # View to start a new receipt
 def new_receipt(request,return_product=0):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
 
     # Reset session data for a new receipt
@@ -214,7 +214,7 @@ def new_receipt(request,return_product=0):
         return redirect('recipt:add')
 # View to delete a product from the session
 def dele(request, id):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
 
     try:
@@ -226,7 +226,7 @@ def dele(request, id):
     return redirect('recipt:index')
 # View to edit customer details
 def edit_customer(request, customer_name, customer_email):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
 
     if request.method == 'POST':
@@ -243,7 +243,7 @@ def edit_customer(request, customer_name, customer_email):
     return render(request, 'recipt/edit_customer.html', {"customer_form": customer_form, "customer_name": customer_name, "customer_email": customer_email})
 # View to edit product details
 def edit_product(request, id):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
 
     try:
@@ -303,7 +303,7 @@ def save_customer_recipt(request, new_recipt):
         # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
 def profile(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
     user_data=models.select_userdata(request.user.username)
     if request.method == 'POST':
@@ -350,6 +350,7 @@ def login_view(request):
                 messages.success(request, 'This is a success TEST message!')
                 return HttpResponseRedirect(reverse("recipt:new_receipt", kwargs={'return_product': 0}))
             else:
+                
                 return render(request, "recipt/login.html", {
                 "message": "invalid permissions",
                 "username": username  # Retain the entered username

@@ -12,6 +12,16 @@ from django.contrib.auth.hashers import check_password
 import pandas as pd
 from .sales_report import generate_report
 class NewDataForm(forms.Form):
+    def for_edit_user(self,first_name ,last_name, cnic,phone_number,email,username,user_type, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'].initial = first_name
+        self.fields['last_name'].initial = last_name
+        self.fields['cnic'].initial = cnic
+        # self.fields['password'].initial=password
+        self.fields['phone_number'].initial = phone_number
+        self.fields['email'].initial = email
+        self.fields['username'].initial = username
+        self.fields['user_type'].initial = user_type
     USER_TYPE_CHOICES = [
         ('inventory manager', 'Inventory Manager'),
         ('counter manager', 'Counter Manager'),
@@ -45,7 +55,7 @@ class NewDataForm(forms.Form):
         })
     )
     phone_number = forms.CharField(
-        max_length=15,
+        max_length=12,
         widget=forms.TextInput(attrs={
             'id': 'id_phone_number',
             'placeholder': 'Enter Phone Number',
@@ -100,6 +110,7 @@ class NewDataForm(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px; height: 100px;'  
         })
     )
+
 class NewDataForm_edit(forms.Form):
     def for_edit_user(self,first_name ,last_name, cnic,phone_number,email,username,user_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -163,6 +174,24 @@ class NewDataForm_edit(forms.Form):
         widget=forms.TextInput(attrs={
             'id': 'id_username',
             'placeholder': 'Enter username',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        })
+    )
+    password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            'id': 'id_password',
+            'placeholder': 'Enter password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'  
+        })
+    )
+    confirm_password = forms.CharField(
+        required=False,
+        widget=forms.PasswordInput(attrs={
+            'id': 'id_confirm_password',
+            'placeholder': 'Enter confirm password',
             'class': 'form-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
@@ -278,6 +307,8 @@ def edit_user(request, user_index, username):
             user.first_name = form.cleaned_data['first_name']
             user.last_name = form.cleaned_data['last_name']
             user.email = form.cleaned_data['email']
+            password=form.cleaned_data['password']
+            confirm_password=form.cleaned_data['confirm_password']
             cnic = form.cleaned_data['cnic']
             phone_number = form.cleaned_data['phone_number']
             address = form.cleaned_data['address']
@@ -285,17 +316,17 @@ def edit_user(request, user_index, username):
             
             print(f"before updating in edit_user models.save_userdata({username}, {cnic}, {phone_number}, {address}, {user_type})")
             models.save_userdata(username, cnic, phone_number, address, user_type)  # Update User and custom Employ model
-            
             print(f"line 169 before saving {user}")
+            if password and confirm_password and password==confirm_password:
+                user.set_password(password)
             user.save()
-            
             messages.success(request, 'User updated successfully!')
             return redirect('management:index')
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
         if not user_data:
-            form = NewDataForm(initial={
+            form = NewDataForm_edit(initial={
             'first_name': user.first_name,
             'last_name': user.last_name,
             'email': user.email,
@@ -336,23 +367,6 @@ def remove_user(request, user_index,username):
         messages.error(request, f"User '{username}' not found.")
     
     return redirect('management:index')
-def login_view(request):
-    if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
-        user = authenticate(request, username=username, password=password)
-        if user is not None and models.select_userdata(username)[1] == "administration manager":
-            login(request, user)
-            return HttpResponseRedirect(reverse("management:index"))
-        else:
-            messages.error(request, "Invalid credentials.")
-            return render(request, "management/login.html", {
-                "username": username
-            })
-    return render(request, "management/login.html")
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect(reverse("management:login"))
 def profile(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
@@ -506,3 +520,22 @@ def sales_report_view(request):
             print(f"Unexpected error: {e}")
 
     return render(request, 'management/sales_report.html', {'chart_url': chart_url})
+
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        if user is not None and models.select_userdata(username)[1] == "administration manager":
+            login(request, user)
+            return HttpResponseRedirect(reverse("management:index"))
+        else:
+            
+            messages.error(request, "Invalid credentials.")
+            return render(request, "management/login.html", {
+                "username": username
+            })
+    return render(request, "management/login.html")
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("management:login"))
