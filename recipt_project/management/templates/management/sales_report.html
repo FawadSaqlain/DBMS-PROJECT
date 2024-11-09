@@ -3,21 +3,30 @@
 {% block body %}
     <h1 style="text-align: center; font-weight: bold; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">Sales Report</h1>
 
-    <form method="POST" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
+    <form method="POST" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; width: 80%; max-width: 800px;">
         {% csrf_token %}
         
-        <label for="frequency" style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">Frequency:</label>
-        <select name="frequency" id="id_frequency" onchange="updateDateInputs()" class="form-control" style="padding: 8px 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; width: 200px; margin-bottom: 15px;">
-            <option value="daily">Daily</option>
-            <option value="monthly">Monthly</option>
-            <option value="yearly">Yearly</option>
-        </select>
+        <!-- Container for labels and inputs -->
+        <div style="display: flex; width: 100%; gap: 15px; margin-bottom: 20px;">
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                <label for="frequency" style="font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">Frequency:</label>
+                <select name="frequency" id="id_frequency" onchange="updateDateInputs()" class="form-control" style="padding: 8px 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; width: 100%; margin-top: 5px;">
+                    <option value="daily">Daily</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
 
-        <label for="start_date" style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">Start Date:</label>
-        <input type="date" name="start_date" id="id_start_date" class="form-control" style="padding: 8px 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; width: 200px; margin-bottom: 15px;"><br><br>
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                <label for="start_date" style="font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">Start Date:</label>
+                <input type="date" name="start_date" id="id_start_date" class="form-control" style="padding: 8px 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; width: 100%; margin-top: 5px;">
+            </div>
 
-        <label for="end_date" style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">End Date:</label>
-        <input type="date" name="end_date" id="id_end_date" class="form-control" style="padding: 8px 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; width: 200px; margin-bottom: 15px;"><br><br>
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                <label for="end_date" style="font-size: 1.2em; font-weight: bold; margin-bottom: 5px;">End Date:</label>
+                <input type="date" name="end_date" id="id_end_date" class="form-control" style="padding: 8px 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; width: 100%; margin-top: 5px;">
+            </div>
+        </div>
 
         <button type="submit" style="background-color: rgb(166, 43, 43); color: #fff; font-weight: bold; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">
             Generate Report

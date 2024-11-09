@@ -10,6 +10,9 @@
             <option value="first_name">First Name</option>
             <option value="last_name">Last Name</option>
             <option value="email">Email</option>
+            <option value="user_type">user type</option>
+            <option value="cnic">CNIC</option>
+            <option value="updated_datetime">date joined / Updated</option>
             <option value="phone_number">Phone Number</option>
             <option value="address">Address</option>
             <option value="all">All Users</option>
@@ -134,9 +137,13 @@
                 {% endfor %}
                 <td>
                     {% load static %}
+                    {% if request.user.username != user.username %}
                     <a href="{% url 'management:remove_user' forloop.counter0 user.username %}" class="delete-button">
                         <img src="{% static 'management_css/assets/delete_icon.jpg' %}" alt="Delete" style="width: 17px; height: 23px;">
                     </a>
+                    {% else %}
+                        <div style="width: 17px; height: 23px;display: inline-flex;" ></div>
+                    {% endif %}
                     <a href="{% url 'management:edit_user' forloop.counter0 user.username %}" class="edit-button">
                         <img src="{% static 'management_css/assets/edit_icon.jpeg' %}" alt="Edit" style="width: 17px; height: 23px;">
                     </a>
