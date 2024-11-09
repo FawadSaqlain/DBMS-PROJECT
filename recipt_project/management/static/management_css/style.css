@@ -70,7 +70,7 @@ header {
   width: 100px;
   height: 35px;
   background-color: #f1f1f1;
-  color: brown;
+  color: rgb(165, 42, 42);
   font-weight: bold;
   border: none;
   cursor: pointer;

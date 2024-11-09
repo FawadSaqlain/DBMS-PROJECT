@@ -9,7 +9,8 @@ from datetime import datetime
 from django import forms
 from . import models
 from django.contrib.auth.hashers import check_password
-
+import pandas as pd
+from .sales_report import generate_report
 class NewDataForm(forms.Form):
     USER_TYPE_CHOICES = [
         ('inventory manager', 'Inventory Manager'),
@@ -206,7 +207,7 @@ class changepassword(forms.Form):
     )
 
 def index(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
 
     users = User.objects.all()
@@ -217,7 +218,7 @@ def index(request):
         'length_users': len(users)
     })
 def add_user(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
 
     if request.method == 'POST':
@@ -263,7 +264,7 @@ def add_user(request):
     return render(request, 'management/add.html', {"form": NewDataForm()})
 def edit_user(request, user_index, username):
     # username = 'hamza'  # For testing
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
     
     # print(f"line 151 data is coming in edit_user {user_index} , {username}")
@@ -319,7 +320,7 @@ def edit_user(request, user_index, username):
         'username': username  # Fixed typo: 'usename' -> 'username'
     })
 def remove_user(request, user_index,username):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
 
     try:
@@ -353,7 +354,7 @@ def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("management:login"))
 def profile(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
     user_data=models.select_userdata(request.user.username)
     if request.method == 'POST':
@@ -387,6 +388,8 @@ def profile(request):
                     "user_data":user_data
                     })
 def search_user(request):
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
+        return HttpResponseRedirect(reverse("management:login"))
     search_column = request.GET.get('section', 'username')  # Default search column
     search_value = request.GET.get('q', '')  # Retrieved search value
     
@@ -421,8 +424,8 @@ def arange_user(results):
     return databasedata, users
 
 def user_sort(request,asc_decs,sort_by):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse("inventry:login"))
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
+        return HttpResponseRedirect(reverse("management:login"))
 
     # Define valid fields for sorting in Django
     valid_fields_in_django = ['username', 'email', 'first_name', 'last_name']
@@ -470,3 +473,36 @@ def user_sort(request,asc_decs,sort_by):
         'length_users': range(len(models.select_alluserdata())),
         'sorted_as': f"{asc_decs}{sort_by.lstrip('-')}"
     })
+
+def sales_report_view(request):
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
+        return HttpResponseRedirect(reverse("management:login"))
+    chart_url = None
+
+    if request.method == "POST":
+        try:
+            frequency = request.POST.get('frequency')
+            start_date = request.POST.get('start_date')
+            end_date = request.POST.get('end_date')
+            print(f"line 72 :: {frequency}  {start_date}  {end_date}")
+            
+            if frequency and start_date and end_date:
+                start_date = pd.to_datetime(start_date)
+                end_date = pd.to_datetime(end_date)
+
+                if frequency == 'daily':
+                    end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+                elif frequency == 'monthly':
+                    end_date = end_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+                    end_date = end_date + pd.offsets.MonthEnd(0)
+                elif frequency == 'yearly':
+                    end_date = end_date.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
+
+                print(f"line 92 :: {frequency}  {start_date}  {end_date}")
+                chart_url = generate_report(frequency, start_date, end_date)
+        except ValueError as ve:
+            print(f"Date parsing error: {ve}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+
+    return render(request, 'management/sales_report.html', {'chart_url': chart_url})
