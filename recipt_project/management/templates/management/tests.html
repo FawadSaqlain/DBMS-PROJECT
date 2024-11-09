@@ -1,16 +1,56 @@
-{% extends "inventry/layout.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+    <script>
+        function updateDateInputs() {
+            const frequencySelect = document.getElementById('id_frequency');
+            const startDateInput = document.getElementById('id_start_date');
+            const endDateInput = document.getElementById('id_end_date');
+            
+            if (frequencySelect.value === 'monthly') {
+                startDateInput.type = 'month';
+                endDateInput.type = 'month';
+            } else if (frequencySelect.value === 'yearly') {
+                startDateInput.type = 'number';
+                endDateInput.type = 'number';
+                startDateInput.min = '1900';
+                endDateInput.min = '1900';
+                startDateInput.placeholder = 'YYYY';
+                endDateInput.placeholder = 'YYYY';
+            } else if (frequencySelect.value === 'daily') {
+                startDateInput.type = 'date';
+                endDateInput.type = 'date';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Sales Report</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <label for="frequency">Frequency:</label>
+        <select name="frequency" id="id_frequency" onchange="updateDateInputs()" class="form-control">
+            <option value="daily">Daily</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly">Yearly</option>
+        </select><br><br>
 
-{% block body %}
-sorted as {{sorted_as}}
-<br>
-current order {{current_order}}
-<br>
-{% for user in django %}
-user :: {{user}}
-<br>
-{% endfor %}
-{% for data in database %}
-data :: {{data}}
-<br>
-{%endfor%}
-{% endblock %}
+        <label for="start_date">Start Date:</label>
+        <input type="date" name="start_date" id="id_start_date" class="form-control"><br><br>
+
+        <label for="end_date">End Date:</label>
+        <input type="date" name="end_date" id="id_end_date" class="form-control"><br><br>
+
+        <button type="submit">Generate Report</button>
+    </form>
+    
+    {% if chart_url %}
+        <h2>Sales Graph</h2>
+        <img src="{{ chart_url }}" alt="Sales Graph">
+    {% endif %}
+</body>
+</html>
