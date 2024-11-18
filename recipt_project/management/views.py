@@ -110,7 +110,6 @@ class NewDataForm(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px; height: 100px;'  
         })
     )
-
 class NewDataForm_edit(forms.Form):
     def for_edit_user(self,first_name ,last_name, cnic,phone_number,email,username,user_type, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -280,11 +279,17 @@ def add_user(request):
 
                     messages.success(request, 'User created successfully!')
                 else:
-                    messages.error(request, 'Passwords do not match!')
+                    # messages.error(request, 'Passwords do not match!')
+                    return render(request, 'management/error.html', {
+                    "error": "Passwords do not match!"
+                    })
                 # Redirect to the index page
                 # return redirect(reverse("management:index"))
             except Exception as e:
-                messages.error(request, f'Error creating user: {str(e)}')
+                # messages.error(request, f'Error creating user: {str(e)}')
+                return render(request, 'management/error.html', {
+                    "error": "Passwords do not match!"
+                    })
                 return render(request, 'management/add.html', {'form': form})
         else:
             messages.error(request, 'Please correct the errors below.')
@@ -323,7 +328,10 @@ def edit_user(request, user_index, username):
             messages.success(request, 'User updated successfully!')
             return redirect('management:index')
         else:
-            messages.error(request, 'Please correct the errors below.')
+            # messages.error(request, 'Please correct the errors below.')
+            return render(request, 'management/error.html', {
+                    "error": "Please correct the errors below."
+                    })
     else:
         if not user_data:
             form = NewDataForm_edit(initial={
@@ -363,8 +371,12 @@ def remove_user(request, user_index,username):
         models.delete_userdata(username)
         user.delete()
         messages.success(request, f"User '{username}' has been deleted.")
+        
     except User.DoesNotExist:
-        messages.error(request, f"User '{username}' not found.")
+        # messages.error(request, f"User '{username}' not found.")
+        return render(request, 'management/error.html', {
+                    "error": f"User '{username}' not found."
+                    })
     
     return redirect('management:index')
 def profile(request):
@@ -385,19 +397,26 @@ def profile(request):
                     # request.user.save() 
                     return redirect('management:logout')
                 else:
-                    return render(request, 'management/profile.html', {
-                        "form": form,
-                        "message": "Passwords do not match",
-                        "user_data":user_data
+                    # return render(request, 'management/profile.html', {
+                    #     "form": form,
+                    #     "message": "Passwords do not match",
+                    #     "user_data":user_data
+                    #     })
+                    return render(request, 'management/error.html', {
+                        "error": "Passwords do not match"
                         })
             else:
-                return render(request, 'management/profile.html', {
-                    "form": form,
-                    "message": "Old password is incorrect",
-                    "user_data":user_data
-                    })
+            #     return render(request, 'management/profile.html', {
+            #         "form": form,
+            #         "message": "Old password is incorrect",
+            #         "user_data":user_data
+            #         })
+            # else:
+                return render(request, 'management/error.html', {
+                        "error": "Old password is incorrect"
+                        })
     return render(request, 'management/profile.html', {
-                    "message": "you are not changing the password",
+                    "message": "",
                     "form": changepassword(),
                     "user_data":user_data
                     })
@@ -473,9 +492,15 @@ def user_sort(request,asc_decs,sort_by):
             print(f"User.objects.get(username={username}) :: {user}")
         
         except User.DoesNotExist:
-            print(f"User with username '{username}' does not exist.")
+            # print(f"User with username '{username}' does not exist.")
+            return render(request, 'management/error.html', {
+                    "error": f"User with username '{username}' does not exist."
+                    })
         except Exception as e:
             print(f"Error selecting data: {e}")
+            return render(request, 'management/error.html', {
+                    "error": f"Error selecting data: {e}"
+                    })
 
     # print(f"user_database :: {completedata_database}")
     # print(f"user_django :: {completedata_django}")
@@ -515,9 +540,15 @@ def sales_report_view(request):
                 print(f"line 92 :: {frequency}  {start_date}  {end_date}")
                 chart_url = generate_report(frequency, start_date, end_date)
         except ValueError as ve:
-            print(f"Date parsing error: {ve}")
+            # print(f"Date parsing error: {ve}")
+            return render(request, 'management/error.html', {
+                        "error": f"Date parsing error: {ve}"
+                        })
         except Exception as e:
             print(f"Unexpected error: {e}")
+            return render(request, 'management/error.html', {
+                        "error": f"Unexpected error: {e}"
+                        })
 
     return render(request, 'management/sales_report.html', {'chart_url': chart_url})
 
@@ -530,11 +561,13 @@ def login_view(request):
             login(request, user)
             return HttpResponseRedirect(reverse("management:index"))
         else:
-            
-            messages.error(request, "Invalid credentials.")
-            return render(request, "management/login.html", {
-                "username": username
-            })
+            # messages.error(request, "Invalid credentials.")
+            return render(request, 'management/error.html', {
+                        "error": "Invalid credentials."
+                        })
+            # return render(request, "management/login.html", {
+            #     "username": username
+            # })
     return render(request, "management/login.html")
 def logout_view(request):
     logout(request)

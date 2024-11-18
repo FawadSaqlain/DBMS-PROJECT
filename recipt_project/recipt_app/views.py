@@ -133,9 +133,21 @@ def sendmail(request, new_recipt):
     }
 
     # Ensure session data exists
-    if not user_data['products'] or not user_data['customer_name'] or not user_data['customer_email']:
-        return HttpResponse("Required session data is missing.", status=400)
-
+    if not user_data['products'] :
+        # return HttpResponse("Required session data is missing.", status=400)
+        return render(request, 'management/error.html', {
+                        "error": f"Required session data is missing. product is {user_data['products']}"
+                        })
+    if not user_data['customer_name'] :
+        # return HttpResponse("Required session data is missing.", status=400)
+        return render(request, 'management/error.html', {
+                        "error": f"Required session data is missing. customer name is {user_data['customer_name']}"
+                        })
+    if not user_data['customer_email']:
+        # return HttpResponse("Required session data is missing.", status=400)
+        return render(request, 'management/error.html', {
+                        "error": f"Required session data is missing. customer email is {user_data['customer_email']}"
+                        })
     # Send email and handle response from sendmail_py
     result = sendmail_py(user_data)
     print(f"line 228 Result from sendmail_py: {result}")  # Log the result for debugging
@@ -170,22 +182,30 @@ def add(request):
             prod_code = form_product.cleaned_data['prod_code']
             quantity = form_product.cleaned_data['quantity']
             product_recipt = models.get_product(prod_code)
-            print(f"line 261 product recipt = {product_recipt}")
-            if product_recipt[2] >= quantity:
-                quantity_price = product_recipt[3] * quantity
-                product_found = False
+            if product_recipt:
+                print(f"line 261 product recipt = {product_recipt}")
+                if product_recipt[2] >= quantity:
+                    quantity_price = product_recipt[3] * quantity
+                    product_found = False
 
-                for product in request.session["products"]:
-                    if product[0] == prod_code:
-                        product[1] += quantity
-                        product[3] += quantity_price
-                        product_found = True
-                        break
+                    for product in request.session["products"]:
+                        if product[0] == prod_code:
+                            product[1] += quantity
+                            product[3] += quantity_price
+                            product_found = True
+                            break
 
-                if not product_found:
-                    request.session["products"].append([prod_code, quantity, product_recipt[3], quantity_price,product_recipt[1]])
-                request.session['total_price'] += quantity_price
-
+                    if not product_found:
+                        request.session["products"].append([prod_code, quantity, product_recipt[3], quantity_price,product_recipt[1]])
+                    request.session['total_price'] += quantity_price
+                else:
+                    return render(request, 'management/error.html', {
+                        "error": f"product quantity not available ({product_recipt[2]})"
+                        })
+            else:
+                return render(request, 'management/error.html', {
+                        "error": "product code not available"
+                        })
             customer_name = form_customer.cleaned_data['customer_name']
             customer_email = form_customer.cleaned_data['customer_email']
             if customer_name:
@@ -221,7 +241,9 @@ def dele(request, id):
         product = request.session["products"].pop(id)
         request.session['total_price'] -= product[3]  # Subtract the quantity_price
     except IndexError:
-        pass  # Handle index errors if necessary
+        return render(request, 'management/error.html', {
+                        "error": f"Invalid index :: {IndexError}"
+                        })# Handle index errors if necessary
 
     return redirect('recipt:index')
 # View to edit customer details
@@ -239,7 +261,6 @@ def edit_customer(request, customer_name, customer_email):
             return redirect('recipt:index')
     else:
         customer_form = CustomerForm(initial={'customer_name': customer_name, 'customer_email': customer_email})
-
     return render(request, 'recipt/edit_customer.html', {"customer_form": customer_form, "customer_name": customer_name, "customer_email": customer_email})
 # View to edit product details
 def edit_product(request, id):
@@ -281,7 +302,10 @@ def save_customer_recipt(request, new_recipt):
     products = request.session.get("products")
 
     if not customer_name or not customer_email or not recipt_code:
-        return HttpResponse("Customer data not provided.", status=400)
+        # return HttpResponse("Customer data not provided.", status=400)
+        return render(request, 'management/error.html', {
+                        "error": "Customer data not provided."
+                        })
 
     if request.user.first_name and request.user.last_name:
         Employ_name = f"{request.user.first_name} {request.user.last_name} ({request.user.last_name})"
@@ -291,8 +315,11 @@ def save_customer_recipt(request, new_recipt):
     try:
         models.save_customer_recipt_to_db(customer_name, customer_email, Employ_name, recipt_code, date_time, total_price, products)
     except Exception as e:
-        print(f"line 387 Error saving receipt: {e}")
-        return HttpResponse("Error saving data to the database.", status=500)
+        # print(f"line 387 Error saving receipt: {e}")
+        # return HttpResponse("Error saving data to the database.", status=500)
+        return render(request, 'management/error.html', {
+                        "error": "Error saving receipt: {e}"
+                        })
         
     # Redirect or return a valid response
     if new_recipt == 1:
@@ -320,19 +347,24 @@ def profile(request):
                     # request.user.save() 
                     return redirect('recipt:logout')
                 else:
-                    return render(request, 'recipt/profile.html', {
-                        "form": form,
-                        "message": "Passwords do not match",
-                        "user_data":user_data
+                    # return render(request, 'recipt/profile.html', {
+                    #     "form": form,
+                    #     "message": "Passwords do not match",
+                    #     "user_data":user_data
+                    #     })
+                    return render(request, 'management/error.html', {
+                        "error": "Passwords do not match"
                         })
             else:
-                return render(request, 'recipt/profile.html', {
-                    "form": form,
-                    "message": "Old password is incorrect",
-                    "user_data":user_data
-                    })
+                # return render(request, 'recipt/profile.html', {
+                #     "form": form,
+                #     "message": "Old password is incorrect",
+                #     "user_data":user_data
+                #     })
+                return render(request, 'management/error.html', {
+                        "error": "Old password is incorrect"
+                        })
     return render(request, 'recipt/profile.html', {
-                    "message": "you are not changing the password",
                     "form": changepassword(),
                     "user_data":user_data
                     })
@@ -350,16 +382,21 @@ def login_view(request):
                 messages.success(request, 'This is a success TEST message!')
                 return HttpResponseRedirect(reverse("recipt:new_receipt", kwargs={'return_product': 0}))
             else:
-                
-                return render(request, "recipt/login.html", {
-                "message": "invalid permissions",
-                "username": username  # Retain the entered username
-            })
+            #     return render(request, "recipt/login.html", {
+            #     "message": "invalid permissions",
+            #     "username": username  # Retain the entered username
+            # })
+                return render(request, 'management/error.html', {
+                        "error": "invalid permissions"
+                        })
         else:
-            return render(request, "recipt/login.html", {
-                "message": "Invalid credentials.",
-                "username": username  # Retain the entered username
-            })
+            # return render(request, "recipt/login.html", {
+            #     "message": "Invalid credentials.",
+            #     "username": username  # Retain the entered username
+            # })
+            return render(request, 'management/error.html', {
+                        "error": "invalid credentials"
+                        })
     return render(request, "recipt/login.html")
 def logout_view(request):
     logout(request)

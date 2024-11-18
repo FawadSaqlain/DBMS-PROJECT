@@ -19,10 +19,6 @@
             <a href="{% url 'inventry:add' %}" class="action-button">Add New Item</a>
             <button onclick="printReceipt()" class="action-button print-button">Print Receipt</button>
         </div>
-        {% if error_message %}
-    <div class="alert alert-danger">{{ error_message }}</div>
-{% endif %}
-
     </div>
 </div>
 

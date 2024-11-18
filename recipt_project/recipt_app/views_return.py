@@ -67,7 +67,10 @@ def save_customer_recipt_return(request, new_recipt):
         models_return.save_customer_recipt_return_to_db(customer_name,customer_email,Employ_name, recipt_code_buy,recipt_code, date_time, total_price, products)
     except Exception as e:
         print(f"line 421 Error saving receipt: {e}")
-        return HttpResponse("Error saving data to the database.", status=500)
+        # return HttpResponse("Error saving data to the database.", status=500)
+        return render(request, 'management/error.html', {
+                        "error": f"Error saving receipt: {e}"
+                        })
         
     # Redirect or return a valid response
     if new_recipt == 1:
@@ -126,13 +129,17 @@ def sendmail_return(request, new_recipt):
 
     # Catch-all return, ensuring we never return None
     return HttpResponse("Unexpected error.", status=500)
+
+
+
+
+
 def return_product(request):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
 
     # Get the receipt code from session or None
     recipt_code_buy = request.session.get("recipt_code_buy", None)
-
     if request.method == 'POST':
         form_return_product = returnProduct(request.POST)
         
@@ -152,19 +159,24 @@ def return_product(request):
             # Get or save the receipt code
             if not recipt_code_buy:
                 recipt_code_buy = form_return_product_recipt_code.cleaned_data['recipt_code_buy']
-                request.session["recipt_code_buy"] = recipt_code_buy
+                if():
+                    request.session["recipt_code_buy"] = recipt_code_buy
+                else:
                 customer=models.get_customer_recipt(request.session["recipt_code_buy"])
-                request.session["customer_name"]=customer[1]
-                request.session["customer_email"]=customer[2]
-
+                if customer:
+                    request.session["customer_name"]=customer[1]
+                    request.session["customer_email"]=customer[2]
+                else:
+                    request.session["customer_name"]=""
+                    request.session["customer_email"]=""
 
             # Fetch product receipt details based on receipt code and product code
             product_recipt = models.get_recipt_product(recipt_code_buy, prod_code)
             if product_recipt:
                 if product_recipt[3] >= quantity:
                     quantity_price = product_recipt[4] * quantity
-                    product_found = False
 
+                    product_found = False
                     # Check if the product already exists in the session products list
                     for product in request.session["products"]:
                         if product[0] == prod_code:
@@ -176,10 +188,9 @@ def return_product(request):
                     if not product_found:
                         # Add the new product to the session list
                         request.session["products"].append([prod_code, quantity, product_recipt[4], quantity_price, product_recipt[2]])
-                    
                     # Update total price
                     request.session['total_price'] += quantity_price
-
+                
             # If the receipt code is present (from POST or session), save it in the session
             if recipt_code_buy:
                 request.session["recipt_code_buy"] = recipt_code_buy

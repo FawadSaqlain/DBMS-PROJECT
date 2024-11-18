@@ -103,11 +103,14 @@ def search_view(request):
                 # Validate if search_value is a valid integer
                 int(search_value)
             except ValueError:
-                return render(request, 'inventry/index.html', {
-                    "products": [],
-                    'length_products': range(0),
-                    'error_message': "Search value for quantity must be a valid integer."
-                })
+                # return render(request, 'inventry/index.html', {
+                #     "products": [],
+                #     'length_products': range(0),
+                #     'error_message': "Search value for quantity must be a valid integer."
+                # })
+                return render(request, 'inventry/error.html', {
+                        "error": "Search value for quantity must be a valid integer."
+                        })
         
         # Call the model method to perform the search based on column and value
         results = models.search_products(search_column, search_value)
@@ -215,19 +218,25 @@ def profile(request):
                     # request.user.save() 
                     return redirect('inventry:logout')
                 else:
-                    return render(request, 'inventry/profile.html', {
-                        "form": form,
-                        "message": "Passwords do not match",
-                        "user_data":user_data
+                    # return render(request, 'inventry/profile.html', {
+                    #     "form": form,
+                    #     "message": "Passwords do not match",
+                    #     "user_data":user_data
+                    #     })
+                    return render(request, 'inventry/error.html', {
+                        "error": "Passwords do not match"
                         })
             else:
-                return render(request, 'inventry/profile.html', {
-                    "form": form,
-                    "message": "Old password is incorrect",
-                    "user_data":user_data
+                # return render(request, 'inventry/profile.html', {
+                #     "form": form,
+                #     "message": "Old password is incorrect",
+                #     "user_data":user_data
+                #     })
+                return render(request, 'inventry/error.html', {
+                    "error": "Old password is incorrect"
                     })
     return render(request, 'inventry/profile.html', {
-                    "message": "you are not changing the password",
+                    "message": "",
                     "form": changepassword(),
                     "user_data":user_data
                     })
@@ -243,15 +252,21 @@ def login_view(request):
 
                 return HttpResponseRedirect(reverse("inventry:add"))
             else:
-                return render(request, "inventry/login.html", {
-                "message": "invalit permisions",
-                "username": username  # Retain the entered username
-            })
+            #     return render(request, "inventry/login.html", {
+            #     "message": "invalid permisions",
+            #     "username": username  # Retain the entered username
+            # })
+                return render(request, 'inventry/error.html', {
+                    "error": "invalid permisions"
+                    })
         else:
-            return render(request, "inventry/login.html", {
-                "message": "Invalid credentials.",
-                "username": username  # Retain the entered username
-            })
+            # return render(request, "inventry/login.html", {
+            #     "message": "Invalid credentials.",
+            #     "username": username  # Retain the entered username
+            # })
+            return render(request, 'inventry/error.html', {
+                "error": "Invalid credentials."
+                })
     return render(request, "inventry/login.html") 
 def logout_view(request):
     logout(request)
