@@ -262,6 +262,7 @@ def edit_customer(request, customer_name, customer_email):
     else:
         customer_form = CustomerForm(initial={'customer_name': customer_name, 'customer_email': customer_email})
     return render(request, 'recipt/edit_customer.html', {"customer_form": customer_form, "customer_name": customer_name, "customer_email": customer_email})
+
 # View to edit product details
 def edit_product(request, id):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
@@ -279,18 +280,25 @@ def edit_product(request, id):
             # Update session data
             new_prod_code = form_product.cleaned_data['prod_code']
             new_quantity = form_product.cleaned_data['quantity']
-            new_quantity_price = price * new_quantity
-
-            # Update the product
-            request.session["products"][id] = [new_prod_code, new_quantity, price, new_quantity_price,pro_descript ]
-
-            # Recalculate total price
-            request.session['total_price'] = sum(p[3] for p in request.session["products"])
-
-            return redirect('recipt:index')
+            product_recipt = models.get_product(new_prod_code)
+            if product_recipt:
+                if new_quantity<= product_recipt[2]:
+                    new_quantity_price = price * new_quantity
+                    # Update the product
+                    request.session["products"][id] = [new_prod_code, new_quantity, price, new_quantity_price,pro_descript ]
+                    # Recalculate total price
+                    request.session['total_price'] = sum(p[3] for p in request.session["products"])
+                    return redirect('recipt:index')
+                else:
+                    return render(request, 'management/error.html', {
+                        "error": f"product quantity not available ({product_recipt[2]})"
+                        })
+            else:
+                return render(request, 'recipt/error.html', {
+                    "error": "product code is not available"
+                    })
     else:
         form_product = ProductForm(initial={'prod_code': prod_code, 'quantity': quantity})
-
     return render(request, 'recipt/add.html', {"form_product": form_product, 'is_editing': True, 'id': id})
 @csrf_exempt
 def save_customer_recipt(request, new_recipt):

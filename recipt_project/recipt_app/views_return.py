@@ -130,85 +130,90 @@ def sendmail_return(request, new_recipt):
     # Catch-all return, ensuring we never return None
     return HttpResponse("Unexpected error.", status=500)
 
-
-
-
-
 def return_product(request):
-    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
-        return HttpResponseRedirect(reverse("recipt:login"))
+    try:
+        # Ensure user is authenticated and has the correct role
+        if not request.user.is_authenticated or (
+            models.select_userdata(request.user.username)[1] not in ["counter manager", "administration manager"]
+        ):
+            return HttpResponseRedirect(reverse("recipt:login"))
 
-    # Get the receipt code from session or None
-    recipt_code_buy = request.session.get("recipt_code_buy", None)
-    if request.method == 'POST':
-        form_return_product = returnProduct(request.POST)
-        
-        # If there's no receipt code in the session, process the receipt code form
-        if not recipt_code_buy:
-            form_return_product_recipt_code = return_product_recipt_code(request.POST)
-        else:
-            # Otherwise, use the receipt code from session and don't show the form
-            form_return_product_recipt_code = return_product_recipt_code()
+        # Retrieve receipt code from session, if available
+        recipt_code_buy = request.session.get("recipt_code_buy", None)
 
-        # Validate both forms
-        if form_return_product.is_valid() and (form_return_product_recipt_code.is_valid() or recipt_code_buy):
-            # Get product code and quantity
-            prod_code = form_return_product.cleaned_data['prod_code']
-            quantity = form_return_product.cleaned_data['quantity']
+        if request.method == 'POST':
+            form_return_product = returnProduct(request.POST)
 
-            # Get or save the receipt code
             if not recipt_code_buy:
-                recipt_code_buy = form_return_product_recipt_code.cleaned_data['recipt_code_buy']
-                if():
+                form_return_product_recipt_code = return_product_recipt_code(request.POST)
+            else:
+                form_return_product_recipt_code = return_product_recipt_code()
+
+            # Validate both forms
+            if form_return_product.is_valid() and (form_return_product_recipt_code.is_valid() or recipt_code_buy):
+                prod_code = form_return_product.cleaned_data['prod_code']
+                quantity = form_return_product.cleaned_data['quantity']
+
+                if not recipt_code_buy:
+                    recipt_code_buy = form_return_product_recipt_code.cleaned_data['recipt_code_buy']
+                    if not models.table_exists(recipt_code_buy):
+                        return render(request, 'recipt/error.html', {"error": "Buy receipt does not exist."})
+
                     request.session["recipt_code_buy"] = recipt_code_buy
-                else:
-                customer=models.get_customer_recipt(request.session["recipt_code_buy"])
-                if customer:
-                    request.session["customer_name"]=customer[1]
-                    request.session["customer_email"]=customer[2]
-                else:
-                    request.session["customer_name"]=""
-                    request.session["customer_email"]=""
 
-            # Fetch product receipt details based on receipt code and product code
-            product_recipt = models.get_recipt_product(recipt_code_buy, prod_code)
-            if product_recipt:
-                if product_recipt[3] >= quantity:
-                    quantity_price = product_recipt[4] * quantity
+                    # Fetch customer details
+                    customer = models.get_customer_recipt(recipt_code_buy)
+                    request.session["customer_name"] = customer[1] if customer else ""
+                    request.session["customer_email"] = customer[2] if customer else ""
 
-                    product_found = False
-                    # Check if the product already exists in the session products list
-                    for product in request.session["products"]:
-                        if product[0] == prod_code:
-                            product[1] += quantity  # Update quantity
-                            product[3] += quantity_price  # Update total price
-                            product_found = True
-                            break
+                # Fetch product receipt details
+                product_recipt = models.get_recipt_product(recipt_code_buy, prod_code)
+                if not product_recipt:
+                    return render(request, 'recipt/error.html', {"error": "Product does not exist."})
 
-                    if not product_found:
-                        # Add the new product to the session list
-                        request.session["products"].append([prod_code, quantity, product_recipt[4], quantity_price, product_recipt[2]])
-                    # Update total price
-                    request.session['total_price'] += quantity_price
-                
-            # If the receipt code is present (from POST or session), save it in the session
-            if recipt_code_buy:
-                request.session["recipt_code_buy"] = recipt_code_buy
-                customer=models.get_customer_recipt(request.session["recipt_code_buy"])
-                request.session["customer_name"]=customer[1]
-                request.session["customer_email"]=customer[2]
-        else:
-            # Render the form again with errors
-            return render(request, 'recipt/return_product.html', {
-                'form_product': form_return_product,
-                'form_recipt': form_return_product_recipt_code,
-                'error': 'Please provide valid product and receipt code.'
-            })
+                # Check if quantity is valid
+                if product_recipt[3] < quantity:
+                    return render(request, 'recipt/error.html', {"error": "Insufficient quantity in receipt."})
 
-    # Render the form for GET requests
-    return render(request, 'recipt/return_product.html', {
-        "form_product": returnProduct(),
-        'form_recipt': return_product_recipt_code(),
-        'recipt_code_buy': request.session.get("recipt_code_buy", None)  # Pass the receipt code if present
-    })
-# Main view for displaying receipt details
+                # Calculate quantity price
+                quantity_price = product_recipt[4] * quantity
+                product_found = False
+
+                # Update session data for the product
+                for product in request.session.get("products", []):
+                    if product[0] == prod_code:
+                        product[1] += quantity
+                        product[3] += quantity_price
+                        product_found = True
+                        break
+
+                if not product_found:
+                    request.session.setdefault("products", []).append(
+                        [prod_code, quantity, product_recipt[4], quantity_price, product_recipt[2]]
+                    )
+
+                # Update total price
+                request.session["total_price"] = request.session.get("total_price", 0) + quantity_price
+
+            else:
+                return render(request, 'recipt/return_product.html', {
+                    'form_product': form_return_product,
+                    'form_recipt': form_return_product_recipt_code,
+                    'error': 'Please provide valid product and receipt code.',
+                })
+
+        # Render the form for GET requests
+        return render(request, 'recipt/return_product.html', {
+            "form_product": returnProduct(),
+            'form_recipt': return_product_recipt_code(),
+            'recipt_code_buy': recipt_code_buy,
+        })
+
+    except models.DoesNotExist:
+        return render(request, 'recipt/error.html', {"error": "Database operation failed."})
+    except KeyError:
+        return render(request, 'recipt/error.html', {"error": "Session data missing or corrupted."})
+    except ValueError:
+        return render(request, 'recipt/error.html', {"error": "Invalid input provided."})
+    except Exception:
+        return render(request, 'recipt/error.html', {"error": "An unexpected error occurred. Please try again later."})
