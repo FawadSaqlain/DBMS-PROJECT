@@ -247,7 +247,7 @@ def dele(request, id):
 
     return redirect('recipt:index')
 # View to edit customer details
-def edit_customer(request, customer_name, customer_email):
+def edit_customer(request, customer_name=None, customer_email=None):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
 
@@ -280,7 +280,9 @@ def edit_product(request, id):
             # Update session data
             new_prod_code = form_product.cleaned_data['prod_code']
             new_quantity = form_product.cleaned_data['quantity']
+            
             product_recipt = models.get_product(new_prod_code)
+            print(f"** line 285 product_recipt :: {product_recipt} ")
             if product_recipt:
                 if new_quantity<= product_recipt[2]:
                     new_quantity_price = price * new_quantity
@@ -311,9 +313,10 @@ def save_customer_recipt(request, new_recipt):
 
     if not customer_name or not customer_email or not recipt_code:
         # return HttpResponse("Customer data not provided.", status=400)
-        return render(request, 'management/error.html', {
-                        "error": "Customer data not provided."
-                        })
+        # return render(request, 'management/error.html', {
+        #                 "error": "Customer data not provided."
+        #                 })
+        pass
 
     if request.user.first_name and request.user.last_name:
         Employ_name = f"{request.user.first_name} {request.user.last_name} ({request.user.last_name})"

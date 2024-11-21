@@ -72,7 +72,7 @@ SELECT * FROM customers_return
 -- SELECT * FROM _gvmm0
 -- SELECT * FROM _mjn2P
 -- SELECT * FROM _lbkVh
-SELECT * FROM _fLIIa
+SELECT * FROM _Mg1em
 -- SELECT * FROM EMPLOY
 -- drop table _4AWX0
 -- update _XCLsB set quantity=20 where prod_code='iQz22'

@@ -6,43 +6,50 @@
         <div style="display: flex; justify-content: space-between;">
             <div>
                 {% if not customer_name %}
-                {% if request.user.first_name and request.user.last_name %}
-                <h3>Here is your receipt by {{ request.user.first_name }} {{ request.user.last_name }}</h3>
-                {% else %}
-                <h3>Here is your receipt by {{ request.user.username }}</h3>
-                {% endif %}
-                {% else %}
-                {% if request.user.first_name and request.user.last_name %}
-                <h3>Here is {{ customer_name }}'s receipt by {{ request.user.first_name }} {{ request.user.last_name }}
-                    {% if customer_name %}
-                    
-                    <a href="{% url 'recipt:edit_customer' customer_name customer_email %}" class="edit-button">
-                        <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain" alt="EDIT"
-                        style="width: 15px; height: 20px;  margin-right: 10px;">
-                    </a>
+                    {% if request.user.first_name and request.user.last_name %}
+                        <h3>Here is your receipt by {{ request.user.first_name }} {{ request.user.last_name }}
+                        <a href="{% url 'recipt:edit_customer' customer_name customer_email %}" class="edit-button">
+                            <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain"
+                                alt="EDIT" style="width: 15px; height: 20px;  margin-right: 10px;">
+                        </a></h3>
+                        {% else %}
+                        <h3>Here is your receipt by {{ request.user.username }}
+                        <a href="{% url 'recipt:edit_customer' customer_name customer_email %}" class="edit-button">
+                            <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain"
+                                alt="EDIT" style="width: 15px; height: 20px;  margin-right: 10px;">
+                        </a></h3>
                     {% endif %}
-                </h3>
                 {% else %}
-                <h3>Here is {{ customer_name }}'s receipt by {{ request.user.username }}
-                    {% if customer_name %}
-                    <a href="{% url 'recipt:edit_customer' customer_name customer_email %}" class="edit-button">
-                        <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain" alt="EDIT"
-                        style="width: 15px; height: 20px;  margin-right: 10px;">
-                    </a>
+                    {% if request.user.first_name and request.user.last_name %}
+                        <h3>Here is {{ customer_name }}'s receipt by {{ request.user.first_name }} {{ request.user.last_name }}
+                            {% if customer_name %}
+                                <a href="{% url 'recipt:edit_customer' customer_name customer_email %}" class="edit-button">
+                                    <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain"
+                                        alt="EDIT" style="width: 15px; height: 20px;  margin-right: 10px;">
+                                </a>
+                        {% endif %}
+                        </h3>
+                    {% else %}
+                        <h3>Here is {{ customer_name }}'s receipt by {{ request.user.username }}
+                            {% if customer_name %}
+                                <a href="{% url 'recipt:edit_customer' customer_name customer_email %}" class="edit-button">
+                                    <img src="https://th.bing.com/th/id/OIP.P6trHImFdjGgSXQBU7_sagHaHa?rs=1&pid=ImgDetMain"
+                                        alt="EDIT" style="width: 15px; height: 20px;  margin-right: 10px;">
+                                </a>
+                            {% endif %}
+                        </h3>
                     {% endif %}
-                </h3>
-                {% endif %}
                 {% endif %}
             </div>
             <h6 class="receipt-date">{{ now }}</h6>
         </div>
         {% if recipt_code or recipt_code_buy %}
-    <h6>
-        {% if recipt_code %}recipt code: {{ recipt_code }}{% endif %}
-        {% if recipt_code and recipt_code_buy %} | {% endif %}
-        {% if recipt_code_buy %}recipt buy code: {{ recipt_code_buy }}{% endif %}
-    </h6>
-{% endif %}
+        <h6>
+            {% if recipt_code %}recipt code: {{ recipt_code }}{% endif %}
+            {% if recipt_code and recipt_code_buy %} | {% endif %}
+            {% if recipt_code_buy %}recipt buy code: {{ recipt_code_buy }}{% endif %}
+        </h6>
+        {% endif %}
 
         <div id="index_outer_div" class="receipt-details">
             {% if products %}
@@ -70,11 +77,21 @@
                         <td>
                             {% load static %}
                             <a href="{% url 'recipt:dele' forloop.counter0 %}" class="delete-button">
-                                <img src="{% static 'recipt_css/assets/delete_icon.jpg' %}" alt="Delete" style="width: 15px; height: 20px;">
+                                <img src="{% static 'recipt_css/assets/delete_icon.jpg' %}" alt="Delete"
+                                    style="width: 15px; height: 20px;">
                             </a>
+                            {% if recipt_code_buy %}
+                            <a href="{% url 'recipt:edit_product_return' forloop.counter0 recipt_code_buy %}"
+                                class="edit-button">
+                                <img src="{% static 'recipt_css/assets/edit_icon.jpeg' %}" alt="Edit"
+                                    style="width: 15px; height: 20px;">
+                            </a>
+                            {% else %}
                             <a href="{% url 'recipt:edit_product' forloop.counter0 %}" class="edit-button">
-                                <img src="{% static 'recipt_css/assets/edit_icon.jpeg' %}" alt="Edit" style="width: 15px; height: 20px;">
+                                <img src="{% static 'recipt_css/assets/edit_icon.jpeg' %}" alt="Edit"
+                                    style="width: 15px; height: 20px;">
                             </a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -84,7 +101,7 @@
             <h1>No items added</h1>
             {% endif %}
         </div>
-        
+
         <div>
             <h4>Total Price: {{ total_price }}</h4>
         </div>
@@ -111,44 +128,45 @@
     <a href="{% url 'recipt:save_customer_return' 0 %}" class="action-button">Save E.recipt & no new return receipt</a>
     {% endif %}
     {% if products %}
-    <button onclick="printAndSaveReceipt()" class="action-button print-button">Print & Save Receipt & new_receipt</button>
+    <button onclick="printAndSaveReceipt()" class="action-button print-button">Print & Save Receipt &
+        new_receipt</button>
     {% endif %}
-<script>
-function printAndSaveReceipt() {
-    document.querySelectorAll('.delete-button').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.edit-button').forEach(el => el.style.display = 'none');
+    <script>
+        function printAndSaveReceipt() {
+            document.querySelectorAll('.delete-button').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.edit-button').forEach(el => el.style.display = 'none');
 
-    window.print();
+            window.print();
 
-    document.querySelectorAll('.delete-button').forEach(el => el.style.display = 'inline');
-    document.querySelectorAll('.edit-button').forEach(el => el.style.display = 'inline');
+            document.querySelectorAll('.delete-button').forEach(el => el.style.display = 'inline');
+            document.querySelectorAll('.edit-button').forEach(el => el.style.display = 'inline');
 
-    console.log("Saving data after printing...");
-    saveCustomer()
-    // setTimeout(saveCustomer, 1000); // 1-second delay
-}
-
-function saveCustomer() {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", "/recipt_app/save-customer/1", true);
-    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            console.log("Customer data saved successfully!");
-            // Redirect to a new receipt after saving
-            window.location.href = "/recipt_app/new/";
-        } else {
-            console.log("Error saving customer data: " + xhr.status);
+            console.log("Saving data after printing...");
+            saveCustomer()
+            // setTimeout(saveCustomer, 1000); // 1-second delay
         }
-    };
 
-    xhr.onerror = function () {
-        console.log("Request failed.");
-    };
+        function saveCustomer() {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", "/recipt_app/save-customer/1", true);
+            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
-    xhr.send();
-}
-</script>
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    console.log("Customer data saved successfully!");
+                    // Redirect to a new receipt after saving
+                    window.location.href = "/recipt_app/new/";
+                } else {
+                    console.log("Error saving customer data: " + xhr.status);
+                }
+            };
+
+            xhr.onerror = function () {
+                console.log("Request failed.");
+            };
+
+            xhr.send();
+        }
+    </script>
 
     {% endblock %}

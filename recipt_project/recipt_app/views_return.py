@@ -6,6 +6,7 @@ from datetime import datetime
 from .sendmail_return import sendmail_return_py
 from . import models  # Assuming this function saves customer data to DB
 from . import models_return  # Assuming this function saves customer data to DB
+from .views import ProductForm
 
 class returnProduct(forms.Form):
     def for_edit_return_product(self, prod_code, quantity, *args, **kwargs):
@@ -25,7 +26,7 @@ class returnProduct(forms.Form):
         widget=forms.NumberInput(attrs={
             'placeholder': 'Enter product quantity',
             'class': 'form_product-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;',
         })
     )
 # Form for adding/editing customer details
@@ -217,3 +218,46 @@ def return_product(request):
         return render(request, 'recipt/error.html', {"error": "Invalid input provided."})
     except Exception:
         return render(request, 'recipt/error.html', {"error": "An unexpected error occurred. Please try again later."})
+
+
+
+# View to edit product details
+def edit_product_return(request, id,recipt_code_buy):
+    print(f"** line 226 product_recipt_buy :: {recipt_code_buy} |\\|//|")
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
+        return HttpResponseRedirect(reverse("recipt:login"))
+
+    try:
+        product = request.session["products"][id]
+        prod_code, quantity, price, quantity_price,pro_descript = product
+    except IndexError:
+        return redirect('recipt:index')  # Redirect if invalid ID
+
+    if request.method == 'POST':
+        form_product = ProductForm(request.POST)
+        if form_product.is_valid():
+            # Update session data
+            new_prod_code = form_product.cleaned_data['prod_code']
+            new_quantity = form_product.cleaned_data['quantity']
+            
+            product_recipt=models.get_recipt_product(recipt_code_buy,new_prod_code)
+            print(f"** line 243 product_recipt_buy :: {recipt_code_buy} |\\|//| product_recipt :: {product_recipt} ")
+            if product_recipt:
+                if new_quantity<= product_recipt[3]:
+                    new_quantity_price = price * new_quantity
+                    # Update the product
+                    request.session["products"][id] = [new_prod_code, new_quantity, price, new_quantity_price,pro_descript ]
+                    # Recalculate total price
+                    request.session['total_price'] = sum(p[3] for p in request.session["products"])
+                    return redirect('recipt:index')
+                else:
+                    return render(request, 'management/error.html', {
+                        "error": f"product quantity not available ({product_recipt[3]})"
+                        })
+            else:
+                return render(request, 'recipt/error.html', {
+                    "error": f"product code ({prod_code}) is not available"
+                    })
+    else:
+        form_product = ProductForm(initial={'prod_code': prod_code, 'quantity': quantity})
+    return render(request, 'recipt/add.html', {"form_product": form_product, 'is_editing_return': True, 'id': id ,'recipt_code_buy': recipt_code_buy})

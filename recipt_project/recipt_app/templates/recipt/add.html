@@ -2,7 +2,11 @@
 
 {% block body %}
 <div>
-    <form action="{% if is_editing %}{% url 'recipt:edit_product' id %}{% else %}{% url 'recipt:add' %}{% endif %}" method="post">
+    <form
+    action="{% if is_editing %}{% url 'recipt:edit_product' id %} 
+    {% elif is_editing_return %} {% url 'recipt:edit_product_return' id recipt_code_buy %} 
+    {% else %}{% url 'recipt:add' %}{% endif %}" 
+    method="post">
         {% csrf_token %}
         <!-- Dynamic heading based on whether you are adding or editing an item -->
         <h1>
