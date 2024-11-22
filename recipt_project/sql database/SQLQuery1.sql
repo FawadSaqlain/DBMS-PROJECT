@@ -68,11 +68,11 @@ USE GENERALSTORE_MS
 -- ORDER BY prod_code ASC;  -- Sorts the products by price in ascending order
 -- SELECT * FROM product
 SELECT * FROM customers
-SELECT * FROM customers_return
+-- SELECT * FROM customers_return
 -- SELECT * FROM _gvmm0
 -- SELECT * FROM _mjn2P
 -- SELECT * FROM _lbkVh
-SELECT * FROM _Mg1em
+-- SELECT * FROM _Mg1em
 -- SELECT * FROM EMPLOY
 -- drop table _4AWX0
 -- update _XCLsB set quantity=20 where prod_code='iQz22'

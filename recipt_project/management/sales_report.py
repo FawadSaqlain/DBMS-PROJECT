@@ -73,8 +73,8 @@ def generate_report(frequency, start_date, end_date):
 
         dates = resampled_data.index
         total_prices = resampled_data['total_price']
-
         return plot_sales_data(dates, total_prices, frequency, start_date, end_date)
+
     except Exception as e:
         print(f"Error in generating report: {e}")
         return None

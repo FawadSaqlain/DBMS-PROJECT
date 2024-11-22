@@ -200,3 +200,25 @@ def view_sorted_user(request, asc_decs, sort_by):
     except Exception as e:
         print(f"line 200 Error fetching Employ data: {e}")
         return []
+    
+from django.db import connection
+
+def get_customer_data():
+    """Returns a tuple containing lists of customers and customers_return data."""
+    try:
+        with connection.cursor() as cursor:
+            # Fetch customers
+            query = "SELECT * FROM customers"
+            cursor.execute(query)
+            customers = cursor.fetchall()
+
+        with connection.cursor() as cursor:
+            # Fetch customers_return
+            query_return = "SELECT * FROM customers_return"
+            cursor.execute(query_return)
+            customers_return = cursor.fetchall()
+
+        return customers, customers_return
+    except Exception as e:
+        print(f"Error fetching customer data: {e}")
+        return [], []  # Return empty lists if an error occurs

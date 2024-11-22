@@ -233,7 +233,6 @@ class changepassword(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
-
 def index(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
@@ -455,7 +454,6 @@ def arange_user(results):
         databasedata.append(user_database)
 
     return databasedata, users
-
 def user_sort(request,asc_decs,sort_by):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
@@ -512,7 +510,6 @@ def user_sort(request,asc_decs,sort_by):
         'length_users': range(len(models.select_alluserdata())),
         'sorted_as': f"{asc_decs}{sort_by.lstrip('-')}"
     })
-
 def sales_report_view(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
@@ -549,7 +546,6 @@ def sales_report_view(request):
             return render(request, 'management/error.html', {
                         "error": f"Unexpected error: {e}"
                         })
-
     return render(request, 'management/sales_report.html', {'chart_url': chart_url})
 
 def login_view(request):

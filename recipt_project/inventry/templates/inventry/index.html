@@ -17,7 +17,14 @@
         </select>
         <div class="actions">
             <a href="{% url 'inventry:add' %}" class="action-button">Add New Item</a>
-            <button onclick="printReceipt()" class="action-button print-button">Print Receipt</button>
+            <!-- <button onclick="printReceipt()" class="action-button print-button">Print Receipt</button> -->
+            <form action="{% url 'inventry:export_excel' %}" method="post">
+                {% csrf_token %}
+                {% for product in products %}
+                <input type="hidden" name="products" value="{{ product|join:',' }}">
+                {% endfor %}
+                <button type="submit" class="action-button">Export to Excel</button>
+            </form>            
         </div>
     </div>
 </div>

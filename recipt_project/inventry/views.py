@@ -8,6 +8,8 @@ import random
 import string
 from . import models
 from django.contrib.auth.hashers import check_password
+import pandas as pd
+from io import BytesIO
 
 # Helper function to generate a random receipt number
 def generate_random_key(length=5):
@@ -200,6 +202,40 @@ def edit_product(request, prod_index,prod_code):
         'prod_index': prod_index,
         'prod_code': prod_code  # Add this line
     })
+def export_excel(request):
+    if request.method == "POST":
+        # Extract products from the POST data
+        raw_products = request.POST.getlist('products')  # List of serialized products
+        if not raw_products:
+            # return HttpResponse("No products available to export.", status=400)
+            return render(request, 'inventry/error.html', {
+                        "error": "No products available to export."
+                        })
+
+        # Deserialize products
+        products = [product.split(',') for product in raw_products]
+
+        # Define column names for the Excel file
+        column_names = ['Product Code', 'Description', 'Quantity', 'Price', 'Total', 'Date Time', 'Updated By']
+
+        # Convert products to a DataFrame
+        df = pd.DataFrame(products, columns=column_names)
+
+        # Create a BytesIO stream to save the Excel file
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Products')
+
+        # Set up the response
+        response = HttpResponse(
+            output.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="Inventory Products ({datetime.now().strftime("%Y-%m-%d/%H-%M-%S")}).xlsx"'
+
+        return response
+    else:
+        return HttpResponse("Invalid request method.", status=405)
 def profile(request):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
@@ -249,7 +285,6 @@ def login_view(request):
         if (user is not None):
             if (models.select_userdata(username)[1] == "inventory manager" or models.select_userdata(username)[1] == "administration manager"):
                 login(request, user)
-
                 return HttpResponseRedirect(reverse("inventry:add"))
             else:
             #     return render(request, "inventry/login.html", {
@@ -271,4 +306,3 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("inventry:login"))
-
