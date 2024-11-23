@@ -4,8 +4,8 @@
 <h1 style="text-align: center; font-weight: bold; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">Sales
     Report</h1>
 
-<form method="POST"
-    style="display: flex; flex-direction: column; align-items: center; margin-top: 20px; width: 80%; max-width: 800px;">
+    <form method="POST"
+    style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto; width: 80%; max-width: 800px; max-height: 100vh;">
     {% csrf_token %}
 
     <!-- Container for labels and inputs -->
@@ -158,8 +158,8 @@
             </tr>
                 {% for cust_return in customer_return %}
                 {% if cust_return.4 == cust_buy.4 %}
-            </tr>
-                <td>{{i}}</td>
+            <tr style="color: rgb(110, 0, 0);">
+                <td>{{ cust_return.0 }}</td>
                 <td>{{ cust_return.1 }}</td>
                 <td>{{ cust_return.2 }}</td>
                 <td>{{ cust_return.3 }}</td>
@@ -180,7 +180,7 @@
 </div>
 
 <script>
-    const searchUrl = "{% url 'management:search_user' %}";
+    const searchUrl = "{% url 'management:customer_search' %}";
     function autoSearch() {
         const query = document.getElementById('searchInput').value;
         const section = document.getElementById('searchSection').value;

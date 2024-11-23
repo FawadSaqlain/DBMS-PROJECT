@@ -222,3 +222,48 @@ def get_customer_data():
     except Exception as e:
         print(f"Error fetching customer data: {e}")
         return [], []  # Return empty lists if an error occurs
+
+
+def view_customer_sort(asc_decs,sort_by):
+    """Returns a list of sorted customer in the customer buy."""
+    try:
+        with connection.cursor() as cursor:
+            order = "ASC" if asc_decs == 0 else "DESC"
+            query = f"SELECT * FROM customers ORDER BY {sort_by} {order}"
+            cursor.execute(query)
+            customers = cursor.fetchall()
+            return [list(customers) for customers in customers]
+    except Exception as e:
+        print(f"line 143 Error fetching customers data: {e}")
+        return []
+
+
+
+def get_customer_search(search_column, search_value):
+    result = []
+    
+    # Search in the custom customers table for usernames
+    with connection.cursor() as cursor:
+        valid_columns = ['username', 'user_type', 'cnic', 'phone_number', 'updated_datetime', 'address']
+
+        if search_column == 'all':
+            sql = """
+            SELECT * FROM customers
+            WHERE LOWER(name) LIKE LOWER(%s)
+            OR LOWER(email) LIKE LOWER(%s)
+            OR LOWER(Employ_name) LIKE LOWER(%s)
+            OR LOWER(recipt_code) LIKE LOWER(%s)
+            OR LOWER(total_price) LIKE LOWER(%s)
+            OR LOWER(CAST(updated_datetime AS VARCHAR(50))) LIKE LOWER(%s)
+            """
+            like_value = f'%{search_value}%'
+            cursor.execute(sql, [like_value] * 6)
+        else:
+            if search_column not in valid_columns:
+                raise ValueError("Invalid search column provided.")
+            
+            sql = f"SELECT username FROM customers WHERE LOWER({search_column}) LIKE LOWER(%s)"
+            cursor.execute(sql, [f'%{search_value}%'])
+        results = cursor.fetchall()
+        return results
+

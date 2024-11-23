@@ -547,7 +547,6 @@ def sales_report_view(request):
                         "error": f"Unexpected error: {e}"
                         })
     return render(request, 'management/sales_report.html', {'chart_url': chart_url})
-
 def login_view(request):
     if request.method == "POST":
         username = request.POST["username"]

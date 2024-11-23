@@ -14,5 +14,6 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('user_sort/<int:asc_decs>/<str:sort_by>/', views.user_sort, name='user_sort'),
     path('sales_report/',tests.sales_report_view,name='sales_report'),
-    path('customer_sort/<int:asc_decs>/<str:sort_by>/',tests.customer_sort,name='customer_sort')
+    path('customer_sort/<int:asc_decs>/<str:sort_by>/',tests.customer_sort,name='customer_sort'),
+    path('customer_search/', tests.customer_search, name='customer_search'),
     ]

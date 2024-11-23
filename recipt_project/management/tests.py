@@ -11,12 +11,40 @@ from . import models
 from django.contrib.auth.hashers import check_password
 import pandas as pd
 from .sales_report import generate_report
-def customer_sort(asc_decs,sort_bye):
-    pass
+def customer_sort(request,asc_decs,sort_by):
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
+        return HttpResponseRedirect(reverse("management:login"))
+    customer_buy=models.view_customer_sort(asc_decs,sort_by)
+    # rendering(request,customer_buy)
+    return HttpResponseRedirect(reverse(rendering(request,customer_buy)))
+
+
+# def customer_search(request):
+#     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
+#         return HttpResponseRedirect(reverse("management:login"))
+#     search_column = request.GET.get('section', 'username')  # Default search column
+#     search_value = request.GET.get('q', '')  # Retrieved search value
+    
+#     # Convert search_value to string (if not already a string)
+#     search_value = str(search_value)
+    
+#     print(f"line 399 search value :: {search_value} , search column :: {search_column}")
+
+#     results = []  # Initialize results list
+
+#     # Check if search_value is not empty
+#     if search_value:
+#         results = models.get_customer_search(search_column, search_value)
+#     rendering(results)
+#     # Render
+
 def customerdata(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
-    return models.get_customer_data()
+    customer_buy , customer_return = models.get_customer_data()
+    # rendering(request, customer_buy, customer_return)
+    return HttpResponseRedirect(reverse(rendering(request,customer_buy, customer_return)))
+
 def sales_report_view(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
@@ -43,6 +71,8 @@ def sales_report_view(request):
 
                 print(f"line 92 :: {frequency}  {start_date}  {end_date}")
                 chart_url = generate_report(frequency, start_date, end_date)
+                # rendering(request,chart_url)
+                return HttpResponseRedirect(reverse(rendering(request,chart_url)))
         except ValueError as ve:
             # print(f"Date parsing error: {ve}")
             return render(request, 'management/error.html', {
@@ -53,5 +83,13 @@ def sales_report_view(request):
             return render(request, 'management/error.html', {
                         "error": f"Unexpected error: {e}"
                         })
-    customer_buy , customer_return = customerdata(request)
-    return render(request, 'management/sales_report.html', {'chart_url': chart_url,'customer_buy': customer_buy,'customer_return': customer_return})
+
+def rendering( request, customer_buy=None , customer_return=None , chart_url=None):
+    return render(request, 'management/sales_report.html',
+                {'chart_url': chart_url,'customer_buy': customer_buy,'customer_return': customer_return})
+
+# def sales_report(request):
+#     chart_url=sales_report_view(request)
+#     customer_buy , customer_return = customerdata(request)
+#     return render(request, 'management/sales_report.html',
+#                 {'chart_url': chart_url,'customer_buy': customer_buy,'customer_return': customer_return})
