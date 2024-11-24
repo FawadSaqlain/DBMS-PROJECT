@@ -87,6 +87,8 @@ def inventry_sort(request,asc_decs,sort_by):
         'sorted_as':f"{asc_decs}{sort_by}"
     })
 def search_view(request):
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
+        return HttpResponseRedirect(reverse("inventry:login"))
     search_column = request.GET.get('section', 'product_code')  # Default search column
     search_value = request.GET.get('q', '')  # Retrieved search value
     

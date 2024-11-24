@@ -200,8 +200,6 @@ def view_sorted_user(request, asc_decs, sort_by):
     except Exception as e:
         print(f"line 200 Error fetching Employ data: {e}")
         return []
-    
-from django.db import connection
 
 def get_customer_data():
     """Returns a tuple containing lists of customers and customers_return data."""
@@ -238,32 +236,97 @@ def view_customer_sort(asc_decs,sort_by):
         return []
 
 
+def get_customer_buy_buy_recipt_code_search(search_column, search_value): 
+    if search_column == 'recipt_code_buy':
+        search_column = 'recipt_code'
+    if search_column == 'recipt_code_return':
+        return []
+    customer_buy = []
 
-def get_customer_search(search_column, search_value):
-    result = []
-    
-    # Search in the custom customers table for usernames
     with connection.cursor() as cursor:
-        valid_columns = ['username', 'user_type', 'cnic', 'phone_number', 'updated_datetime', 'address']
-
+        valid_columns = ['name', 'email', 'Employ_name', 'recipt_code', 'total_price', 'date_time']
         if search_column == 'all':
             sql = """
-            SELECT * FROM customers
+            SELECT recipt_code FROM customers
             WHERE LOWER(name) LIKE LOWER(%s)
             OR LOWER(email) LIKE LOWER(%s)
             OR LOWER(Employ_name) LIKE LOWER(%s)
             OR LOWER(recipt_code) LIKE LOWER(%s)
-            OR LOWER(total_price) LIKE LOWER(%s)
-            OR LOWER(CAST(updated_datetime AS VARCHAR(50))) LIKE LOWER(%s)
+            OR CAST(total_price AS VARCHAR) LIKE LOWER(%s)
+            OR FORMAT(date_time, 'yyyy-MM-dd HH:mm:ss') LIKE LOWER(%s)
             """
             like_value = f'%{search_value}%'
             cursor.execute(sql, [like_value] * 6)
         else:
             if search_column not in valid_columns:
-                raise ValueError("Invalid search column provided.")
+                raise ValueError(f"Invalid search column: {search_column}")
             
-            sql = f"SELECT username FROM customers WHERE LOWER({search_column}) LIKE LOWER(%s)"
+            sql = f"SELECT recipt_code FROM customers WHERE LOWER({search_column}) LIKE LOWER(%s)"
             cursor.execute(sql, [f'%{search_value}%'])
-        results = cursor.fetchall()
-        return results
 
+        customer_buy = cursor.fetchall()
+    return customer_buy
+
+def get_customer_return_buy_recipt_code_search(search_column, search_value):
+    customer_return = []
+    with connection.cursor() as cursor:
+        valid_columns = ['name', 'email', 'Employ_name', 'recipt_code_buy', 'recipt_code_return', 'total_price', 'date_time']
+        if search_column == 'all':
+            sql = """
+            SELECT recipt_code_buy FROM customers_return
+            WHERE LOWER(name) LIKE LOWER(%s)
+            OR LOWER(email) LIKE LOWER(%s)
+            OR LOWER(Employ_name) LIKE LOWER(%s)
+            OR LOWER(recipt_code_buy) LIKE LOWER(%s)
+            OR LOWER(recipt_code_return) LIKE LOWER(%s)
+            OR CAST(total_price AS VARCHAR) LIKE LOWER(%s)
+            OR FORMAT(date_time, 'yyyy-MM-dd HH:mm:ss') LIKE LOWER(%s)
+            """
+            like_value = f'%{search_value}%'
+            cursor.execute(sql, [like_value] * 7)
+        else:
+            if search_column not in valid_columns:
+                raise ValueError(f"Invalid search column: {search_column}")
+
+            sql = f"SELECT recipt_code_buy FROM customers_return WHERE LOWER({search_column}) LIKE LOWER(%s)"
+            cursor.execute(sql, [f'%{search_value}%'])
+
+        customer_return = cursor.fetchall()
+    return customer_return
+from django.db import connection
+
+def get_customer_data_by_recipt(customer_buy, customer_return):
+    """
+    Fetch data for customers and customers_return based on receipt codes.
+
+    Args:
+        customer_buy (list): A list of receipt codes for customers.
+        customer_return (list): A list of receipt codes for customers_return.
+
+    Returns:
+        tuple: Two lists containing data from customers and customers_return tables.
+    """
+    try:
+        customers = []
+        customers_return = []
+
+        with connection.cursor() as cursor:
+            # Fetch customers data
+            for recipt_code in customer_buy:
+                query = "SELECT * FROM customers WHERE recipt_code = %s"
+                print(f"Executing Query: {query} with Parameter: {recipt_code}")
+                cursor.execute(query, [str(recipt_code)])  # Ensure input is string
+                customers.extend(cursor.fetchall())
+
+            # Fetch customers_return data
+            for recipt_code_buy in customer_return:
+                query_return = "SELECT * FROM customers_return WHERE recipt_code_buy = %s"
+                print(f"Executing Query: {query_return} with Parameter: {recipt_code_buy}")
+                cursor.execute(query_return, [str(recipt_code_buy)])  # Ensure input is string
+                customers_return.extend(cursor.fetchall())
+
+        return customers, customers_return
+
+    except Exception as e:
+        print(f"Error fetching customer data: {e}")
+        return [], []  # Return empty lists if an error occurs
