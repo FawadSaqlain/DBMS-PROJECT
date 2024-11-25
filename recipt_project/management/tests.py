@@ -11,6 +11,12 @@ from . import models
 from django.contrib.auth.hashers import check_password
 import pandas as pd
 from .sales_report import generate_report
+def get_recipt(request,code,table_name):
+    recipt=models.get_table_recipt(code)
+    customer=models.get_customer_by_recipt_code(code , table_name)
+    return render(request,"management/recipt.html",{"recipt":recipt,'customer':customer})
+
+'''
 def customer_sort(request,asc_decs,sort_by):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
@@ -28,7 +34,7 @@ def customer_search(request):
     # Convert search_value to string (if not already a string)
     search_value = str(search_value)
     
-    print(f"line 399 search value :: {search_value} , search column :: {search_column}")
+    print(f"line 31 search value :: {search_value} , search column :: {search_column}")
 
     customer_buy = []  # Initialize customer_buy list
     customer_return = []  # Initialize customer_return list
@@ -37,11 +43,27 @@ def customer_search(request):
     if search_value:
         customer_buy_code = models.get_customer_buy_buy_recipt_code_search(search_column, search_value)
         customer_return_code = models.get_customer_return_buy_recipt_code_search(search_column, search_value)
-        customer_buy , customer_return=models.get_customer_data_by_recipt(customer_buy_code,customer_return_code)
+        print(f"customer_buy_code :: {customer_buy_code}")
+        print(f"customer_return_code :: {customer_return_code}")
+        for code in customer_buy_code:
+            customer_buy.append(models.get_customer_buy_data(code))
+            
+        
+        for code in customer_return_code:
+            if models.get_customer_return_data(code) not in customer_return:
+                customer_return.append(models.get_customer_return_data(code))
+            if models.get_customer_buy_data(code) not in customer_buy:
+                customer_buy.append(models.get_customer_buy_data(code))
+
+        flattened_customer_buy = [item for sublist in customer_buy for item in sublist]
+        # Flatten customer_return
+        flattened_customer_return = [item for sublist in customer_return for item in sublist]
+        print(f"customer_buy :: {customer_buy}")
+        print(f"customer_return :: {customer_return}")
         
 
     return render(request, 'management/customer_table.html',
-                {'customer_buy': customer_buy,'customer_return': customer_return})
+                {'customer_buy': flattened_customer_buy,'customer_return': flattened_customer_return})
 
 
 def customerdata(request):
@@ -50,3 +72,4 @@ def customerdata(request):
     customer_buy , customer_return = models.get_customer_data()
     return render(request, 'management/customer_table.html',
                 {'customer_buy': customer_buy,'customer_return': customer_return})
+'''

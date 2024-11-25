@@ -118,7 +118,7 @@ class NewDataForm_edit(forms.Form):
         self.fields['cnic'].initial = cnic
         self.fields['phone_number'].initial = phone_number
         self.fields['email'].initial = email
-        self.fields['username'].initial = username
+        # self.fields['username'].initial = username
         self.fields['user_type'].initial = user_type
     USER_TYPE_CHOICES = [
         ('inventory manager', 'Inventory Manager'),
@@ -169,14 +169,14 @@ class NewDataForm_edit(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
-    username = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'id': 'id_username',
-            'placeholder': 'Enter username',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
+    # username = forms.CharField(
+    #     widget=forms.TextInput(attrs={
+    #         'id': 'id_username',
+    #         'placeholder': 'Enter username',
+    #         'class': 'form-control',
+    #         'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+    #     })
+    # )
     password = forms.CharField(
         required=False,
         widget=forms.PasswordInput(attrs={
@@ -567,3 +567,56 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("management:login"))
+
+def customer_sort(request,asc_decs,sort_by):
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
+        return HttpResponseRedirect(reverse("management:login"))
+    customer_buy, customer_return = models.get_customer_data()
+    customer_buy=models.view_customer_sort(asc_decs,sort_by)
+    return render(request,"management/customer_table.html",{"customer_buy":customer_buy,'sorted_as':f"{asc_decs}{sort_by}","customer_return":customer_return})
+
+def customer_search(request):
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
+        return HttpResponseRedirect(reverse("management:login"))
+    search_column = request.GET.get('section')  # Default search column
+    search_value = request.GET.get('q', '')  # Retrieved search value
+    
+    # Convert search_value to string (if not already a string)
+    search_value = str(search_value)
+    
+    print(f"line 589 search value :: {search_value} , search column :: {search_column}")
+
+    customer_buy = []  # Initialize customer_buy list
+    customer_return = []  # Initialize customer_return list
+
+    # Check if search_value is not empty
+    if search_value:
+        customer_buy_code = models.get_customer_buy_buy_recipt_code_search(search_column, search_value)
+        customer_return_code = models.get_customer_return_buy_recipt_code_search(search_column, search_value)
+        
+        for code in customer_buy_code:
+            customer_buy.append(models.get_customer_buy_data(code))
+            
+        
+        for code in customer_return_code:
+            if models.get_customer_return_data(code) not in customer_return:
+                customer_return.append(models.get_customer_return_data(code))
+            if models.get_customer_buy_data(code) not in customer_buy:
+                customer_buy.append(models.get_customer_buy_data(code))
+
+        flattened_customer_buy = [item for sublist in customer_buy for item in sublist]
+        # Flatten customer_return
+        flattened_customer_return = [item for sublist in customer_return for item in sublist]
+        
+        
+
+    return render(request, 'management/customer_table.html',
+                {'customer_buy': flattened_customer_buy,'customer_return': flattened_customer_return})
+
+
+def customerdata(request):
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
+        return HttpResponseRedirect(reverse("management:login"))
+    customer_buy , customer_return = models.get_customer_data()
+    return render(request, 'management/customer_table.html',
+                {'customer_buy': customer_buy,'customer_return': customer_return})

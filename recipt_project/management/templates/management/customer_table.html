@@ -6,7 +6,7 @@
         <input type="text" id="searchInput" required placeholder="Search...">
         <select id="searchSection" required onchange="autoSearch()">
             <option value="" disabled selected>Search by</option>
-            <option value="Name">Name</option>
+            <option value="name">Name</option>
             <option value="email">Email</option>
             <option value="Employ_name">Employ name</option>
             <option value="recipt_code_buy">recipt code buy</option>
@@ -56,26 +56,17 @@
                     </a>
                     {% endif %}
                 </th>
-                <th>{% if sorted_as == '0recipt_code_buy' %}
-                    <a href="{% url 'management:customer_sort' 1 'recipt_code_buy' %}" class="hover-effect">
+                <th>{% if sorted_as == '0recipt_code' %}
+                    <a href="{% url 'management:customer_sort' 1 'recipt_code' %}" class="hover-effect">
                         <h3>recipt code buy</h3>
                     </a>
                     {% else %}
-                    <a href="{% url 'management:customer_sort' 0 'recipt_code_buy' %}" class="hover-effect">
+                    <a href="{% url 'management:customer_sort' 0 'recipt_code' %}" class="hover-effect">
                         <h3>recipt code buy</h3>
                     </a>
                     {% endif %}
                 </th>
-                <th>{% if sorted_as == '0recipt_code_return' %}
-                    <a href="{% url 'management:customer_sort' 1 'recipt_code_return' %}" class="hover-effect">
-                        <h3>recipt code return</h3>
-                    </a>
-                    {% else %}
-                    <a href="{% url 'management:customer_sort' 0 'recipt_code_return' %}" class="hover-effect">
-                        <h3>recipt code return</h3>
-                    </a>
-                    {% endif %}
-                </th>
+                <th><h3>recipt code return</h3></th>
                 <th>{% if sorted_as == '0total_price' %}
                     <a href="{% url 'management:customer_sort' 1 'total_price' %}" class="hover-effect">
                         <h3>total price</h3>
@@ -106,7 +97,7 @@
                 <td>{{ cust_buy.1 }}</td>
                 <td>{{ cust_buy.2 }}</td>
                 <td>{{ cust_buy.3 }}</td>
-                <td>{{ cust_buy.4 }}</td>
+                <td><a href="{% url 'management:get_recipt' cust_buy.4 'customers' %}" class="hover-effect">{{ cust_buy.4 }}</a></td>
                 <td>NONE</td>
                 <td>{{cust_buy.5}}</td>
                 <td>{{ cust_buy.6 }}</td>
@@ -118,8 +109,8 @@
                 <td>{{ cust_return.1 }}</td>
                 <td>{{ cust_return.2 }}</td>
                 <td>{{ cust_return.3 }}</td>
-                <td>{{ cust_return.4 }}</td>
-                <td>{{ cust_return.5 }}</td>
+                <td><a href="{% url 'management:get_recipt' cust_return.4 'customers' %}" class="hover-effect">{{ cust_return.4 }}</a></td>
+                <td><a href="{% url 'management:get_recipt' cust_return.5 'customers_return' %}" class="hover-effect">{{ cust_return.5 }}</a></td>
                 <td>{{ cust_return.6 }}</td>
                 <td>{{ cust_return.7 }}</td>
             </tr>

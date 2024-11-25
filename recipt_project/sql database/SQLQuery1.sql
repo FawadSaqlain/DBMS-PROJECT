@@ -40,16 +40,16 @@ USE GENERALSTORE_MS
 --     added_by_employ NVARCHAR(100),
 -- )
 -- drop table Employ
--- CREATE TABLE Employ (
---     username NVARCHAR(100) PRIMARY KEY,
---     user_type NVARCHAR(1000),
---     cnic NVARCHAR(1000),
---     phone_number NVARCHAR(1000),
---     updated_datetime DATETIME,
---     address NVARCHAR(1000),
--- )
+CREATE TABLE Employ (
+    username NVARCHAR(100) PRIMARY KEY,
+    user_type NVARCHAR(1000),
+    cnic NVARCHAR(1000),
+    phone_number NVARCHAR(1000),
+    updated_datetime DATETIME,
+    address NVARCHAR(1000),
+)
 
--- INSERT INTO Employ (username, user_type, cnic, phone_number, updated_datetime, address)VALUES ('fawad', 'administration manager', '3660302698539', '03316963802', '2020-04-12', 'mumtazgarden');
+INSERT INTO Employ (username, user_type, cnic, phone_number, updated_datetime, address)VALUES ('fawad', 'administration manager', '3660302698539', '03316963802', '2020-04-12', 'mumtazgarden');
 -- IF OBJECT_ID('customers', 'U') IS NOT NULL
 -- BEGIN
     -- DROP TABLE customers;
@@ -67,7 +67,7 @@ USE GENERALSTORE_MS
 -- SELECT * FROM Product
 -- ORDER BY prod_code ASC;  -- Sorts the products by price in ascending order
 -- SELECT * FROM product
-SELECT * FROM customers
+-- SELECT * FROM customers
 -- SELECT * FROM customers_return
 -- SELECT * FROM _gvmm0
 -- SELECT * FROM _mjn2P

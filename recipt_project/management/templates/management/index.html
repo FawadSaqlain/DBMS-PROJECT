@@ -18,8 +18,7 @@
             <option value="all">All Users</option>
         </select>
         <div class="actions">
-            <a href="{% url 'management:add_user' %}" class="action-button">Add New User</a>
-            <button onclick="printReceipt()" class="action-button print-button">Print Receipt</button>
+            <a href="{% url 'management:add_user' %}" class="action-button"><button style="background-color: brown; color: white; padding: 5px;margin-left: 30px; border-radius: 5px;"><strong>Add New Employ</strong></button></a>
         </div>
         {% if error_message %}
             <div class="alert alert-danger">{{ error_message }}</div>

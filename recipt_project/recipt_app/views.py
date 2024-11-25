@@ -319,7 +319,7 @@ def save_customer_recipt(request, new_recipt):
         pass
 
     if request.user.first_name and request.user.last_name:
-        Employ_name = f"{request.user.first_name} {request.user.last_name} ({request.user.last_name})"
+        Employ_name = f"{request.user.first_name} {request.user.last_name} ({request.user.username})"
     else:
         Employ_name = request.user.username
 

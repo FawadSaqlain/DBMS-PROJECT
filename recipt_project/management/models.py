@@ -236,11 +236,13 @@ def view_customer_sort(asc_decs,sort_by):
         return []
 
 
-def get_customer_buy_buy_recipt_code_search(search_column, search_value): 
+def get_customer_buy_buy_recipt_code_search(search_column, search_value):
+    """Search for customer buy data based on a column and value, returning a list of receipt codes as strings."""
     if search_column == 'recipt_code_buy':
         search_column = 'recipt_code'
     if search_column == 'recipt_code_return':
         return []
+
     customer_buy = []
 
     with connection.cursor() as cursor:
@@ -260,15 +262,20 @@ def get_customer_buy_buy_recipt_code_search(search_column, search_value):
         else:
             if search_column not in valid_columns:
                 raise ValueError(f"Invalid search column: {search_column}")
-            
+
             sql = f"SELECT recipt_code FROM customers WHERE LOWER({search_column}) LIKE LOWER(%s)"
             cursor.execute(sql, [f'%{search_value}%'])
 
-        customer_buy = cursor.fetchall()
+        # Fetch results and extract the first column as strings
+        customer_buy = [row[0] for row in cursor.fetchall()]
+
     return customer_buy
 
+
 def get_customer_return_buy_recipt_code_search(search_column, search_value):
+    """Search for customer return data based on a column and value, returning a list of receipt codes as strings."""
     customer_return = []
+
     with connection.cursor() as cursor:
         valid_columns = ['name', 'email', 'Employ_name', 'recipt_code_buy', 'recipt_code_return', 'total_price', 'date_time']
         if search_column == 'all':
@@ -291,42 +298,66 @@ def get_customer_return_buy_recipt_code_search(search_column, search_value):
             sql = f"SELECT recipt_code_buy FROM customers_return WHERE LOWER({search_column}) LIKE LOWER(%s)"
             cursor.execute(sql, [f'%{search_value}%'])
 
-        customer_return = cursor.fetchall()
+        # Fetch results and extract the first column as strings
+        customer_return = [row[0] for row in cursor.fetchall()]
+
     return customer_return
-from django.db import connection
 
-def get_customer_data_by_recipt(customer_buy, customer_return):
-    """
-    Fetch data for customers and customers_return based on receipt codes.
-
-    Args:
-        customer_buy (list): A list of receipt codes for customers.
-        customer_return (list): A list of receipt codes for customers_return.
-
-    Returns:
-        tuple: Two lists containing data from customers and customers_return tables.
-    """
+def get_customer_buy_data(recipt_buy_code):
+    """Returns a tuple containing data of customers from the 'customers' table."""
     try:
-        customers = []
-        customers_return = []
-
         with connection.cursor() as cursor:
-            # Fetch customers data
-            for recipt_code in customer_buy:
-                query = "SELECT * FROM customers WHERE recipt_code = %s"
-                print(f"Executing Query: {query} with Parameter: {recipt_code}")
-                cursor.execute(query, [str(recipt_code)])  # Ensure input is string
-                customers.extend(cursor.fetchall())
-
-            # Fetch customers_return data
-            for recipt_code_buy in customer_return:
-                query_return = "SELECT * FROM customers_return WHERE recipt_code_buy = %s"
-                print(f"Executing Query: {query_return} with Parameter: {recipt_code_buy}")
-                cursor.execute(query_return, [str(recipt_code_buy)])  # Ensure input is string
-                customers_return.extend(cursor.fetchall())
-
-        return customers, customers_return
-
+            # Fetch customers
+            query = "SELECT * FROM customers WHERE recipt_code = %s"
+            cursor.execute(query, [recipt_buy_code])  # Pass the parameter correctly
+            customers = cursor.fetchall()
+        return customers
     except Exception as e:
         print(f"Error fetching customer data: {e}")
-        return [], []  # Return empty lists if an error occurs
+        return []  # Return an empty list if an error occurs
+
+
+def get_customer_return_data(recipt_buy_code):
+    """Returns a tuple containing data of customers from the 'customers_return' table."""
+    try:
+        with connection.cursor() as cursor:
+            # Fetch customers_return
+            query_return = "SELECT * FROM customers_return WHERE recipt_code_buy = %s"
+            cursor.execute(query_return, [recipt_buy_code])  # Pass the parameter correctly
+            customers_return = cursor.fetchall()
+        return customers_return
+    except Exception as e:
+        print(f"Error fetching customer return data: {e}")
+        return []  # Return an empty list if an error occurs
+
+
+def get_table_recipt(table_name):
+    try:
+        with connection.cursor() as cursor:
+            query = f"SELECT * FROM {table_name}"
+            cursor.execute(query)
+            table_data = cursor.fetchall()
+            if table_data:
+                return [list(row) for row in table_data]  
+            else:
+                return None  
+    except Exception as e:
+        print(f"line 64 Error fetching table data: {e}")
+        return None
+
+
+def get_customer_by_recipt_code(code,table_name):
+    try:
+        with connection.cursor() as cursor:
+            if table_name=='customers_return':
+                query = f"SELECT * FROM {table_name} WHERE recipt_code_return = %s"
+            else:
+                query = f"SELECT * FROM {table_name} WHERE recipt_code = %s"
+            cursor.execute(query, [code])  # Pass the parameter correctly
+            customer = cursor.fetchone()
+            if customer:
+                return list(customer)
+            else:
+                return None
+    except Exception as e:
+        print(f"Error fetching customer data: {e}")
