@@ -17,26 +17,28 @@
         <tbody>
             <tr>
                 {% for product in recipt %}
-                <td>{{ product.0 }}</td>
                 <td>{{ product.1 }}</td>
                 <td>{{ product.2 }}</td>
                 <td>{{ product.3 }}</td>
                 <td>{{ product.4 }}</td>
+                <td>{{ product.5 }}</td>
                 {% endfor %}
             </tr>
         </tbody>
     </table>
 
-    <table class="user-table">
+    <table class="user-table" style="margin-top: 20px;">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Employ Name</th>
-                <th>Receipt Code (Buy)</th>
-                <th>Receipt Code (Return)</th>
-                <th>Total Price</th>
-                <th>Date & Time</th>
+                1<th>Name</th>
+                2<th>Email</th>
+                3<th>Employ Name</th>
+                4<th>Receipt Code (Buy)</th>
+                {% if customer.7 %}
+                5<th>Receipt Code (Return)</th>
+                {% endif %}
+                6<th>Total Price</th>
+                7<th>Date & Time</th>
             </tr>
         </thead>
         <tbody>
@@ -45,10 +47,16 @@
                 <td>{{ customer.1 }}</td>
                 <td>{{ customer.2 }}</td>
                 <td>{{ customer.3 }}</td>
-                <td>{{ customer.4 }}</td>
-                {% if len(customer) >7 %}
+                <td><a href="{% url 'management:get_recipt' customer.4 'customers' %}" class="hover-effect">{{ customer.4 }}</a></td>
+                {% if customer.7 %}
+                <td><a href="{% url 'management:get_recipt' customer.5 'customers_return' %}" class="hover-effect">{{ customer.5 }}</a></td>
+                {% else %}
                 <td>{{ customer.5 }}</td>
+                {% endif %}
                 <td>{{ customer.6 }}</td>
+                {% if customer.7 %}
+                <td>{{ customer.7 }}</td>
+                {% endif %}
             </tr>
         </tbody>
     </table>

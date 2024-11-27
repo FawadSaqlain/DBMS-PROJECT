@@ -100,11 +100,16 @@ def edit_user(request, user_index, username):
             print(f"before updating in edit_user models.save_userdata({username}, {cnic}, {phone_number}, {address}, {user_type})")
             models.save_userdata(username, cnic, phone_number, address, user_type)  # Update User and custom Employ model
             print(f"line 169 before saving {user}")
-            if password and confirm_password and password==confirm_password:
+            if ((password or confirm_password) and (password==confirm_password)):
                 user.set_password(password)
+            elif ((password or confirm_password) and (password!=confirm_password)):
+                return render(request, 'management/error.html', {
+                    "error": "password and confirm password miss matches."
+                    })
             user.save()
             messages.success(request, 'User updated successfully!')
             return redirect('management:index')
+        
         else:
             # messages.error(request, 'Please correct the errors below.')
             return render(request, 'management/error.html', {
@@ -172,7 +177,7 @@ def profile(request):
                     request.user.set_password(new_password)
                     request.user.save()
                     print("line 214 :: password is changed ")
-                    # request.user.save() 
+                    # request.user.save()
                     return redirect('management:logout')
                 else:
                     # return render(request, 'management/profile.html', {

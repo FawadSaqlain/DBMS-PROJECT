@@ -5,43 +5,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'management_css/style.css' %}">
     <link rel="icon" type="image/x-icon" href="{% static 'management_css/assets/BUGS logo.jpeg' %}" alt="BUGS">
     <title>B U G S</title>
 </head>
 
 <body>
+
     <header>
-        <div class="header-row">
+        <div class="header-left">
+            <div>
+            <a href="{% url 'recipt:index' %}" target="_blank">
+                <button type="button" class="logout-button">Counter</button>
+            </a>
+            <a href="{% url 'inventry:index' %}" target="_blank">
+                <button type="button" class="logout-button">Inventroy</button>
+            </a>
+        </div>
+        <div>
+            <a href="{% url 'management:index' %}" target="_blank">
+                <button type="button" class="logout-button">Management</button>
+            </a>
+            <a href="{% url 'management:customerdata' %}" target="_blank">
+                <button type="button" class="logout-button">Sales Data</button>
+            </a>
+        </div>
+        </div>
+
+        <div class="header-center">
             <div class="header-title">Bhatti Union General Store</div>
-            <div class="header-buttons">
-                <a href="{% url 'management:logout' %}">
-                    <button type="button" class="logout-button">Log out</button>
-                </a>
-                <a href="{% url 'management:profile' %}">
-                    <button type="button" class="logout-button">Profile</button>
-                </a>
-            </div>
-        </div>
-    
-        <!-- Centered Management Section title -->
-        <div class="line2">
             <div class="section-title">Management Section</div>
-            <div class="left-buttons">
-                <a href="{% url 'recipt:index' %}">
-                    <button type="button" class="logout-button">Counter</button>
-                </a>
-                <a href="{% url 'inventry:index' %}">
-                    <button type="button" class="logout-button">Inventry</button>
-                </a>
-                <a href="{% url 'management:customerdata'%}">
-                    <button type="button" class="logout-button">Sales Data</button>
-                </a>
-            </div>
         </div>
-    </header>    
-    
+
+        <div class="header-right">
+            <a href="{% url 'management:logout' %}">
+                <button type="button" class="logout-button">Log out</button>
+            </a>
+            <a href="{% url 'management:profile' %}">
+                <button type="button" class="logout-button">Profile</button>
+            </a>
+        </div>
+    </header>
+
     <div id="outerContainer">
         <div id="container">
             {% block body %}

@@ -15,57 +15,58 @@ body {
   color: rgb(0, 0, 0);
 }
 
-/* Header styling */
+    /* Header styling */
 header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
   background-color: rgba(0, 0, 0, 0.7);
   padding: 20px;
   color: aliceblue;
 }
 
-/* First Row: Title and Profile/Logout Buttons */
-.header-row {
+/* First Column: Buttons for Counter, Inventory, Management, and Sales Data */
+.header-left {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 10px;
+  flex-direction: column;
+  float: left;
+  
 }
 
+/* Second Column: Store Title and Management Section Title */
+.header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* gap: 10px; */
+}
+
+/* Third Column: Profile/Logout Buttons */
+.header-right {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  /* gap: 15px; */
+  float: right;
+}
+
+/* Title and Section title styling */
 .header-title {
   font-size: 1.8em;
   font-weight: bold;
   text-align: center;
-  width: 100%;
-}
-
-.header-buttons {
-  display: flex;
-  gap: 15px;
-}
-
-/* Centered Inventory Section title and right-aligned buttons */
-.line2 {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
 }
 
 .section-title {
   font-size: 1.5em;
   font-weight: bold;
   text-align: center;
-  flex-grow: 1; /* Centers the title */
-}
-
-.right-buttons {
-  display: flex;
-  gap: 15px;
-  margin-right: 20px; /* Optional: adds spacing from the right edge */
 }
 
 /* Button styling */
+
 .logout-button {
   width: 100px;
   height: 35px;
@@ -75,12 +76,12 @@ header {
   border: none;
   cursor: pointer;
   transition: background-color 0.3s;
+  margin-top: 10px;
+  margin-left: 5px;
 }
-
 .logout-button:hover {
   background-color: #ddd;
 }
-
 /* Centered container */
 #outerContainer {
   display: flex;
