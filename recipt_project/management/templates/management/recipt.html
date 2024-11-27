@@ -1,11 +1,56 @@
 {% extends "management/layout.html" %}
 
 {% block body %}
-<div>
-{{recipt}}
-</div>
-<br>
-<div>
-{{customer}}
+
+<div id="index_outer_div" class="user-details">
+    <!-- <div class="receipt-header">Receipt Details</div> -->
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>Product Code</th>
+                <th>Product Description</th>
+                <th>Quantity</th>
+                <th>Price per Unit</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for product in recipt %}
+                <td>{{ product.0 }}</td>
+                <td>{{ product.1 }}</td>
+                <td>{{ product.2 }}</td>
+                <td>{{ product.3 }}</td>
+                <td>{{ product.4 }}</td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="user-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Employ Name</th>
+                <th>Receipt Code (Buy)</th>
+                <th>Receipt Code (Return)</th>
+                <th>Total Price</th>
+                <th>Date & Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                
+                <td>{{ customer.1 }}</td>
+                <td>{{ customer.2 }}</td>
+                <td>{{ customer.3 }}</td>
+                <td>{{ customer.4 }}</td>
+                {% if len(customer) >7 %}
+                <td>{{ customer.5 }}</td>
+                <td>{{ customer.6 }}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 {% endblock %}

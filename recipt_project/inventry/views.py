@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout 
-from django import forms
+from . import views_forms
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
@@ -16,60 +16,7 @@ def generate_random_key(length=5):
     characters = string.ascii_letters + string.digits
     random_key = ''.join(random.choices(characters, k=length))
     return random_key
-# Form for adding/editing products
-class NewDataForm(forms.Form):
-    def for_edit_product(self,prod_desc ,pric, quant, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['prod_description'].initial = prod_desc
-        self.fields['prod_sale_price'].initial = pric
-        self.fields['prod_quantity'].initial = quant
 
-    prod_description = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'id': 'id_name',
-            'placeholder': 'Enter product Description',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;height:100px'
-        })
-    )
-    prod_sale_price = forms.IntegerField(
-        widget=forms.NumberInput(attrs={
-            'placeholder': 'Enter product price',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-
-    prod_quantity = forms.IntegerField(
-        widget=forms.NumberInput(attrs={
-            'placeholder': 'Enter product quantity',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-class changepassword(forms.Form):
-    old_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'id': 'id_old_password',
-            'placeholder': 'Enter old password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    new_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'placeholder': 'Enter new password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    confirm_new_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'placeholder': 'Enter confirm new password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
 def index(request):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
@@ -133,7 +80,7 @@ def add(request):
         request.session["products"] = []
 
     if request.method == 'POST':
-        form = NewDataForm(request.POST)
+        form = views_forms.NewDataForm(request.POST)
         if form.is_valid():
             prod_code = generate_random_key()
             prod_description = form.cleaned_data['prod_description']
@@ -150,7 +97,7 @@ def add(request):
         else:
             return render(request, 'inventry/add.html', {'form': form})
     
-    return render(request, 'inventry/add.html', {"form": NewDataForm()})
+    return render(request, 'inventry/add.html', {"form": views_forms.NewDataForm()})
 def delet(request, prod_index,prod_code):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
@@ -173,7 +120,7 @@ def edit_product(request, prod_index,prod_code):
         return redirect('inventry:index')  # Redirect if invalid index
 
     if request.method == 'POST':
-        form = NewDataForm(request.POST)
+        form = views_forms.NewDataForm(request.POST)
         if form.is_valid():
             # Retrieve updated data from the form
             new_prod_description = form.cleaned_data['prod_description']
@@ -192,7 +139,7 @@ def edit_product(request, prod_index,prod_code):
 
     else:
         # If GET request, prepopulate the form with existing product details
-        form = NewDataForm(initial={
+        form = views_forms.NewDataForm(initial={
             'prod_description': prod_description,
             'prod_quantity': prod_quantity,
             'prod_sale_price': prod_sale_price
@@ -243,7 +190,7 @@ def profile(request):
         return HttpResponseRedirect(reverse("inventry:login"))
     user_data=models.select_userdata(request.user.username)
     if request.method == 'POST':
-        form = changepassword(request.POST)
+        form = views_forms.changepassword(request.POST)
         if form.is_valid():
             old_password = form.cleaned_data['old_password']
             new_password = form.cleaned_data['new_password']
@@ -275,7 +222,7 @@ def profile(request):
                     })
     return render(request, 'inventry/profile.html', {
                     "message": "",
-                    "form": changepassword(),
+                    "form": views_forms.changepassword(),
                     "user_data":user_data
                     })
 def login_view(request):

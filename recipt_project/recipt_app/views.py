@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from django import forms
+from . import views_forms
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
@@ -11,79 +11,13 @@ from django.views.decorators.csrf import csrf_exempt
 from . import models  # Assuming this function saves customer data to DB
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
-class changepassword(forms.Form):
-    old_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'id': 'id_old_password',
-            'placeholder': 'Enter old password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    new_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'placeholder': 'Enter new password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    confirm_new_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'placeholder': 'Enter confirm new password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
+
 # Helper function to generate a random receipt number
 def generate_random_key(length=5):
     characters = string.ascii_letters + string.digits
     random_key = ''.join(random.choices(characters, k=length))
     return "_" + random_key
-# Form for adding/editing products
-class ProductForm(forms.Form):
-    def for_edit_product(self, code, quant, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['prod_code'].initial = code
-        self.fields['quantity'].initial = quant
 
-    prod_code = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'id': 'id_prod_code',
-            'placeholder': 'Enter product code',
-            'class': 'form_product-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    quantity = forms.IntegerField(
-        widget=forms.NumberInput(attrs={
-            'placeholder': 'Enter product quantity',
-            'class': 'form_product-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-# Form for adding/editing customer details
-class CustomerForm(forms.Form):
-    def for_edit_customer(self, customer_name, customer_email, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['customer_name'].initial = customer_name
-        self.fields['customer_email'].initial = customer_email
-
-    customer_name = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={
-            'placeholder': 'Customer name',
-            'class': 'form_product-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;',
-        })
-    )
-    customer_email = forms.EmailField(
-        required=False,
-        widget=forms.EmailInput(attrs={
-            'placeholder': 'Customer email',
-            'class': 'form_product-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;',
-        })
-    )
 def index(request):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
@@ -176,8 +110,8 @@ def add(request):
         return HttpResponseRedirect(reverse("recipt:login"))
     
     if request.method == 'POST':
-        form_product = ProductForm(request.POST)
-        form_customer = CustomerForm(request.POST)
+        form_product = views_forms.ProductForm(request.POST)
+        form_customer = views_forms.CustomerForm(request.POST)
         if form_product.is_valid() and form_customer.is_valid():
             prod_code = form_product.cleaned_data['prod_code']
             quantity = form_product.cleaned_data['quantity']
@@ -215,7 +149,7 @@ def add(request):
 
         else:
             return render(request, 'recipt/add.html', {'form_product': form_product, 'form_customer': form_customer})
-    return render(request, 'recipt/add.html', {"form_product": ProductForm(), 'form_customer': CustomerForm()})
+    return render(request, 'recipt/add.html', {"form_product": views_forms.ProductForm(), 'form_customer': views_forms.CustomerForm()})
 # View to start a new receipt
 def new_receipt(request,return_product=0):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
@@ -252,7 +186,7 @@ def edit_customer(request, customer_name=None, customer_email=None):
         return HttpResponseRedirect(reverse("recipt:login"))
 
     if request.method == 'POST':
-        customer_form = CustomerForm(request.POST)
+        customer_form = views_forms.CustomerForm(request.POST)
         if customer_form.is_valid():
             customer_name = customer_form.cleaned_data['customer_name']
             customer_email = customer_form.cleaned_data['customer_email']
@@ -260,7 +194,7 @@ def edit_customer(request, customer_name=None, customer_email=None):
             request.session['customer_email'] = customer_email
             return redirect('recipt:index')
     else:
-        customer_form = CustomerForm(initial={'customer_name': customer_name, 'customer_email': customer_email})
+        customer_form = views_forms.CustomerForm(initial={'customer_name': customer_name, 'customer_email': customer_email})
     return render(request, 'recipt/edit_customer.html', {"customer_form": customer_form, "customer_name": customer_name, "customer_email": customer_email})
 
 # View to edit product details
@@ -275,7 +209,7 @@ def edit_product(request, id):
         return redirect('recipt:index')  # Redirect if invalid ID
 
     if request.method == 'POST':
-        form_product = ProductForm(request.POST)
+        form_product = views_forms.ProductForm(request.POST)
         if form_product.is_valid():
             # Update session data
             new_prod_code = form_product.cleaned_data['prod_code']
@@ -300,7 +234,7 @@ def edit_product(request, id):
                     "error": "product code is not available"
                     })
     else:
-        form_product = ProductForm(initial={'prod_code': prod_code, 'quantity': quantity})
+        form_product = views_forms.ProductForm(initial={'prod_code': prod_code, 'quantity': quantity})
     return render(request, 'recipt/add.html', {"form_product": form_product, 'is_editing': True, 'id': id})
 @csrf_exempt
 def save_customer_recipt(request, new_recipt):
@@ -345,7 +279,7 @@ def profile(request):
         return HttpResponseRedirect(reverse("recipt:login"))
     user_data=models.select_userdata(request.user.username)
     if request.method == 'POST':
-        form = changepassword(request.POST)
+        form = views_forms.changepassword(request.POST)
         if form.is_valid():
             old_password = form.cleaned_data['old_password']
             new_password = form.cleaned_data['new_password']
@@ -376,7 +310,7 @@ def profile(request):
                         "error": "Old password is incorrect"
                         })
     return render(request, 'recipt/profile.html', {
-                    "form": changepassword(),
+                    "form": views_forms.changepassword(),
                     "user_data":user_data
                     })
 # Login and logout views

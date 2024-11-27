@@ -1,238 +1,17 @@
 from django.contrib.auth import authenticate, login, logout
-from django import forms
+from . import views_forms
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from datetime import datetime
-from django import forms
+
 from . import models
 from django.contrib.auth.hashers import check_password
 import pandas as pd
 from .sales_report import generate_report
-class NewDataForm(forms.Form):
-    def for_edit_user(self,first_name ,last_name, cnic,phone_number,email,username,user_type, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['first_name'].initial = first_name
-        self.fields['last_name'].initial = last_name
-        self.fields['cnic'].initial = cnic
-        # self.fields['password'].initial=password
-        self.fields['phone_number'].initial = phone_number
-        self.fields['email'].initial = email
-        self.fields['username'].initial = username
-        self.fields['user_type'].initial = user_type
-    USER_TYPE_CHOICES = [
-        ('inventory manager', 'Inventory Manager'),
-        ('counter manager', 'Counter Manager'),
-        ('administration manager', 'Administration Manager'),
-    ]
-    first_name = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={
-            'id': 'id_first_name',
-            'placeholder': 'Enter first name',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    last_name = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={
-            'id': 'id_last_name',
-            'placeholder': 'Enter last name',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    cnic = forms.CharField(
-        max_length=15,
-        widget=forms.TextInput(attrs={
-            'id': 'id_cnic',
-            'placeholder': 'Enter CNIC',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    phone_number = forms.CharField(
-        max_length=12,
-        widget=forms.TextInput(attrs={
-            'id': 'id_phone_number',
-            'placeholder': 'Enter Phone Number',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            'id': 'id_email',
-            'placeholder': 'Enter Email',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    username = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'id': 'id_username',
-            'placeholder': 'Enter username',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'id': 'id_password',
-            'placeholder': 'Enter password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'  
-        })
-    )
-    confirm_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'id': 'id_confirm_password',
-            'placeholder': 'Enter confirm password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'  
-        })
-    )
-    user_type = forms.ChoiceField(
-        choices=USER_TYPE_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-input',
-            'style': 'margin-right: 10px; margin-bottom: 10px;'
-        })
-    )
-    address = forms.CharField(
-        widget=forms.Textarea(attrs={
-            'id': 'id_address',
-            'placeholder': 'Enter Address',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px; height: 100px;'  
-        })
-    )
-class NewDataForm_edit(forms.Form):
-    def for_edit_user(self,first_name ,last_name, cnic,phone_number,email,username,user_type, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['first_name'].initial = first_name
-        self.fields['last_name'].initial = last_name
-        self.fields['cnic'].initial = cnic
-        self.fields['phone_number'].initial = phone_number
-        self.fields['email'].initial = email
-        # self.fields['username'].initial = username
-        self.fields['user_type'].initial = user_type
-    USER_TYPE_CHOICES = [
-        ('inventory manager', 'Inventory Manager'),
-        ('counter manager', 'Counter Manager'),
-        ('administration manager', 'Administration Manager'),
-    ]
-    first_name = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={
-            'id': 'id_first_name',
-            'placeholder': 'Enter first name',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    last_name = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={
-            'id': 'id_last_name',
-            'placeholder': 'Enter last name',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    cnic = forms.CharField(
-        max_length=15,
-        widget=forms.TextInput(attrs={
-            'id': 'id_cnic',
-            'placeholder': 'Enter CNIC',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    phone_number = forms.CharField(
-        max_length=15,
-        widget=forms.TextInput(attrs={
-            'id': 'id_phone_number',
-            'placeholder': 'Enter Phone Number',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            'id': 'id_email',
-            'placeholder': 'Enter Email',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    # username = forms.CharField(
-    #     widget=forms.TextInput(attrs={
-    #         'id': 'id_username',
-    #         'placeholder': 'Enter username',
-    #         'class': 'form-control',
-    #         'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-    #     })
-    # )
-    password = forms.CharField(
-        required=False,
-        widget=forms.PasswordInput(attrs={
-            'id': 'id_password',
-            'placeholder': 'Enter password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'  
-        })
-    )
-    confirm_password = forms.CharField(
-        required=False,
-        widget=forms.PasswordInput(attrs={
-            'id': 'id_confirm_password',
-            'placeholder': 'Enter confirm password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    user_type = forms.ChoiceField(
-        choices=USER_TYPE_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-input',
-            'style': 'margin-right: 10px; margin-bottom: 10px;'
-        })
-    )
-    address = forms.CharField(
-        widget=forms.Textarea(attrs={
-            'id': 'id_address',
-            'placeholder': 'Enter Address',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px; height: 100px;'  
-        })
-    )
-class changepassword(forms.Form):
-    old_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'id': 'id_old_password',
-            'placeholder': 'Enter old password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    new_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'placeholder': 'Enter new password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    confirm_new_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
-            'placeholder': 'Enter confirm new password',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
+
 def index(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
@@ -249,7 +28,7 @@ def add_user(request):
         return HttpResponseRedirect(reverse("management:login"))
 
     if request.method == 'POST':
-        form = NewDataForm(request.POST)
+        form = views_forms.NewDataForm(request.POST)
         if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
@@ -294,7 +73,7 @@ def add_user(request):
             messages.error(request, 'Please correct the errors below.')
             return render(request, 'management/add.html', {'form': form})
 
-    return render(request, 'management/add.html', {"form": NewDataForm()})
+    return render(request, 'management/add.html', {"form": views_forms.NewDataForm()})
 def edit_user(request, user_index, username):
     # username = 'hamza'  # For testing
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
@@ -305,7 +84,7 @@ def edit_user(request, user_index, username):
     # print(f"line 153 before saving {user}")
     user_data = models.select_userdata(username)  # Assuming this function retrieves user data including cnic, phone_number, user_type, etc.
     if request.method == 'POST':
-        form = NewDataForm_edit(request.POST)
+        form = views_forms.NewDataForm_edit(request.POST)
         if form.is_valid():
             user.username=username
             user.first_name = form.cleaned_data['first_name']
@@ -333,14 +112,14 @@ def edit_user(request, user_index, username):
                     })
     else:
         if not user_data:
-            form = NewDataForm_edit(initial={
+            form = views_forms.NewDataForm_edit(initial={
             'first_name': user.first_name,
             'last_name': user.last_name,
             'email': user.email,
             'username': user.username
         })
         else:
-            form = NewDataForm_edit(initial={
+            form = views_forms.NewDataForm_edit(initial={
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'email': user.email,
@@ -383,7 +162,7 @@ def profile(request):
         return HttpResponseRedirect(reverse("management:login"))
     user_data=models.select_userdata(request.user.username)
     if request.method == 'POST':
-        form = changepassword(request.POST)
+        form = views_forms.changepassword(request.POST)
         if form.is_valid():
             old_password = form.cleaned_data['old_password']
             new_password = form.cleaned_data['new_password']
@@ -416,7 +195,7 @@ def profile(request):
                         })
     return render(request, 'management/profile.html', {
                     "message": "",
-                    "form": changepassword(),
+                    "form": views_forms.changepassword(),
                     "user_data":user_data
                     })
 def search_user(request):

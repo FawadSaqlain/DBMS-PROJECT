@@ -1,4 +1,4 @@
-from django import forms
+from . import views_return_forms
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
@@ -6,44 +6,8 @@ from datetime import datetime
 from .sendmail_return import sendmail_return_py
 from . import models  # Assuming this function saves customer data to DB
 from . import models_return  # Assuming this function saves customer data to DB
-from .views import ProductForm
+from . import views_forms
 
-class returnProduct(forms.Form):
-    def for_edit_return_product(self, prod_code, quantity, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['prod_code'].initial = prod_code
-        self.fields['quantity'].initial = quantity
-
-    prod_code = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'id': 'id_prod_code',
-            'placeholder': 'Enter product code',
-            'class': 'form_product-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-        })
-    )
-    quantity = forms.IntegerField(
-        widget=forms.NumberInput(attrs={
-            'placeholder': 'Enter product quantity',
-            'class': 'form_product-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;',
-        })
-    )
-# Form for adding/editing customer details
-class return_product_recipt_code(forms.Form):
-    recipt_code_buy = forms.CharField(
-        required=False,  # Make it not required because it will only be asked once
-        widget=forms.TextInput(attrs={
-            'placeholder': 'Receipt Code',
-            'class': 'form_product-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;',
-        })
-    )
-
-    def for_edit_recipt_code(self, recipt_code_buy, *args, **kwargs):
-        """Set the receipt code if it's being edited or provided in the session."""
-        super().__init__(*args, **kwargs)
-        self.fields['recipt_code_buy'].initial = recipt_code_buy
 
 def save_customer_recipt_return(request, new_recipt):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
@@ -143,12 +107,12 @@ def return_product(request):
         recipt_code_buy = request.session.get("recipt_code_buy", None)
 
         if request.method == 'POST':
-            form_return_product = returnProduct(request.POST)
+            form_return_product = views_return_forms.returnProduct(request.POST)
 
             if not recipt_code_buy:
-                form_return_product_recipt_code = return_product_recipt_code(request.POST)
+                form_return_product_recipt_code = views_return_forms.return_product_recipt_code(request.POST)
             else:
-                form_return_product_recipt_code = return_product_recipt_code()
+                form_return_product_recipt_code = views_return_forms.return_product_recipt_code()
 
             # Validate both forms
             if form_return_product.is_valid() and (form_return_product_recipt_code.is_valid() or recipt_code_buy):
@@ -205,8 +169,8 @@ def return_product(request):
 
         # Render the form for GET requests
         return render(request, 'recipt/return_product.html', {
-            "form_product": returnProduct(),
-            'form_recipt': return_product_recipt_code(),
+            "form_product": views_return_forms.returnProduct(),
+            'form_recipt': views_return_forms.return_product_recipt_code(),
             'recipt_code_buy': recipt_code_buy,
         })
 
@@ -234,7 +198,7 @@ def edit_product_return(request, id,recipt_code_buy):
         return redirect('recipt:index')  # Redirect if invalid ID
 
     if request.method == 'POST':
-        form_product = ProductForm(request.POST)
+        form_product = views_forms.ProductForm(request.POST)
         if form_product.is_valid():
             # Update session data
             new_prod_code = form_product.cleaned_data['prod_code']
@@ -259,5 +223,5 @@ def edit_product_return(request, id,recipt_code_buy):
                     "error": f"product code ({prod_code}) is not available"
                     })
     else:
-        form_product = ProductForm(initial={'prod_code': prod_code, 'quantity': quantity})
+        form_product = views_forms.ProductForm(initial={'prod_code': prod_code, 'quantity': quantity})
     return render(request, 'recipt/add.html', {"form_product": form_product, 'is_editing_return': True, 'id': id ,'recipt_code_buy': recipt_code_buy})
