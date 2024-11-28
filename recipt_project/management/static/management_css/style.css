@@ -14,8 +14,7 @@ body {
   font-family: Arial, sans-serif;
   color: rgb(0, 0, 0);
 }
-
-    /* Header styling */
+/* Header styling */
 header {
   display: flex;
   flex-direction: row;
@@ -26,15 +25,12 @@ header {
   padding: 20px;
   color: aliceblue;
 }
-
 /* First Column: Buttons for Counter, Inventory, Management, and Sales Data */
 .header-left {
   display: flex;
   flex-direction: column;
   float: left;
-  
 }
-
 /* Second Column: Store Title and Management Section Title */
 .header-center {
   display: flex;
@@ -42,7 +38,6 @@ header {
   align-items: center;
   /* gap: 10px; */
 }
-
 /* Third Column: Profile/Logout Buttons */
 .header-right {
   display: flex;
@@ -51,7 +46,6 @@ header {
   /* gap: 15px; */
   float: right;
 }
-
 /* Title and Section title styling */
 .header-title {
   font-size: 1.8em;
@@ -78,16 +72,20 @@ header {
   transition: background-color 0.3s;
   margin-top: 10px;
   margin-left: 5px;
+  border-radius: 5px;
 }
+
 .logout-button:hover {
   background-color: #ddd;
 }
+
 /* Centered container */
 #outerContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 500px); /* Adjusted for header height */
+  min-height: calc(100vh - 500px);
+  /* Adjusted for header height */
 }
 
 #container {
@@ -98,25 +96,6 @@ header {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-size: medium;
   font-weight: bold;
-}
-
-/* Receipt details section */
-.receipt-details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.receipt-section {
-  margin: 10px;
-}
-
-.receipt-date {
-  float: right;
-}
-
-.receipt-actions {
-  margin-top: 10px;
 }
 
 .delete-button,
@@ -137,11 +116,13 @@ header {
 
 /* Image swap on hover */
 .delete-button img:hover {
-  content: url('../management_css/assets/colore_changed_delete_icon.jpg'); /* Change this to your hover image URL */
+  content: url('../management_css/assets/colore_changed_delete_icon.jpg');
+  /* Change this to your hover image URL */
 }
 
 .edit-button img:hover {
-  content: url('../management_css/assets/color_changed_edit_icon.jpg'); /* Change this to your hover image URL */
+  content: url('../management_css/assets/color_changed_edit_icon.jpg');
+  /* Change this to your hover image URL */
 }
 
 /* Other styling */
@@ -166,7 +147,9 @@ a.hover-effect:hover h3 {
 }
 
 /* Align the text center */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   text-align: center;
   font-weight: bold;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -222,7 +205,8 @@ a.hover-effect:hover h3 {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.user-table th, .user-table td {
+.user-table th,
+.user-table td {
   padding: 10px;
   text-align: left;
 }

@@ -1,4 +1,4 @@
-/* Reset default margin and padding */
+Reset default margin and padding
 * {
   margin: 0;
   padding: 0;
@@ -12,27 +12,75 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   font-family: Arial, sans-serif;
+  margin-top: -8px;
 }
 
 /* Header styling */
 header {
+  display: flex;
+  justify-content: space-between; /* Space between the center and right elements */
+  align-items: center; /* Vertical alignment */
   width: 100%;
-  height: 100px;
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding-top: 30px;
-  padding-bottom: 30px;
+  height: fit-content;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding-top: 40px;
+  padding-bottom: 40px;
   color: aliceblue;
+  position: relative; /* Ensure child positioning works correctly */
 }
 
-/* Centered container */
+/* Second Column: Store Title and Management Section Title */
+.header-center {
+  position: absolute; /* Absolute positioning for perfect centering */
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Third Column: Profile/Logout Buttons */
+.header-right {
+  margin-left: auto; /* Push the right div to the far right */
+  display: flex;
+  flex-direction: row;
+  gap: 10px; /* Space between buttons */
+}
+
+/* Title and Section title styling */
+.header-title {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.section-title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.logout-button {
+  width: 100px;
+  height: 35px;
+  background-color: #f1f1f1;
+  color: rgb(165, 42, 42);
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-radius: 5px;
+}
+
+.logout-button:hover {
+  background-color: #ddd;
+}
+
+/* Centered container  */
 #outerContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  min-height: calc(100vh - 500px); /* Adjusted for header height */
 }
-
 #container {
   width: fit-content;
   padding: 20px;
@@ -43,24 +91,6 @@ header {
   font-weight: bold;
 }
 
-/* Receipt details section */
-.receipt-details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.receipt-section {
-  margin: 10px;
-}
-
-.receipt-date {
-  float: right;
-}
-
-.receipt-actions {
-  margin-top: 10px;
-}
 
  .delete-button, .edit-button {
   display: inline-block;
@@ -91,7 +121,7 @@ header {
 
 .action-button {
   color: rgb(166, 43, 43);
-  text-decoration: none;
+  /* text-decoration: none; */
   margin-right: 10px;
 }
 
@@ -205,3 +235,4 @@ a.hover-effect:hover h3 {
 .product-table thead tr th:hover {
   font-weight:bolder;
 }
+

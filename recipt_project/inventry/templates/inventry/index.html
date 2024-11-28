@@ -15,21 +15,23 @@
             <option value="added_by_employ">Added / Updated by</option>
             <option value="all">complete inventry</option>
         </select>
-        <div class="actions">
-            <a href="{% url 'inventry:add' %}" class="action-button">Add New Item</a>
-            <!-- <button onclick="printReceipt()" class="action-button print-button">Print Receipt</button> -->
+        <div style="display: flex;flex-direction: row;">
+            <a href="{% url 'inventry:add' %}"><button class="action-button"
+                    style="background-color: brown; color: white; padding: 5px;margin-left: 30px; border-radius: 5px;">
+                    <strong>Add New Item</strong></button></a>
             <form action="{% url 'inventry:export_excel' %}" method="post">
                 {% csrf_token %}
                 {% for product in products %}
                 <input type="hidden" name="products" value="{{ product|join:',' }}">
                 {% endfor %}
-                <button type="submit" class="action-button">Export to Excel</button>
-            </form>            
+                <button type="submit" class="action-button"
+                    style="background-color: brown; color: white; padding: 5px;margin-left: 30px; border-radius: 5px;"><strong>Export
+                        to Excel</strong></button>
+            </form>
         </div>
     </div>
 </div>
-
-<div id="index_outer_div" class="receipt-details">
+<div id="index_outer_div">
     {% if products %}
     <table class="product-table">
         <thead>
@@ -125,8 +127,8 @@
                             style="width: 17px; height: 23px; margin-right: 10px;">
                     </a>
                 </td>
-                
-               
+
+
             </tr>
 
             {% endfor %}

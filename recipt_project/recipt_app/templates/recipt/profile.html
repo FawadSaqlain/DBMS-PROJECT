@@ -1,20 +1,52 @@
-{% extends "inventry/layout.html" %}
-
+{% extends "recipt/layout.html" %}
 {% block body %}
 <div>
-        {% if message %}
-            <strong>{{message}}</strong>
-        {% endif %}
     <form method="post">
         {% csrf_token %}
         <h1>Change Password</h1>
-
         {% if form %}
-            {{ form.as_p }}
+        {{ form.as_p }}
         {% endif %}
-
-        <input type="submit" value="Update Details" style="background-color: brown; color: white; padding: 5px; margin-top: 30px;">
-    </form>
+        <input type="submit" value="Update Details"
+    style="background-color: brown; color: white; padding: 5px; margin-top: 30px; display: block; margin: 30px auto;">
+</form>
 </div>
-{{ user_data }}
+<div style="margin-top: 40px; padding: 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 8px;">
+    <h2 style="color: #444; border-bottom: 2px solid #8b0000; padding-bottom: 5px; margin-bottom: 20px;">User
+        Information</h2>
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+            <tr style="background-color: #8b0000; color: white;">
+                <th style="padding: 10px; border: 1px solid #ddd;">Field</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>User Name</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">{{ user_data.0 }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>User Type</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">{{ user_data.1 }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>User CNIC</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">{{ user_data.2 }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>User Phone No</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">{{ user_data.3 }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>Last Updated On</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">{{ user_data.4 }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;"><strong>User Address</strong></td>
+                <td style="padding: 10px; border: 1px solid #ddd;">{{ user_data.5 }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
 {% endblock %}

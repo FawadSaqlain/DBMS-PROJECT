@@ -77,22 +77,6 @@ class NewDataForm(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
-    # password = forms.CharField(
-    #     widget=forms.PasswordInput(attrs={
-    #         'id': 'id_password',
-    #         'placeholder': 'Enter password',
-    #         'class': 'form-control',
-    #         'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-    #     })
-    # )
-    # confirm_password = forms.CharField(
-    #     widget=forms.PasswordInput(attrs={
-    #         'id': 'id_confirm_password',
-    #         'placeholder': 'Confirm password',
-    #         'class': 'form-control',
-    #         'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
-    #     })
-    # )
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'id': 'id_password',
@@ -145,7 +129,6 @@ class NewDataForm_edit(forms.Form):
         self.fields['cnic'].initial = cnic
         self.fields['phone_number'].initial = phone_number
         self.fields['email'].initial = email
-        # self.fields['username'].initial = username
         self.fields['user_type'].initial = user_type
     USER_TYPE_CHOICES = [
         ('inventory manager', 'Inventory Manager'),
@@ -294,4 +277,3 @@ class changepassword(forms.Form):
             )
         ]
     )
-    
