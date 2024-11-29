@@ -42,8 +42,6 @@ class NewDataForm(forms.Form):
         })
     )
 
-
-
 class changepassword(forms.Form):
     old_password = forms.CharField(
         widget=forms.PasswordInput(attrs={

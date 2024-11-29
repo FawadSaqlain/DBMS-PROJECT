@@ -131,7 +131,12 @@
                         <td>{{ userdata.2 }}</td>
                         <td>{{ userdata.3 }}</td>
                         <td>{{ userdata.4 }}</td>
-                        <td>{{ userdata.5 }}</td>
+                        <td>
+                            <span class="address-preview" title="{{ userdata.5 }}">
+                                {{ userdata.5|slice:":9" }}
+                            </span>
+                        </td>
+                        
                     {% endif %}
                 {% endfor %}
                 <td>

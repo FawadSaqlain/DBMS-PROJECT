@@ -9,13 +9,13 @@ class NewDataForm(forms.Form):
     ]
 
     first_name = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={
-            'id': 'id_first_name',
-            'placeholder': 'Enter first name',
-            'class': 'form-control',
-            'oninput': "this.value = this.value.replace(/[^a-zA-Z ]/g, '')",  # Only allow letters and spaces
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+    max_length=100,
+    widget=forms.TextInput(attrs={
+        'id': 'id_first_name',
+        'placeholder': 'Enter first name',
+        'class': 'form-control',
+        'oninput': "this.value = this.value.replace(/[^a-zA-Z]/g, '')",  # Only allow letters (no spaces or special characters)
+        'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
     last_name = forms.CharField(
@@ -24,10 +24,11 @@ class NewDataForm(forms.Form):
             'id': 'id_last_name',
             'placeholder': 'Enter last name',
             'class': 'form-control',
-            'oninput': "this.value = this.value.replace(/[^a-zA-Z ]/g, '')",  # Only allow letters and spaces
+            'oninput': "this.value = this.value.replace(/[^a-zA-Z]/g, '')",  # Only allow letters (no spaces or special characters)
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
+
     cnic = forms.CharField(
         max_length=15,
         validators=[
@@ -70,13 +71,15 @@ class NewDataForm(forms.Form):
         })
     )
     username = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'id': 'id_username',
-            'placeholder': 'Enter username',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+    widget=forms.TextInput(attrs={
+        'id': 'id_username',
+        'placeholder': 'Enter username',
+        'class': 'form-control',
+        'oninput': "this.value = this.value.replace(/\\s/g, '')",  # Disallow spaces
+        'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
+
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'id': 'id_password',
@@ -136,12 +139,13 @@ class NewDataForm_edit(forms.Form):
         ('administration manager', 'Administration Manager'),
     ]
     first_name = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={
-            'id': 'id_first_name',
-            'placeholder': 'Enter first name',
-            'class': 'form-control',
-            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+    max_length=100,
+    widget=forms.TextInput(attrs={
+        'id': 'id_first_name',
+        'placeholder': 'Enter first name',
+        'class': 'form-control',
+        'oninput': "this.value = this.value.replace(/[^a-zA-Z]/g, '')",  # Only allow letters (no spaces or special characters)
+        'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
     last_name = forms.CharField(
@@ -150,9 +154,11 @@ class NewDataForm_edit(forms.Form):
             'id': 'id_last_name',
             'placeholder': 'Enter last name',
             'class': 'form-control',
+            'oninput': "this.value = this.value.replace(/[^a-zA-Z]/g, '')",  # Only allow letters (no spaces or special characters)
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
+
     cnic = forms.CharField(
         max_length=15,
         validators=[
@@ -169,17 +175,18 @@ class NewDataForm_edit(forms.Form):
         })
     )
     phone_number = forms.CharField(
-        max_length=12,
+        max_length=13,
         validators=[
             RegexValidator(
-                regex=r'^\+\d{11}$',  # Ensures the number starts with + and has exactly 12 characters
-                message="Phone number must start with + and contain 11 digits (e.g., +12345678901)."
+                regex=r'^\+\d{12}$',
+                message="Phone number must start with + and contain 12 digits (e.g., +92345678901)."
             )
         ],
         widget=forms.TextInput(attrs={
             'id': 'id_phone_number',
-            'placeholder': 'Enter Phone Number (e.g., +12345678901)',
+            'placeholder': 'Enter Phone Number (e.g., +92345678901)',
             'class': 'form-control',
+            'oninput': "this.value = this.value.replace(/[^+0-9]/g, '')",  # Only allow + and digits
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         })
     )
