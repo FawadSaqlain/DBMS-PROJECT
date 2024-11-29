@@ -21,7 +21,6 @@ def generate_random_key(length=5):
 def index(request):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
-    print(f"178 request :: {request}")
 
     # Initialize session variables if they do not exist
     if "products" not in request.session:
@@ -38,7 +37,6 @@ def index(request):
     if "recipt_code" not in request.session:
         request.session["recipt_code"] = generate_random_key()
 
-    print(f"line 193 recipt_app/views.py request.session[products] = {request.session["products"]}")
     return render(request, 'recipt/index.html', {
         "products": request.session["products"],
         "total_price": request.session["total_price"],
@@ -68,23 +66,19 @@ def sendmail(request, new_recipt):
 
     # Ensure session data exists
     if not user_data['products'] :
-        # return HttpResponse("Required session data is missing.", status=400)
-        return render(request, 'management/error.html', {
+        return render(request, 'recipt/error.html', {
                         "error": f"Required session data is missing. product is {user_data['products']}"
                         })
     if not user_data['customer_name'] :
-        # return HttpResponse("Required session data is missing.", status=400)
-        return render(request, 'management/error.html', {
+        return render(request, 'recipt/error.html', {
                         "error": f"Required session data is missing. customer name is {user_data['customer_name']}"
                         })
     if not user_data['customer_email']:
-        # return HttpResponse("Required session data is missing.", status=400)
-        return render(request, 'management/error.html', {
+        return render(request, 'recipt/error.html', {
                         "error": f"Required session data is missing. customer email is {user_data['customer_email']}"
                         })
     # Send email and handle response from sendmail_py
     result = sendmail_py(user_data)
-    print(f"line 228 Result from sendmail_py: {result}")  # Log the result for debugging
 
     if result.startswith("Error"):
         # Redirect to edit_customer with the customer's name and email as URL parameters
@@ -96,11 +90,14 @@ def sendmail(request, new_recipt):
 
     else:
         # Handle unexpected issues during email sending
-        return render(request, 'recipt/redirect_popup.html', {
-            'customer_name': user_data['customer_name'],
-            'customer_email': user_data['customer_email'],
-            'error': 'An unexpected issue occurred while sending the email.'
-        })
+        # return render(request, 'recipt/redirect_popup.html', {
+        #     'customer_name': user_data['customer_name'],
+        #     'customer_email': user_data['customer_email'],
+        #     'error': 'An unexpected issue occurred while sending the email.'
+        # })
+        return render(request, 'recipt/error.html', {
+                        "error": f"An unexpected issue occurred while sending the email. to {user_data['customer_name']} on {user_data['customer_email']}."
+                        })
 
     # Catch-all return, ensuring we never return None
     return HttpResponse("Unexpected error.", status=500)
@@ -117,7 +114,6 @@ def add(request):
             quantity = form_product.cleaned_data['quantity']
             product_recipt = models.get_product(prod_code)
             if product_recipt:
-                print(f"line 261 product recipt = {product_recipt}")
                 if product_recipt[2] >= quantity:
                     quantity_price = product_recipt[3] * quantity
                     product_found = False
@@ -133,11 +129,11 @@ def add(request):
                         request.session["products"].append([prod_code, quantity, product_recipt[3], quantity_price,product_recipt[1]])
                     request.session['total_price'] += quantity_price
                 else:
-                    return render(request, 'management/error.html', {
+                    return render(request, 'recipt/error.html', {
                         "error": f"product quantity not available ({product_recipt[2]})"
                         })
             else:
-                return render(request, 'management/error.html', {
+                return render(request, 'recipt/error.html', {
                         "error": "product code not available"
                         })
             customer_name = form_customer.cleaned_data['customer_name']
@@ -175,7 +171,7 @@ def dele(request, id):
         product = request.session["products"].pop(id)
         request.session['total_price'] -= product[3]  # Subtract the quantity_price
     except IndexError:
-        return render(request, 'management/error.html', {
+        return render(request, 'recipt/error.html', {
                         "error": f"Invalid index :: {IndexError}"
                         })# Handle index errors if necessary
 
@@ -216,7 +212,6 @@ def edit_product(request, id):
             new_quantity = form_product.cleaned_data['quantity']
             
             product_recipt = models.get_product(new_prod_code)
-            print(f"** line 285 product_recipt :: {product_recipt} ")
             if product_recipt:
                 if new_quantity<= product_recipt[2]:
                     new_quantity_price = price * new_quantity
@@ -226,7 +221,7 @@ def edit_product(request, id):
                     request.session['total_price'] = sum(p[3] for p in request.session["products"])
                     return redirect('recipt:index')
                 else:
-                    return render(request, 'management/error.html', {
+                    return render(request, 'recipt/error.html', {
                         "error": f"product quantity not available ({product_recipt[2]})"
                         })
             else:
@@ -246,10 +241,6 @@ def save_customer_recipt(request, new_recipt):
     products = request.session.get("products")
 
     if not customer_name or not customer_email or not recipt_code:
-        # return HttpResponse("Customer data not provided.", status=400)
-        # return render(request, 'management/error.html', {
-        #                 "error": "Customer data not provided."
-        #                 })
         pass
 
     if request.user.first_name and request.user.last_name:
@@ -260,9 +251,7 @@ def save_customer_recipt(request, new_recipt):
     try:
         models.save_customer_recipt_to_db(customer_name, customer_email, Employ_name, recipt_code, date_time, total_price, products)
     except Exception as e:
-        # print(f"line 387 Error saving receipt: {e}")
-        # return HttpResponse("Error saving data to the database.", status=500)
-        return render(request, 'management/error.html', {
+        return render(request, 'recipt/error.html', {
                         "error": "Error saving receipt: {e}"
                         })
         
@@ -270,9 +259,7 @@ def save_customer_recipt(request, new_recipt):
     if new_recipt == 1:
         print('line 392 Going to new receipt after saving data')
         return HttpResponseRedirect(reverse("recipt:new_receipt", kwargs={'return_product': 0}))
-        # return new_receipt(request,0)
     else:
-        # return HttpResponse("Customer data saved successfully.")
         return redirect("recipt:index")
 def profile(request):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
@@ -288,25 +275,13 @@ def profile(request):
                 if new_password==confirm_new_password:
                     request.user.set_password(new_password)
                     request.user.save()
-                    print("line 214 :: password is changed ")
-                    # request.user.save() 
                     return redirect('recipt:logout')
                 else:
-                    # return render(request, 'recipt/profile.html', {
-                    #     "form": form,
-                    #     "message": "Passwords do not match",
-                    #     "user_data":user_data
-                    #     })
-                    return render(request, 'management/error.html', {
+                    return render(request, 'recipt/error.html', {
                         "error": "Passwords do not match"
                         })
             else:
-                # return render(request, 'recipt/profile.html', {
-                #     "form": form,
-                #     "message": "Old password is incorrect",
-                #     "user_data":user_data
-                #     })
-                return render(request, 'management/error.html', {
+                return render(request, 'recipt/error.html', {
                         "error": "Old password is incorrect"
                         })
     return render(request, 'recipt/profile.html', {
@@ -318,28 +293,18 @@ def login_view(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
-        print(f"line 437 user name :: {username}")
-        # , password :: {password}")
         user = authenticate(request, username=username, password=password)
         if (user is not None):
             if (models.select_userdata(username)[1] == "counter manager" or models.select_userdata(username)[1] == "administration manager"):
                 login(request, user)
                 messages.success(request, 'This is a success TEST message!')
-                return HttpResponseRedirect(reverse("recipt:new_receipt", kwargs={'return_product': 0}))
+                return HttpResponseRedirect(reverse("recipt:index"))
             else:
-            #     return render(request, "recipt/login.html", {
-            #     "message": "invalid permissions",
-            #     "username": username  # Retain the entered username
-            # })
-                return render(request, 'management/error.html', {
+                return render(request, 'recipt/error.html', {
                         "error": "invalid permissions"
                         })
         else:
-            # return render(request, "recipt/login.html", {
-            #     "message": "Invalid credentials.",
-            #     "username": username  # Retain the entered username
-            # })
-            return render(request, 'management/error.html', {
+            return render(request, 'recipt/error.html', {
                         "error": "invalid credentials"
                         })
     return render(request, "recipt/login.html")

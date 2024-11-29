@@ -1,0 +1,238 @@
+Reset default margin and padding
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Center the entire page content */
+body {
+  min-height: 100vh;
+  background-image: url("../inventry_css/assets/background.jpeg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  font-family: Arial, sans-serif;
+  margin-top: -8px;
+}
+
+/* Header styling */
+header {
+  display: flex;
+  justify-content: space-between; /* Space between the center and right elements */
+  align-items: center; /* Vertical alignment */
+  width: 100%;
+  height: fit-content;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding-top: 40px;
+  padding-bottom: 40px;
+  color: aliceblue;
+  position: relative; /* Ensure child positioning works correctly */
+}
+
+/* Second Column: Store Title and Management Section Title */
+.header-center {
+  position: absolute; /* Absolute positioning for perfect centering */
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Third Column: Profile/Logout Buttons */
+.header-right {
+  margin-left: auto; /* Push the right div to the far right */
+  display: flex;
+  flex-direction: row;
+  gap: 10px; /* Space between buttons */
+}
+
+/* Title and Section title styling */
+.header-title {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.section-title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.logout-button {
+  width: 100px;
+  height: 35px;
+  background-color: #f1f1f1;
+  color: rgb(165, 42, 42);
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-radius: 5px;
+}
+
+.logout-button:hover {
+  background-color: #ddd;
+}
+
+/* Centered container  */
+#outerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 500px); /* Adjusted for header height */
+}
+#container {
+  width: fit-content;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: medium;
+  font-weight: bold;
+}
+
+
+ .delete-button, .edit-button {
+  display: inline-block;
+  width: 15px; /* Match the width of the image */
+  height: 20px; /* Match the height of the image */
+  margin-bottom: 10px;
+  margin-right: 10px;
+  mix-blend-mode: color-burn;
+} 
+
+/* Hover effect for delete and edit buttons */
+.delete-button:hover img, 
+.edit-button:hover img {
+  transform: scale(1.2); /* Scale up the image on hover */
+  transition: transform 0.2s ease-in-out; /* Smooth transition */
+}
+
+/* Image swap on hover */
+.delete-button img:hover {
+  content: url('../inventry_css/assets/colore_changed_delete_icon.jpg' ); /* Change this to your hover image URL */
+  mix-blend-mode: color-burn;
+}
+
+.edit-button img:hover {
+  content: url('../inventry_css/assets/color_changed_edit_icon.jpg'); /* Change this to your hover image URL */
+  mix-blend-mode: color-burn;
+}
+
+.action-button {
+  color: rgb(166, 43, 43);
+  /* text-decoration: none; */
+  margin-right: 10px;
+}
+
+.print-button {
+  margin-right: 0;
+}
+
+/* Remove all default styles */
+a.hover-effect {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Increase size on hover */
+a.hover-effect:hover h3 {
+  font-size: 22px; /* Adjust this value as needed */
+}
+
+/* Align the text center */
+h1, h2, h3 {
+  text-align: center;
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* Add smooth transition effect */
+a.hover-effect:hover h3 {
+  transition: font-size 0.3s ease;
+}
+
+/* Search Bar Container */
+.search-bar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar-container input[type="text"] {
+  width: 250px;
+  padding: 8px 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px 0 0 5px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-bar-container input[type="text"]:focus {
+  border-color: rgb(166, 42, 42);
+  box-shadow: 0 0 5px rgba(195, 195, 195, 0.76);
+}
+
+.search-bar-container select {
+  padding: 8px 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-left: none;
+  border-radius: 0 5px 5px 0;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-bar-container select:focus {
+  border-color: rgb(166, 42, 42);;
+  box-shadow: 0 0 5px rgba(195, 195, 195, 0.76);
+}
+
+/* Smooth transition on hover */
+.search-bar-container input[type="text"]:hover, 
+.search-bar-container select:hover {
+  box-shadow: 0 0 10px rgb(166, 42, 42);
+}
+
+/* Table Styling */
+.product-table {
+  width: 100%;
+  border-collapse: collapse; /* Remove gaps between cells */
+  border-radius: 10px; /* Apply border radius to the table */
+  overflow: hidden; /* Ensure the border radius effect is visible */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Add shadow to the table */
+}
+
+.product-table th, .product-table td {
+  padding: 10px; /* Add padding for better spacing */
+  text-align: left; /* Align text to the left */
+}
+
+/* Alternating Row Colors */
+.product-table tbody tr:nth-child(even) {
+  background-color: #e8e8e8; /* Light gray for even rows */
+}
+
+.product-table tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* White for odd rows */
+}
+
+/* Optional: Highlight on hover */
+.product-table tbody tr:hover {
+  background-color: rgb(173, 173, 173); /* Light blue on hover */
+}
+.product-table thead tr{
+  background-color: rgb(166, 43, 43);
+  color:#ffffff
+}
+
+.product-table thead tr th:hover {
+  font-weight:bolder;
+}
+

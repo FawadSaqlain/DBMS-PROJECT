@@ -16,13 +16,61 @@ body {
 
 /* Header styling */
 header {
+  display: flex;
+  justify-content: space-between; /* Space between the center and right elements */
+  align-items: center; /* Vertical alignment */
   width: 100%;
-  height: 100px;
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding-top: 30px;
-  padding-bottom: 30px;
+  height: fit-content;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding-top: 40px;
+  padding-bottom: 40px;
   color: aliceblue;
+  position: relative; /* Ensure child positioning works correctly */
+}
+
+/* Second Column: Store Title and Management Section Title */
+.header-center {
+  position: absolute; /* Absolute positioning for perfect centering */
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Third Column: Profile/Logout Buttons */
+.header-right {
+  margin-left: auto; /* Push the right div to the far right */
+  display: flex;
+  flex-direction: row;
+  gap: 10px; /* Space between buttons */
+}
+
+/* Title and Section title styling */
+.header-title {
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.section-title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.logout-button {
+  width: 100px;
+  height: 35px;
+  background-color: #f1f1f1;
+  color: rgb(165, 42, 42);
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border-radius: 5px;
+}
+
+.logout-button:hover {
+  background-color: #ddd;
 }
 
 /* Centered container */
@@ -131,3 +179,33 @@ header {
 .product-table th {
     background-color: #ddd;  /* Optional: Background color for table headers */
 }
+
+
+.styled-button {
+  background-color: brown;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.styled-button:hover {
+  /* background-color: #a0522d; Slightly lighter brown */
+  transform: scale(1.05);
+}
+
+.action-button {
+  text-decoration: none;
+}
+/* 
+div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px; /* Spacing between buttons */
+  /* justify-content: center; Center alignment */
+  /*align-items: center;
+  margin: 20px auto;
+} */

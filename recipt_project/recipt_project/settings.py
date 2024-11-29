@@ -39,8 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'recipt_app',
     'inventry',
-    'management',
-    # 'home'
+    'management'
 ]
 
 MIDDLEWARE = [

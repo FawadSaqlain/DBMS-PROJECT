@@ -57,7 +57,7 @@
             {% if products %}
             <table class="product-table">
                 <thead>
-                    <tr>
+                    <tr style="background-color: brown;">
                         <th>Index No</th>
                         <th>Product Name</th>
                         <th>Quantity</th>
@@ -109,29 +109,44 @@
         </div>
         <br>
     </div>
-
-<div>
-    {% if not recipt_code_buy and products %}
-    <a href="{% url 'recipt:add' %}" class="action-button"><button style="background-color: brown; color: white; padding: 5px;margin-left: 7px; border-radius: 5px;" ><strong>Add New Product</strong></button></a>
-    <a href="{% url 'recipt:sendmail' 1 %}" class="action-button"><button style="background-color: brown; color: white; padding: 5px;margin-left: 7px; border-radius: 5px;" ><strong>send E.recipt</strong></button></a>
-    <!-- <a href="{% url 'recipt:sendmail' 0 %}" class="action-button">send E.recipt & no new receipt</a> -->
-    <a href="{% url 'recipt:save_customer' 1 %}" class="action-button"><button style="background-color: brown; color: white; padding: 5px;margin-left: 7px; border-radius: 5px;" ><strong>Save E.recipt</strong></button></a>
-    <!-- <a href="{% url 'recipt:save_customer' 0 %}" class="action-button">Save E.recipt & no new receipt</a> -->
-    {% endif %}
-    {% if recipt_code_buy and products %}
-    <a href="{% url 'recipt:return_product' %}" class="action-button"><button style="background-color: brown; color: white; padding: 5px;margin-left: 7px; border-radius: 5px;" ><strong>add return Product</strong></button></a>
-    <a href="{% url 'recipt:sendmail_return' 1 %}" class="action-button"><button style="background-color: brown; color: white; padding: 5px;margin-left: 7px; border-radius: 5px;" ><strong>send return E.recipt</strong></button></a>
-    <!-- <a href="{% url 'recipt:sendmail_return' 0 %}" class="action-button">send return E.recipt & no new receipt</a> -->
-    <a href="{% url 'recipt:save_customer_return' 1 %}" class="action-button"><button style="background-color: brown; color: white; padding: 5px;margin-left: 7px; border-radius: 5px;" ><strong>Save E.recipt </strong></button></a>
-    <!-- <a href="{% url 'recipt:save_customer_return' 0 %}" class="action-button">Save E.recipt & no new return receipt</a> -->
-    {% endif %}
-    {% if products %}
-    <button onclick="printAndSaveReceipt()" class="action-button print-button" style="background-color: brown; color: white; padding: 5px;margin-left: 7px; border-radius: 5px;" ><strong>Print</strong></button>
-    {% endif %}
-    <div>
-    <a href="{% url 'recipt:new_receipt' 0 %}" class="action-button"><button style="background-color: brown; color: white; padding: 5px;margin-left: 7px; border-radius: 5px;" ><strong>New Buy Receipt</strong></button></a>
-    <a href="{% url 'recipt:new_receipt' 1 %}" class="action-button"><button style="background-color: brown; color: white; padding: 5px;margin-left: 7px; border-radius: 5px;" ><strong>new Return product</strong></button></a>
-</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 20px 0;">
+        {% if not recipt_code_buy and products %}
+        <a href="{% url 'recipt:add' %}" class="action-button">
+            <button class="styled-button"><strong>Add New Product</strong></button>
+        </a>
+        <a href="{% url 'recipt:sendmail' 1 %}" class="action-button">
+            <button class="styled-button"><strong>Send E-Receipt</strong></button>
+        </a>
+        <a href="{% url 'recipt:save_customer' 1 %}" class="action-button">
+            <button class="styled-button"><strong>Save E-Receipt</strong></button>
+        </a>
+        {% endif %}
+    
+        {% if recipt_code_buy and products %}
+        <a href="{% url 'recipt:return_product' %}" class="action-button">
+            <button class="styled-button"><strong>Add Return Product</strong></button>
+        </a>
+        <a href="{% url 'recipt:sendmail_return' 1 %}" class="action-button">
+            <button class="styled-button"><strong>Send Return E-Receipt</strong></button>
+        </a>
+        <a href="{% url 'recipt:save_customer_return' 1 %}" class="action-button">
+            <button class="styled-button"><strong>Save E-Receipt</strong></button>
+        </a>
+        {% endif %}
+    
+        {% if products %}
+        <button onclick="printAndSaveReceipt()" class="styled-button"><strong>Print</strong></button>
+        {% endif %}
+        <div>
+        <a href="{% url 'recipt:new_receipt' 0 %}" class="action-button">
+            <button class="styled-button"><strong>New Buy Receipt</strong></button>
+        </a>
+        <a href="{% url 'recipt:new_receipt' 1 %}" class="action-button">
+            <button class="styled-button"><strong>New Return Product</strong></button>
+        </a>
+    </div>
+    </div>
+    
 </div>
     <script>
         function printAndSaveReceipt() {

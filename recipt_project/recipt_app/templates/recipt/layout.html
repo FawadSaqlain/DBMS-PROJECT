@@ -10,14 +10,20 @@
 </head>
 <body>
     <header>
-        <h1>Bhatti Union General Store</h1>
+        <div class="header-center">
+            <div class="header-title">Bhatti Union General Store</div>
+            <div class="section-title">Counter Section</div>
+        </div>
+        <div class="header-right">
         <a href="{% url 'recipt:logout' %}">
-            <button type="button" class="logout-button"style="float: right;width: 100px;height: 30px; color: brown; "><strong>Log out</strong></button>
+            <button type="button" class="logout-button"><strong>Log out</strong></button>
         </a>
         <a href="{% url 'recipt:profile' %}">
-            <button type="button" class="logout-button"style="float: right;width: 100px;height: 30px; color: brown; "><strong>profile</strong></button>
+            <button type="button" class="logout-button"><strong>profile</strong></button>
         </a>
+        </div>
     </header>
+
     <div id="outerContainer">
         <div id="container">
             {% block body %}

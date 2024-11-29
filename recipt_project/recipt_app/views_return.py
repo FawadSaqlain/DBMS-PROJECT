@@ -20,9 +20,6 @@ def save_customer_recipt_return(request, new_recipt):
     total_price = request.session.get("total_price")
     products = request.session.get("products")
 
-    # if not customer_name or not customer_email or not recipt_code:
-    #     return HttpResponse("Customer data not provided.", status=400)
-
     if request.user.first_name and request.user.last_name:
         Employ_name = f"{request.user.first_name} {request.user.last_name} ({request.user.last_name})"
     else:
@@ -31,15 +28,12 @@ def save_customer_recipt_return(request, new_recipt):
     try:
         models_return.save_customer_recipt_return_to_db(customer_name,customer_email,Employ_name, recipt_code_buy,recipt_code, date_time, total_price, products)
     except Exception as e:
-        print(f"line 421 Error saving receipt: {e}")
-        # return HttpResponse("Error saving data to the database.", status=500)
-        return render(request, 'management/error.html', {
+        return render(request, 'recipt/error.html', {
                         "error": f"Error saving receipt: {e}"
                         })
         
     # Redirect or return a valid response
     if new_recipt == 1:
-        print('line 426 Going to new receipt after saving data')
         return redirect("recipt:new_receipt", return_product=1)
     else:
         # return HttpResponse("Customer data saved successfully.")
@@ -63,19 +57,12 @@ def sendmail_return(request, new_recipt):
         'recipt_code_buy':request.session.get("recipt_code_buy"),
         'bought_product':models.get_table(request.session["recipt_code_buy"])
     }
-    
-    print(f"270 recipt buy :: {request.session["recipt_code_buy"]} model bought :: {models.get_table(request.session["recipt_code_buy"])}")
-    print(f"271 product return :: {user_data['products']}")
-    print(f"272 product bought :: {user_data['bought_product']}")
-
     # Ensure session data exists
     if not user_data['products'] or not user_data['customer_name'] or not user_data['customer_email']:
         return HttpResponse("Required session data is missing.", status=400)
 
     # Send email and handle response from sendmail_py
     result = sendmail_return_py(user_data)
-    print(f"line 228 Result from sendmail_py: {result}")  # Log the result for debugging
-
     if result.startswith("Error"):
         # Redirect to edit_customer with the customer's name and email as URL parameters
         return redirect('recipt:edit_customer', customer_name=user_data['customer_name'], customer_email=user_data['customer_email'])
@@ -86,11 +73,9 @@ def sendmail_return(request, new_recipt):
 
     else:
         # Handle unexpected issues during email sending
-        return render(request, 'recipt/redirect_popup.html', {
-            'customer_name': user_data['customer_name'],
-            'customer_email': user_data['customer_email'],
-            'error': 'An unexpected issue occurred while sending the email.'
-        })
+        return render(request, 'recipt/error.html', {
+                        "error": f"An unexpected issue occurred while sending the email. to {user_data['customer_name']} on {user_data['customer_email']}."
+                        })
 
     # Catch-all return, ensuring we never return None
     return HttpResponse("Unexpected error.", status=500)
@@ -128,6 +113,7 @@ def return_product(request):
 
                     # Fetch customer details
                     customer = models.get_customer_recipt(recipt_code_buy)
+                    
                     request.session["customer_name"] = customer[1] if customer else ""
                     request.session["customer_email"] = customer[2] if customer else ""
 
@@ -187,7 +173,6 @@ def return_product(request):
 
 # View to edit product details
 def edit_product_return(request, id,recipt_code_buy):
-    print(f"** line 226 product_recipt_buy :: {recipt_code_buy} |\\|//|")
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "counter manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("recipt:login"))
 
@@ -205,7 +190,6 @@ def edit_product_return(request, id,recipt_code_buy):
             new_quantity = form_product.cleaned_data['quantity']
             
             product_recipt=models.get_recipt_product(recipt_code_buy,new_prod_code)
-            print(f"** line 243 product_recipt_buy :: {recipt_code_buy} |\\|//| product_recipt :: {product_recipt} ")
             if product_recipt:
                 if new_quantity<= product_recipt[3]:
                     new_quantity_price = price * new_quantity
@@ -215,7 +199,7 @@ def edit_product_return(request, id,recipt_code_buy):
                     request.session['total_price'] = sum(p[3] for p in request.session["products"])
                     return redirect('recipt:index')
                 else:
-                    return render(request, 'management/error.html', {
+                    return render(request, 'recipt/error.html', {
                         "error": f"product quantity not available ({product_recipt[3]})"
                         })
             else:

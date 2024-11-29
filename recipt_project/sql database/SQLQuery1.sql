@@ -29,6 +29,9 @@ USE GENERALSTORE_MS
 --     date_time DATETIME
 -- );
 
+UPDATE customers 
+SET name = 'as', email = 'daasd@sdfdf.com' 
+WHERE recipt_code = '_08u5n';
 
 -- CREATE TABLE product(
 --     prod_code NVARCHAR(100) PRIMARY KEY,
@@ -40,16 +43,16 @@ USE GENERALSTORE_MS
 --     added_by_employ NVARCHAR(100),
 -- )
 -- drop table Employ
-CREATE TABLE Employ (
-    username NVARCHAR(100) PRIMARY KEY,
-    user_type NVARCHAR(1000),
-    cnic NVARCHAR(1000),
-    phone_number NVARCHAR(1000),
-    updated_datetime DATETIME,
-    address NVARCHAR(1000),
-)
+-- CREATE TABLE Employ (
+--     username NVARCHAR(100) PRIMARY KEY,
+--     user_type NVARCHAR(1000),
+--     cnic NVARCHAR(1000),
+--     phone_number NVARCHAR(1000),
+--     updated_datetime DATETIME,
+--     address NVARCHAR(1000),
+-- )
 
-INSERT INTO Employ (username, user_type, cnic, phone_number, updated_datetime, address)VALUES ('fawad', 'administration manager', '3660302698539', '03316963802', '2020-04-12', 'mumtazgarden');
+-- INSERT INTO Employ (username, user_type, cnic, phone_number, updated_datetime, address)VALUES ('fawad', 'administration manager', '3660302698539', '03316963802', '2020-04-12', 'mumtazgarden');
 -- IF OBJECT_ID('customers', 'U') IS NOT NULL
 -- BEGIN
     -- DROP TABLE customers;
@@ -74,6 +77,7 @@ INSERT INTO Employ (username, user_type, cnic, phone_number, updated_datetime, a
 -- SELECT * FROM _lbkVh
 -- SELECT * FROM _Mg1em
 -- SELECT * FROM EMPLOY
+
 -- drop table _4AWX0
 -- update _XCLsB set quantity=20 where prod_code='iQz22'
 -- SELECT * FROM customers WHERE recipt_code = '_d407j'
