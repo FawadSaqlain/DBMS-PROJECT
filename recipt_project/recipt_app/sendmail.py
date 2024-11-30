@@ -80,7 +80,7 @@ class EmailSupportAgent:
             return f"Unexpected Error: {str(e)}"
 
     def handle_incoming_email(self, email_data):
-        subject = f"{email_data['customer_name']}'s Purchase Receipt from BUGS at {datetime.now().strftime('%B %d, %Y at %I:%M %p')}"
+        subject = f"{email_data['customer_name']}'s Purchase Receipt from Easy Mart at {datetime.now().strftime('%B %d, %Y at %I:%M %p')}"
         body = self.create_receipt_body(email_data)
         return self.send_email(subject, body, email_data['customer_email'])
 

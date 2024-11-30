@@ -163,25 +163,26 @@ def insert_quantity_inventry_subtract_recipt_quantity_return(recipt_code, produc
             
             current_quantity = inventry_product[2]  # Assuming index 2 is prod_quant in the inventory
             updated_quantity = current_quantity + quantity
-            update_quantity_price=price_quantity + inventry_product[4]
+            # update_quantity_price=price_quantity + inventry_product[4]
+            update_quantity_price=(quantity*inventry_product[3]) + inventry_product[4] # Assuming index 3 is prod_price in the inventory
             print(f"line 147 updated quantity * price  {update_quantity_price}")
             print(f"line 148 Updating inventory for product {prod_code}: current {current_quantity}, updated {updated_quantity}")
             models.update_quantity(updated_quantity,update_quantity_price, prod_code)
 
             # Get receipt details for the product (the one they bought from originally)
-            inventry_product_recipt = models.get_recipt_product(recipt_code_buy, prod_code)
-            print(f"line 153 inventry_product_recipt :: {inventry_product_recipt}|| recipt_code_buy,:: {recipt_code_buy},|| prod_code :: {prod_code},")
-            if not inventry_product_recipt:
+            product_recipt_buy = models.get_recipt_product(recipt_code_buy, prod_code)
+            print(f"line 153 product_recipt_buy :: {product_recipt_buy}|| recipt_code_buy,:: {recipt_code_buy},|| prod_code :: {prod_code},")
+            if not product_recipt_buy:
                 print(f"line 155 Product with code {prod_code} not found in receipt.")
                 continue
             
-            current_quantity_recipt = inventry_product_recipt[3]  # Assuming index 3 is prod_quant in the receipt
+            current_quantity_recipt = product_recipt_buy[3]  # Assuming index 3 is prod_quant in the receipt
             print(f"line 159 current_quantity_recipt :: {current_quantity_recipt}")
             print(f"line 160 quantity ::{quantity}")
             updated_quantity_recipt = current_quantity_recipt - quantity
             print(f"line 162 updated_quantity_recipt ::{updated_quantity_recipt}")
-            update_quantity_price_recipt=inventry_product_recipt[5] - price_quantity
-            print(f"line 164 update_quantity_price_recipt {update_quantity_price_recipt} # inventry_product_recipt[5] {inventry_product_recipt[5]} # price_quantity {price_quantity}")
+            update_quantity_price_recipt=product_recipt_buy[5] - price_quantity
+            print(f"line 164 update_quantity_price_recipt {update_quantity_price_recipt} # product_recipt_buy[5] {product_recipt_buy[5]} # price_quantity {price_quantity}")
             models.update_recipt_product_quantity(recipt_code_buy, prod_code,updated_quantity_recipt,update_quantity_price_recipt)
 
             # Insert into the return receipt table
@@ -191,7 +192,7 @@ def insert_quantity_inventry_subtract_recipt_quantity_return(recipt_code, produc
                     VALUES (%s, %s, %s, %s, %s)
                 """, [prod_code, inventry_product[1], quantity, price, price_quantity])
 
-        customer_buy_data=models.get_customer_recipt(recipt_code_buy) 
+        customer_buy_data=models.get_customer_recipt(recipt_code_buy)
         total_price_buy=customer_buy_data[5]
         customer_return_buy_data=get_customer_return_recipt(recipt_code)
         total_return_buy=customer_return_buy_data[6]

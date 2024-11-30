@@ -22,5 +22,5 @@ urlpatterns = [
     path('recipt_app/',include("recipt_app.urls")),
     path('inventry/',include("inventry.urls")),
     path('management/',include("management.urls")),
-    # path('',include("home.urls")),
+    path('',include("home.urls")),
 ]

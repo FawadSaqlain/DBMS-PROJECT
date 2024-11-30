@@ -29,9 +29,9 @@ USE GENERALSTORE_MS
 --     date_time DATETIME
 -- );
 
-UPDATE customers 
-SET name = 'as', email = 'daasd@sdfdf.com' 
-WHERE recipt_code = '_08u5n';
+-- UPDATE customers 
+-- SET name = 'as', email = 'daasd@sdfdf.com' 
+-- WHERE recipt_code = '_08u5n';
 
 -- CREATE TABLE product(
 --     prod_code NVARCHAR(100) PRIMARY KEY,
@@ -70,7 +70,7 @@ WHERE recipt_code = '_08u5n';
 -- SELECT * FROM Product
 -- ORDER BY prod_code ASC;  -- Sorts the products by price in ascending order
 -- SELECT * FROM product
--- SELECT * FROM customers
+-- SELECT * FROM customers WHERE recipt_code = '_08u5n';
 -- SELECT * FROM customers_return
 -- SELECT * FROM _gvmm0
 -- SELECT * FROM _mjn2P
