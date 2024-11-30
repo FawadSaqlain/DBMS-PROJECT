@@ -12,12 +12,10 @@ def select_alluserdata():
             cursor.execute(query)
             result = cursor.fetchall()  # Fetch all rows of the result
             if result:
-                print("Data selected successfully:")
-                for row in result:
-                    print(row)  # Print each row
+                return result
             else:
                 print("No data found in the Employ table.")
-            return result
+            
     except DatabaseError as e:
         print(f"Error selecting data: {e}")
 # # Function to save user data
@@ -89,10 +87,10 @@ def select_userdata(username):
             cursor.execute(query, [username])
             result = cursor.fetchone()  # Fetch the first row of the result
             if result:
-                print("Data selected successfully:", result)
+                return result
             else:
                 print("No data found for the given username.")
-            return result
+            
     except DatabaseError as e:
         print(f"Error selecting data: {e}")
 from django.db import connection, IntegrityError
@@ -109,7 +107,6 @@ def save_userdata(username, cnic, phone_number, address, user_type):
             if exists:
                 # Update the existing user data
                 user = select_userdata(username)
-                print(f"line 64 models.py user :: {user}")
                 if user[2] != cnic or user[3] != phone_number or user[4] != address or user[1] != user_type:
                     cursor.execute("""
                         UPDATE dbo.Employ
@@ -120,7 +117,6 @@ def save_userdata(username, cnic, phone_number, address, user_type):
                             updated_datetime = %s
                         WHERE username = %s
                     """, [cnic, phone_number, address, user_type, datetime.now(), username])
-                    print(f"line 71: User {username} updated successfully.")
                 else:
                     print(f"line 73: No updates needed for user {username}.")
             else:
@@ -129,7 +125,6 @@ def save_userdata(username, cnic, phone_number, address, user_type):
                     INSERT INTO dbo.Employ (username, user_type, cnic, phone_number, updated_datetime, address)
                     VALUES (%s, %s, %s, %s, %s, %s)
                 """, [username, user_type, cnic, phone_number, datetime.now(), address])
-                print(f"line 79: User {username} added successfully.")
                 
     except IntegrityError as e:
         print(f"line 81 Error inserting/updating user: {e}")

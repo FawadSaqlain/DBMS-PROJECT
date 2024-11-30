@@ -4,10 +4,8 @@ matplotlib.use('Agg')  # Use non-interactive backend for Django
 import matplotlib.pyplot as plt
 import io
 import base64
-from django.shortcuts import render
 from django.db import connection, DatabaseError
 from matplotlib.ticker import FuncFormatter
-from datetime import datetime
 import pandas as pd
 
 def get_sales_data(start_date, end_date):
@@ -27,10 +25,11 @@ def get_sales_data(start_date, end_date):
 def plot_sales_data(dates, total_prices, frequency, start_date, end_date):
     try:
         plt.figure(figsize=(10, 5))
-        print(f'line 30 :: {dates}')
+        if(len(dates)>50):
+            plt.plot(dates, total_prices, marker='', color=(165/255, 42/255, 42/255))
+        else:
+            plt.plot(dates, total_prices, marker='o', color=(165/255, 42/255, 42/255))
 
-        plt.plot(dates, total_prices, marker='o', color=(165/255, 42/255, 42/255))
-        
         plt.title(f'Sales Report ({frequency.capitalize()} :: {start_date} to {end_date})')
         plt.xlabel('Date')
         plt.ylabel('Total Price')

@@ -30,7 +30,6 @@ class EmailSupportAgent:
         """
         
         for product in email_data['products']:
-            print(f"line 33 product :: {product}")
             product_code, quantity, price, quantity_price,product_discreption = product
             body += f"""
             <tr>

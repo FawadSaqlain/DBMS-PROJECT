@@ -257,7 +257,6 @@ def save_customer_recipt(request, new_recipt):
         
     # Redirect or return a valid response
     if new_recipt == 1:
-        print('line 392 Going to new receipt after saving data')
         return HttpResponseRedirect(reverse("recipt:new_receipt", kwargs={'return_product': 0}))
     else:
         return redirect("recipt:index")
@@ -284,9 +283,12 @@ def profile(request):
                 return render(request, 'recipt/error.html', {
                         "error": "Old password is incorrect"
                         })
+    django_userdata = [ request.user.first_name, request.user.last_name, request.user.email ]
     return render(request, 'recipt/profile.html', {
+                    "message": "",
                     "form": views_forms.changepassword(),
-                    "user_data":user_data
+                    "user_data":user_data,
+                    "django_userdata":django_userdata
                     })
 # Login and logout views
 def login_view(request):

@@ -39,9 +39,6 @@ def search_view(request):
     
     # Convert search_value to string (if not already a string)
     search_value = str(search_value)
-    
-    print(f"line 77 search value :: {search_value} , search column :: {search_column}")
-
     results = []  # Initialize results list
 
     # Check if search_value is not empty
@@ -96,7 +93,6 @@ def delet(request, prod_index,prod_code):
         return HttpResponseRedirect(reverse("inventry:login"))
 
     models.delete_item(prod_code)
-    print("line 138 deleted the product")
     return redirect('inventry:index')
 def edit_product(request, prod_index,prod_code):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
@@ -193,7 +189,6 @@ def profile(request):
                 if new_password==confirm_new_password:
                     request.user.set_password(new_password)
                     request.user.save()
-                    print("line 214 :: password is changed ")
                     # request.user.save() 
                     return redirect('inventry:logout')
                 else:
@@ -204,10 +199,12 @@ def profile(request):
                 return render(request, 'inventry/error.html', {
                     "error": "Old password is incorrect"
                     })
+    django_userdata = [ request.user.first_name,request.user.last_name, request.user.email ]
     return render(request, 'inventry/profile.html', {
                     "message": "",
                     "form": views_forms.changepassword(),
-                    "user_data":user_data
+                    "user_data":user_data,
+                    "django_userdata":django_userdata
                     })
 def login_view(request):
     if request.method == "POST":

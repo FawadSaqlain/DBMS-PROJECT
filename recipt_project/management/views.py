@@ -5,8 +5,6 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
-from datetime import datetime
-
 from . import models
 from django.contrib.auth.hashers import check_password
 import pandas as pd
@@ -75,46 +73,40 @@ def add_user(request):
 
     return render(request, 'management/add.html', {"form": views_forms.NewDataForm()})
 def edit_user(request, user_index, username):
-    # username = 'hamza'  # For testing
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
     
-    # print(f"line 151 data is coming in edit_user {user_index} , {username}")
     user = User.objects.get(username=username)
-    # print(f"line 153 before saving {user}")
     user_data = models.select_userdata(username)  # Assuming this function retrieves user data including cnic, phone_number, user_type, etc.
     if request.method == 'POST':
         form = views_forms.NewDataForm_edit(request.POST)
-        if form.is_valid():
-            user.username=username
-            user.first_name = form.cleaned_data['first_name']
-            user.last_name = form.cleaned_data['last_name']
-            user.email = form.cleaned_data['email']
-            password=form.cleaned_data['password']
-            confirm_password=form.cleaned_data['confirm_password']
-            cnic = form.cleaned_data['cnic']
-            phone_number = form.cleaned_data['phone_number']
-            address = form.cleaned_data['address']
-            user_type = form.cleaned_data['user_type']
-            
-            print(f"before updating in edit_user models.save_userdata({username}, {cnic}, {phone_number}, {address}, {user_type})")
-            models.save_userdata(username, cnic, phone_number, address, user_type)  # Update User and custom Employ model
-            print(f"line 169 before saving {user}")
-            if ((password or confirm_password) and (password==confirm_password)):
-                user.set_password(password)
-            elif ((password or confirm_password) and (password!=confirm_password)):
+        try:
+            if form.is_valid():
+                user.username=username
+                user.first_name = form.cleaned_data['first_name']
+                user.last_name = form.cleaned_data['last_name']
+                user.email = form.cleaned_data['email']
+                password=form.cleaned_data['password']
+                confirm_password=form.cleaned_data['confirm_password']
+                cnic = form.cleaned_data['cnic']
+                phone_number = form.cleaned_data['phone_number']
+                address = form.cleaned_data['address']
+                user_type = form.cleaned_data['user_type']
+                models.save_userdata(username, cnic, phone_number, address, user_type)  # Update User and custom Employ model
+                if ((password or confirm_password) and (password==confirm_password)):
+                    user.set_password(password)
+                elif ((password or confirm_password) and (password!=confirm_password)):
+                    return render(request, 'management/error.html', {
+                        "error": "password and confirm password miss matches."
+                        })
+                user.save()
+                messages.success(request, 'User updated successfully!')
+                return redirect('management:index')
+        except Exception as e:
+                # messages.error(request, 'Please correct the errors below.')
                 return render(request, 'management/error.html', {
-                    "error": "password and confirm password miss matches."
-                    })
-            user.save()
-            messages.success(request, 'User updated successfully!')
-            return redirect('management:index')
-        
-        else:
-            # messages.error(request, 'Please correct the errors below.')
-            return render(request, 'management/error.html', {
-                    "error": "Please correct the errors below."
-                    })
+                        "error": f"Please correct the errors . {e}"
+                        })
     else:
         if not user_data:
             form = views_forms.NewDataForm_edit(initial={
@@ -134,7 +126,6 @@ def edit_user(request, user_index, username):
                 'user_type': user_data[1],  # Assuming user_type is the 2nd column
                 'address': user_data[5],  # Assuming address is the 5th column
             })
-    print(f"line 196 username :: {username}")
     return render(request, 'management/add.html', {
         "form": form,
         'is_editing': True,
@@ -146,11 +137,8 @@ def remove_user(request, user_index,username):
         return HttpResponseRedirect(reverse("management:login"))
 
     try:
-        print(f"line 210 data is coming in edit_user {user_index} , {username}")
         user = User.objects.get(username=username)
-    
         user = User.objects.get(username=username)
-        print(f"line 214 before saving {user}")
         models.delete_userdata(username)
         user.delete()
         messages.success(request, f"User '{username}' has been deleted.")
@@ -165,43 +153,35 @@ def remove_user(request, user_index,username):
 def profile(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
-    user_data=models.select_userdata(request.user.username)
+
     if request.method == 'POST':
         form = views_forms.changepassword(request.POST)
         if form.is_valid():
             old_password = form.cleaned_data['old_password']
             new_password = form.cleaned_data['new_password']
             confirm_new_password = form.cleaned_data['confirm_new_password']
-            if check_password(old_password, request.user.password):
+            print(f"line 163 :: data submitted to the form")
+            check_true=check_password(old_password, request.user.password)
+            print(f"line 165 check_true :: {check_true}")
+            if check_true:
                 if new_password==confirm_new_password:
                     request.user.set_password(new_password)
                     request.user.save()
-                    print("line 214 :: password is changed ")
                     # request.user.save()
                     return redirect('management:logout')
                 else:
-                    # return render(request, 'management/profile.html', {
-                    #     "form": form,
-                    #     "message": "Passwords do not match",
-                    #     "user_data":user_data
-                    #     })
                     return render(request, 'management/error.html', {
                         "error": "Passwords do not match"
                         })
             else:
-            #     return render(request, 'management/profile.html', {
-            #         "form": form,
-            #         "message": "Old password is incorrect",
-            #         "user_data":user_data
-            #         })
-            # else:
                 return render(request, 'management/error.html', {
                         "error": "Old password is incorrect"
                         })
+    django_userdata = [ request.user.first_name, request.user.last_name, request.user.email ]
     return render(request, 'management/profile.html', {
-                    "message": "",
                     "form": views_forms.changepassword(),
-                    "user_data":user_data
+                    "user_data":models.select_userdata(request.user.username),
+                    "django_userdata":django_userdata
                     })
 def search_user(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
@@ -211,16 +191,12 @@ def search_user(request):
     
     # Convert search_value to string (if not already a string)
     search_value = str(search_value)
-    
-    print(f"line 399 search value :: {search_value} , search column :: {search_column}")
-
     results = []  # Initialize results list
 
     # Check if search_value is not empty
     if search_value:
         results = models.search_user(search_column, search_value)
         databasedata , users =arange_user(results)
-        print(f"line 408 ::{databasedata} {users}")
     # Render the template with search results
     return render(request, 'management/index.html', {
         "databasedata":databasedata,
@@ -274,7 +250,6 @@ def user_sort(request,asc_decs,sort_by):
             print(f"User.objects.get(username={username}) :: {user}")
         
         except User.DoesNotExist:
-            # print(f"User with username '{username}' does not exist.")
             return render(request, 'management/error.html', {
                     "error": f"User with username '{username}' does not exist."
                     })
@@ -283,9 +258,6 @@ def user_sort(request,asc_decs,sort_by):
             return render(request, 'management/error.html', {
                     "error": f"Error selecting data: {e}"
                     })
-
-    # print(f"user_database :: {completedata_database}")
-    # print(f"user_django :: {completedata_django}")
 
     # Render response with both sets of data
     return render(request, 'management/index.html', {
@@ -304,7 +276,6 @@ def sales_report_view(request):
             frequency = request.POST.get('frequency')
             start_date = request.POST.get('start_date')
             end_date = request.POST.get('end_date')
-            print(f"line 72 :: {frequency}  {start_date}  {end_date}")
             
             if frequency and start_date and end_date:
                 start_date = pd.to_datetime(start_date)
@@ -318,7 +289,6 @@ def sales_report_view(request):
                 elif frequency == 'yearly':
                     end_date = end_date.replace(month=12, day=31, hour=23, minute=59, second=59, microsecond=999999)
 
-                print(f"line 92 :: {frequency}  {start_date}  {end_date}")
                 chart_url = generate_report(frequency, start_date, end_date)
         except ValueError as ve:
             # print(f"Date parsing error: {ve}")
@@ -344,9 +314,6 @@ def login_view(request):
             return render(request, 'management/error.html', {
                         "error": "Invalid credentials."
                         })
-            # return render(request, "management/login.html", {
-            #     "username": username
-            # })
     return render(request, "management/login.html")
 def logout_view(request):
     logout(request)
@@ -368,8 +335,6 @@ def customer_search(request):
     # Convert search_value to string (if not already a string)
     search_value = str(search_value)
     
-    print(f"line 589 search value :: {search_value} , search column :: {search_column}")
-
     customer_buy = []  # Initialize customer_buy list
     customer_return = []  # Initialize customer_return list
 

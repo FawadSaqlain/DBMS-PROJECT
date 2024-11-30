@@ -92,7 +92,6 @@ DATABASES = {
     }
 }
 
-print('line 93 Printed Database Connected in settings')
 
 
 

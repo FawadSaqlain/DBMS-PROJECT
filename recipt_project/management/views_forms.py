@@ -243,7 +243,12 @@ class NewDataForm_edit(forms.Form):
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px; height: 100px;'  
         })
     )
-class changepassword(forms.Form):
+
+
+from django import forms
+from django.core.validators import RegexValidator
+
+class ChangePasswordForm(forms.Form):
     old_password = forms.CharField(
         widget=forms.PasswordInput(attrs={
             'id': 'id_old_password',
@@ -260,6 +265,7 @@ class changepassword(forms.Form):
     )
     new_password = forms.CharField(
         widget=forms.PasswordInput(attrs={
+            'id': 'id_new_password',
             'placeholder': 'Enter new password',
             'class': 'form-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
@@ -272,7 +278,8 @@ class changepassword(forms.Form):
         ]
     )
     confirm_new_password = forms.CharField(
-        widget=forms.PasswordInput(attrs={
+        widget=forms.TextInput(attrs={
+            'id': 'id_confirm_new_password',
             'placeholder': 'Enter confirm new password',
             'class': 'form-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'

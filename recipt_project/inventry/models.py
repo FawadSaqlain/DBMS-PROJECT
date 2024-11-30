@@ -43,10 +43,6 @@ def search_products(search_column, search_value):
         return results
 @csrf_exempt
 def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, quantity_price_sale, updated_datetime, username):
-    # product=get_product(prod_code)
-    # product=product[0]
-    # print(f"line 51 product {product}")
-    # print(f"line 63 condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
     """Inserts or updates product data in the product table."""
     try:
         with connection.cursor() as cursor:
@@ -56,9 +52,6 @@ def add_each_item(prod_code, prod_description, prod_quantity, prod_sale_price, q
             if exists:
                 # Update the existing record
                 product=get_product(prod_code)
-                print(f"line 63 models.py product :: {product}")
-                # product=product[0]
-                print(f"line 64 condition for updating  if {product[1]} != {prod_description} or {product[4]} != {quantity_price_sale} or {product[6]} != {username}:")
                 if product[1] != prod_description or product[4] != quantity_price_sale :
                     cursor.execute("""
                         UPDATE dbo.product
@@ -137,9 +130,9 @@ def select_userdata(username):
             cursor.execute(query, [username])
             result = cursor.fetchone()  # Fetch the first row of the result
             if result:
-                print("Data selected successfully:", result)
+                return result
             else:
                 print("No data found for the given username.")
-            return result
+            
     except DatabaseError as e:
         print(f"Error selecting data: {e}")
