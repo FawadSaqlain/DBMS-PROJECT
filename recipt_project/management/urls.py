@@ -17,5 +17,5 @@ urlpatterns = [
     path('customer_sort/<int:asc_decs>/<str:sort_by>/',views.customer_sort,name='customer_sort'),
     path('customer_search/', views.customer_search, name='customer_search'),
     path('customerdata/', views.customerdata, name='customerdata'),
-    path('get_recipt/<str:code>/<str:table_name>/', tests.get_recipt, name='get_recipt'),
+    path('get_recipt/<str:code>/<str:table_name>/', views.get_recipt, name='get_recipt'),
     ]

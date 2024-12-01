@@ -178,35 +178,45 @@ def export_excel(request):
 def profile(request):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
-    user_data=models.select_userdata(request.user.username)
     if request.method == 'POST':
-        form = views_forms.changepassword(request.POST)
+        form = views_forms.ChangePasswordForm(request.POST)
         if form.is_valid():
             old_password = form.cleaned_data['old_password']
             new_password = form.cleaned_data['new_password']
             confirm_new_password = form.cleaned_data['confirm_new_password']
-            if check_password(old_password, request.user.password):
-                if new_password==confirm_new_password:
-                    request.user.set_password(new_password)
-                    request.user.save()
-                    # request.user.save() 
-                    return redirect('inventry:logout')
-                else:
-                    return render(request, 'inventry/error.html', {
-                        "error": "Passwords do not match"
+
+            # Validate old password against the user's current password
+            if not check_password(old_password, request.user.password):
+                return render(request, 'inventry/error.html', {
+                        "error": "Your old password not correct."
                         })
+            if confirm_new_password == new_password:
+                # Save the new password
+                request.user.set_password(new_password)
+                request.user.save()
+                return redirect('inventry:logout')
             else:
                 return render(request, 'inventry/error.html', {
-                    "error": "Old password is incorrect"
-                    })
-    django_userdata = [ request.user.first_name,request.user.last_name, request.user.email ]
+                        "error": "New password and confirm password do not match."
+                        })
+        else:
+            return render(request, 'inventry/profile.html', {
+                "form": form,
+                "user_data": models.select_userdata(request.user.username),
+                "django_userdata": [request.user.first_name, request.user.last_name, request.user.email],
+            })
+
+    form = views_forms.ChangePasswordForm()
+    django_userdata = [request.user.first_name, request.user.last_name, request.user.email]
     return render(request, 'inventry/profile.html', {
-                    "message": "",
-                    "form": views_forms.changepassword(),
-                    "user_data":user_data,
-                    "django_userdata":django_userdata
-                    })
+        "form": form,
+        "user_data": models.select_userdata(request.user.username),
+        "django_userdata": django_userdata,
+    })
+
 def login_view(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("inventry:logout"))
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]

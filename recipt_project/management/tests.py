@@ -1,75 +1,102 @@
-from django.contrib.auth import authenticate, login, logout
-from django import forms
+
+from django.core.exceptions import ValidationError
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.contrib.auth.models import User
-from django.contrib import messages
-from datetime import datetime
-from django import forms
-from . import models
 from django.contrib.auth.hashers import check_password
-import pandas as pd
-from .sales_report import generate_report
-def get_recipt(request,code,table_name):
-    recipt=models.get_table_recipt(code)
-    customer=models.get_customer_by_recipt_code(code , table_name)
-    return render(request,"management/recipt.html",{"recipt":recipt,'customer':customer})
+from django.urls import reverse
+from .import views_forms
+from . import models
+from django.http import HttpResponseRedirect
+from django.contrib import messages
+from django import forms
+from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 
-'''
-def customer_sort(request,asc_decs,sort_by):
+from django import forms
+from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
+
+
+class ChangePasswordForm(forms.Form):
+    password_validator = RegexValidator(
+        regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=+#%^()|}{;:/.>,<`~])[A-Za-z\d@$!%*?&_=+#%^()|}{;:/.>,<`~]{8,16}$',
+        message="Password must be 8-16 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
+    )
+
+    old_password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'id': 'id_old_password',
+            'placeholder': 'Enter old password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        }),
+        validators=[password_validator]
+    )
+
+    new_password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'id': 'id_new_password',
+            'placeholder': 'Enter new password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        }),
+        validators=[password_validator]
+    )
+
+    confirm_new_password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'id': 'id_confirm_new_password',
+            'placeholder': 'Confirm new password',
+            'class': 'form-control',
+            'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
+        }),
+        validators=[password_validator]
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        old_password = cleaned_data.get("old_password")
+        new_password = cleaned_data.get("new_password")
+        confirm_new_password = cleaned_data.get("confirm_new_password")
+        return cleaned_data
+
+def profile(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
-    customer_buy, customer_return = models.get_customer_data()
-    customer_buy=models.view_customer_sort(asc_decs,sort_by)
-    return render(request,"management/customer_table.html",{"customer_buy":customer_buy,'sorted_as':f"{asc_decs}{sort_by}","customer_return":customer_return})
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.POST)
+        if form.is_valid():
+            old_password = form.cleaned_data['old_password']
+            new_password = form.cleaned_data['new_password']
+            confirm_new_password = form.cleaned_data['confirm_new_password']
 
+            # Validate old password against the user's current password
+            if not check_password(old_password, request.user.password):
+                return render(request, 'management/error.html', {
+                        "error": "Your old password not correct."
+                        })
+            if confirm_new_password == new_password:
+                # Save the new password
+                request.user.set_password(new_password)
+                request.user.save()
+                return redirect('management:logout')
+            else:
+                return render(request, 'management/error.html', {
+                        "error": "New password and confirm password do not match."
+                        })
+        else:
+            return render(request, 'management/profile.html', {
+                "form": form,
+                "user_data": models.select_userdata(request.user.username),
+                "django_userdata": [request.user.first_name, request.user.last_name, request.user.email],
+            })
 
-def customer_search(request):
-    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
-        return HttpResponseRedirect(reverse("management:login"))
-    search_column = request.GET.get('section')  # Default search column
-    search_value = request.GET.get('q', '')  # Retrieved search value
-    
-    # Convert search_value to string (if not already a string)
-    search_value = str(search_value)
-    
-    print(f"line 31 search value :: {search_value} , search column :: {search_column}")
-
-    customer_buy = []  # Initialize customer_buy list
-    customer_return = []  # Initialize customer_return list
-
-    # Check if search_value is not empty
-    if search_value:
-        customer_buy_code = models.get_customer_buy_buy_recipt_code_search(search_column, search_value)
-        customer_return_code = models.get_customer_return_buy_recipt_code_search(search_column, search_value)
-        print(f"customer_buy_code :: {customer_buy_code}")
-        print(f"customer_return_code :: {customer_return_code}")
-        for code in customer_buy_code:
-            customer_buy.append(models.get_customer_buy_data(code))
-            
-        
-        for code in customer_return_code:
-            if models.get_customer_return_data(code) not in customer_return:
-                customer_return.append(models.get_customer_return_data(code))
-            if models.get_customer_buy_data(code) not in customer_buy:
-                customer_buy.append(models.get_customer_buy_data(code))
-
-        flattened_customer_buy = [item for sublist in customer_buy for item in sublist]
-        # Flatten customer_return
-        flattened_customer_return = [item for sublist in customer_return for item in sublist]
-        print(f"customer_buy :: {customer_buy}")
-        print(f"customer_return :: {customer_return}")
-        
-
-    return render(request, 'management/customer_table.html',
-                {'customer_buy': flattened_customer_buy,'customer_return': flattened_customer_return})
-
-
-def customerdata(request):
-    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
-        return HttpResponseRedirect(reverse("management:login"))
-    customer_buy , customer_return = models.get_customer_data()
-    return render(request, 'management/customer_table.html',
-                {'customer_buy': customer_buy,'customer_return': customer_return})
-'''
+    form = ChangePasswordForm()
+    django_userdata = [request.user.first_name, request.user.last_name, request.user.email]
+    return render(request, 'management/profile.html', {
+        "form": form,
+        "user_data": models.select_userdata(request.user.username),
+        "django_userdata": django_userdata,
+    })

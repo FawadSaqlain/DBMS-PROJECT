@@ -150,39 +150,46 @@ def remove_user(request, user_index,username):
                     })
     
     return redirect('management:index')
+
 def profile(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
-
     if request.method == 'POST':
-        form = views_forms.changepassword(request.POST)
+        form = views_forms.ChangePasswordForm(request.POST)
         if form.is_valid():
             old_password = form.cleaned_data['old_password']
             new_password = form.cleaned_data['new_password']
             confirm_new_password = form.cleaned_data['confirm_new_password']
-            print(f"line 163 :: data submitted to the form")
-            check_true=check_password(old_password, request.user.password)
-            print(f"line 165 check_true :: {check_true}")
-            if check_true:
-                if new_password==confirm_new_password:
-                    request.user.set_password(new_password)
-                    request.user.save()
-                    # request.user.save()
-                    return redirect('management:logout')
-                else:
-                    return render(request, 'management/error.html', {
-                        "error": "Passwords do not match"
+
+            # Validate old password against the user's current password
+            if not check_password(old_password, request.user.password):
+                return render(request, 'management/error.html', {
+                        "error": "Your old password not correct."
                         })
+            if confirm_new_password == new_password:
+                # Save the new password
+                request.user.set_password(new_password)
+                request.user.save()
+                return redirect('management:logout')
             else:
                 return render(request, 'management/error.html', {
-                        "error": "Old password is incorrect"
+                        "error": "New password and confirm password do not match."
                         })
-    django_userdata = [ request.user.first_name, request.user.last_name, request.user.email ]
+        else:
+            return render(request, 'management/profile.html', {
+                "form": form,
+                "user_data": models.select_userdata(request.user.username),
+                "django_userdata": [request.user.first_name, request.user.last_name, request.user.email],
+            })
+
+    form = views_forms.ChangePasswordForm()
+    django_userdata = [request.user.first_name, request.user.last_name, request.user.email]
     return render(request, 'management/profile.html', {
-                    "form": views_forms.changepassword(),
-                    "user_data":models.select_userdata(request.user.username),
-                    "django_userdata":django_userdata
-                    })
+        "form": form,
+        "user_data": models.select_userdata(request.user.username),
+        "django_userdata": django_userdata,
+    })
+
 def search_user(request):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
@@ -203,6 +210,7 @@ def search_user(request):
         "users": users,
         'length_user': range(len(results))
     })
+
 def arange_user(results):
     users=[]
     databasedata=[]
@@ -214,6 +222,7 @@ def arange_user(results):
         databasedata.append(user_database)
 
     return databasedata, users
+
 def user_sort(request,asc_decs,sort_by):
     if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
         return HttpResponseRedirect(reverse("management:login"))
@@ -302,13 +311,20 @@ def sales_report_view(request):
                         })
     return render(request, 'management/sales_report.html', {'chart_url': chart_url})
 def login_view(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("management:logout"))
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-        if user is not None and models.select_userdata(username)[1] == "administration manager":
-            login(request, user)
-            return HttpResponseRedirect(reverse("management:index"))
+        if user is not None :
+            if models.select_userdata(username)[1] == "administration manager":
+                login(request, user)
+                return HttpResponseRedirect(reverse("management:index"))
+            else:
+                return render(request, 'management/error.html', {
+                        "error": "Invalid Permissions."
+                        })
         else:
             # messages.error(request, "Invalid credentials.")
             return render(request, 'management/error.html', {
@@ -369,3 +385,9 @@ def customerdata(request):
     customer_buy , customer_return = models.get_customer_data()
     return render(request, 'management/customer_table.html',
                 {'customer_buy': customer_buy,'customer_return': customer_return})
+
+
+def get_recipt(request,code,table_name):
+    recipt=models.get_table_recipt(code)
+    customer=models.get_customer_by_recipt_code(code , table_name)
+    return render(request,"management/recipt.html",{"recipt":recipt,'customer':customer})

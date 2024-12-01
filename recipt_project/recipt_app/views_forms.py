@@ -1,47 +1,52 @@
 from django import forms
 from django.core.validators import RegexValidator, MinValueValidator,MaxLengthValidator,MinLengthValidator
 
-class changepassword(forms.Form):
+class ChangePasswordForm(forms.Form):
+    password_validator = RegexValidator(
+        regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=+#%^()|}{;:/.>,<`~])[A-Za-z\d@$!%*?&_=+#%^()|}{;:/.>,<`~]{8,16}$',
+        message="Password must be 8-16 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
+    )
+
     old_password = forms.CharField(
+        required=True,
         widget=forms.PasswordInput(attrs={
             'id': 'id_old_password',
             'placeholder': 'Enter old password',
             'class': 'form-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         }),
-        validators=[
-            RegexValidator(
-                regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=+#%^()|}{;:/.>,<`~])[A-Za-z\d@$!%*?&_=+#%^()|}{;:/.>,<`~]{8,16}$',
-                message="Password must be 8-16 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
-            )
-        ]
+        validators=[password_validator]
     )
+
     new_password = forms.CharField(
+        required=True,
         widget=forms.PasswordInput(attrs={
+            'id': 'id_new_password',
             'placeholder': 'Enter new password',
             'class': 'form-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         }),
-        validators=[
-            RegexValidator(
-                regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=+#%^()|}{;:/.>,<`~])[A-Za-z\d@$!%*?&_=+#%^()|}{;:/.>,<`~]{8,16}$',
-                message="Password must be 8-16 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
-            )
-        ]
+        validators=[password_validator]
     )
+
     confirm_new_password = forms.CharField(
+        required=True,
         widget=forms.PasswordInput(attrs={
-            'placeholder': 'Enter confirm new password',
+            'id': 'id_confirm_new_password',
+            'placeholder': 'Confirm new password',
             'class': 'form-control',
             'style': 'width: 100%; padding: 10px; margin-bottom: 10px;'
         }),
-        validators=[
-            RegexValidator(
-                regex=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_=+#%^()|}{;:/.>,<`~])[A-Za-z\d@$!%*?&_=+#%^()|}{;:/.>,<`~]{8,16}$',
-                message="Password must be 8-16 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
-            )
-        ]
+        validators=[password_validator]
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        old_password = cleaned_data.get("old_password")
+        new_password = cleaned_data.get("new_password")
+        confirm_new_password = cleaned_data.get("confirm_new_password")
+        return cleaned_data
+
     
     # Form for adding/editing products
 class ProductForm(forms.Form):
