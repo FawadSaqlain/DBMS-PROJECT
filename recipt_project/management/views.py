@@ -36,7 +36,7 @@ def add_user(request):
             username = form.cleaned_data['username']
             address = form.cleaned_data['address']
             user_type = form.cleaned_data['user_type']
-
+            
             password=form.cleaned_data['password']
             confirm_password=form.cleaned_data['confirm_password']
             try:
@@ -66,7 +66,6 @@ def add_user(request):
                 return render(request, 'management/error.html', {
                     "error": "Passwords do not match!"
                     })
-                return render(request, 'management/add.html', {'form': form})
         else:
             messages.error(request, 'Please correct the errors below.')
             return render(request, 'management/add.html', {'form': form})

@@ -10,24 +10,24 @@
     <title>EZ MART</title>
 </head>
 <body>
-
     <header>
         <div class="header-left">
-            <!-- Dropdown Menu for Small Screens -->
-            <div class="dropdown-menu">
-                <a href="{% url 'recipt:index' %}" target="_blank">
-                    <button type="button" class="logout-button">Counter</button>
-                </a>
-                <a href="{% url 'inventry:index' %}" target="_blank">
-                    <button type="button" class="logout-button">Inventroy</button>
-                </a>
-                <a href="{% url 'management:index' %}" target="_blank">
-                    <button type="button" class="logout-button">Management</button>
-                </a>
-                <a href="{% url 'management:customerdata' %}" target="_blank">
-                    <button type="button" class="logout-button">Sales Data</button>
-                </a>
-            </div>
+            <div>
+            <a href="{% url 'recipt:index' %}" target="_blank">
+                <button type="button" class="logout-button">Counter</button>
+            </a>
+            <a href="{% url 'inventry:index' %}" target="_blank">
+                <button type="button" class="logout-button">Inventroy</button>
+            </a>
+        </div>
+        <div>
+            <a href="{% url 'management:index' %}" target="_blank">
+                <button type="button" class="logout-button">Management</button>
+            </a>
+            <a href="{% url 'management:customerdata' %}" target="_blank">
+                <button type="button" class="logout-button">Sales Data</button>
+            </a>
+        </div>
         </div>
 
         <div class="header-center">
@@ -44,7 +44,6 @@
             </a>
         </div>
     </header>
-
     <div id="outerContainer">
         <div id="container">
             {% block body %}

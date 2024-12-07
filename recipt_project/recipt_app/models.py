@@ -162,11 +162,11 @@ def create_table_recipt(recipt_code, products):
             cursor.execute(f"""
                 CREATE TABLE [{recipt_code}] (
                     id INT PRIMARY KEY IDENTITY,
-                    prod_code NVARCHAR(100),
-                    prod_discreption NVARCHAR(1000),
-                    quantity INT,
-                    price FLOAT,
-                    price_quantity FLOAT
+                    prod_code NVARCHAR(5),
+                    prod_discreption TEXT,
+                    quantity INT CHECK (quantity >= 1),
+                    price FLOAT CHECK (price >= 0.0),
+                    price_quantity FLOAT CHECK (price_quantity >= 0.0)
                 )
             """)
         
