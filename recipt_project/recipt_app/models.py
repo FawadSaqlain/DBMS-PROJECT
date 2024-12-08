@@ -72,6 +72,7 @@ def update_quantity(quantity,update_quantity_price, prod_code):
     """
     Updates the quantity of a product in the inventory.
     """
+    print(f"line 75 quantity = {quantity} update_quantity_price={update_quantity_price} prod_code={prod_code}")
     try:
         with connection.cursor() as cursor:
             cursor.execute("""
@@ -97,12 +98,14 @@ def insert_data(recipt_code, products):
             inventry_product = get_product(prod_code)
             if not inventry_product:
                 continue  # Skip if product not found
-            
+
             # inventry_product = inventry_product[0]
             current_quantity = inventry_product[2]  # Assuming this is prod_quant
             updated_quantity = current_quantity - quantity
             update_quantity_price = inventry_product[4] - price_quantity
             # Update the product quantity in the inventory
+            print(f'current_quantity {current_quantity} inventry_product :: {inventry_product}')
+            print(f'updated_quantity{updated_quantity} update_quantity_price {update_quantity_price}')
             update_quantity(updated_quantity,update_quantity_price, prod_code)
             with connection.cursor() as cursor:
                 cursor.execute(f"""

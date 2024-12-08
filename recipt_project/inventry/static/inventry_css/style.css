@@ -8,9 +8,9 @@
 /* Center the entire page content */
 body {
   min-height: 100vh;
-  background-image: url("../inventry_css/assets/background.jpg");
-  background-size: cover;
-  background-repeat: no-repeat;
+  background-image: url("../inventry_css/assets/background.webp");
+  /* background-size: cover; */
+  /* background-repeat: no-repeat; */
   font-family: Arial, sans-serif;
   margin-top: -8px;
   min-height: calc(100vh - 500px);
@@ -99,7 +99,7 @@ header {
   height: 20px; /* Match the height of the image */
   margin-bottom: 10px;
   margin-right: 10px;
-  mix-blend-mode: color-burn;
+  /* mix-blend-mode: color-burn; */
 } 
 
 /* Hover effect for delete and edit buttons */

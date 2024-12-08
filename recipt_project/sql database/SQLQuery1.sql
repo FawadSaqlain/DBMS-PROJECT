@@ -44,7 +44,7 @@ USE GENERALSTORE_MS;
 -- );
 
 -- CREATE TABLE customers_return (
---     id INT PRIMARY KEY IDENTITY(1,1),
+--     id INT,
 --     name NVARCHAR(100),
 --     email NVARCHAR(100),
 --     Employ_name NVARCHAR(100),
@@ -53,22 +53,24 @@ USE GENERALSTORE_MS;
 --     total_price FLOAT CHECK (total_price >= 0.0),
 --     date_time DATETIME
 -- );
-
+-- drop table customers_return
 
 -- UPDATE customers 
 -- SET name = 'as', email = 'daasd@sdfdf.com' 
 -- WHERE recipt_code = '_08u5n';
 
--- drop table product
--- CREATE TABLE product (
---     prod_code NVARCHAR(5) PRIMARY KEY,
---     product_description NVARCHAR(255) NOT NULL UNIQUE,  -- Change TEXT to NVARCHAR(255) for efficiency
---     prod_quant INT CHECK (prod_quant >= 1),  -- Ensures quantity is at least 1
---     prod_sale_price FLOAT CHECK (prod_sale_price >= 0.0),  -- Ensures sale price is at least 0.0
---     quantity_price_sale FLOAT CHECK (quantity_price_sale >= 0.0),  -- Ensures quantity price sale is at least 0.0
---     updated_datetime DATETIME,
---     added_by_employ TEXT
--- );
+drop table product
+CREATE TABLE product (
+    prod_code NVARCHAR(5) PRIMARY KEY,
+    product_description NVARCHAR(255) NOT NULL UNIQUE,  -- Change TEXT to NVARCHAR(255) for efficiency
+    prod_quant INT CHECK (prod_quant >= 0),  -- Ensures quantity is at least 1
+    prod_sale_price FLOAT CHECK (prod_sale_price >= 0.0),  -- Ensures sale price is at least 0.0
+    quantity_price_sale FLOAT CHECK (quantity_price_sale >= 0.0),  -- Ensures quantity price sale is at least 0.0
+    updated_datetime DATETIME,
+    added_by_employ TEXT
+);
+
+-- UPDATE product set prod_quant = 95 where prod_code='P0001';
 INSERT INTO product (prod_code, product_description, prod_quant, prod_sale_price, quantity_price_sale, updated_datetime, added_by_employ)
 VALUES 
 ('P0001', 'Apple iPhone 14', 100, 999.99, 999.99, '2024-12-06 10:00:00', 'John Doe'),
@@ -122,6 +124,11 @@ VALUES
 ('P0049', 'Corsair K95 RGB Mechanical Keyboard', 100, 199.99, 199.99, '2024-12-07 10:00:00', 'Mason Lee'),
 ('P0050', 'Amazon Echo Show 8', 150, 129.99, 129.99, '2024-12-07 10:30:00', 'Aiden Clark');
 
+UPDATE product
+SET quantity_price_sale = prod_quant * prod_sale_price;
+
+select * from product where prod_code='P0045'
+
 -- SELECT * FROM dbo.product
 -- drop table Employ
 -- CREATE TABLE Employ (
@@ -155,7 +162,7 @@ VALUES
 -- SELECT * FROM customers_return
 -- SELECT * FROM _gvmm0
 -- SELECT * FROM _mjn2P
--- SELECT * FROM _lbkVh
+SELECT * FROM _y3ec4
 -- SELECT * FROM _Mg1em
 -- SELECT * FROM EMPLOY
 
@@ -175,35 +182,35 @@ VALUES
 -- WHERE LOWER(%s) LIKE LOWER('%s')
 -- drop table customers
 
-INSERT INTO customers (name, email, Employ_name, recipt_code, total_price, date_time) VALUES 
-('John Doe', 'john.doe1@example.com', 'Alice Smith', 'RC001', 1200, '2024-3-01 14:30:00'),
-('Jane Smith', 'jane.smith1@example.com', 'Bob Johnson', 'RC002', 250, '2024-5-02 15:45:00'),
-('Michael Brown', 'michael.brown1@example.com', 'Charlie Davis', 'RC003', 300, '2024-5-03 12:00:00'),
-('Emily Johnson', 'emily.johnson1@example.com', 'Diana White', 'RC004', 9000, '2024-6-04 18:20:00'),
-('Chris Lee', 'chris.lee1@example.com', 'Edward Taylor', 'RC005', 150, '2024-6-05 09:15:00'),
-('Sarah Parker', 'sarah.parker1@example.com', 'Frank Miller', 'RC006', 17235, '2024-6-06 14:10:00'),
-('David Clark', 'david.clark1@example.com', 'George Hall', 'RC007', 200, '2024-7-07 17:05:00'),
-('Laura Adams', 'laura.adams1@example.com', 'Hannah Scott', 'RC008', 23230, '2024-8-08 10:40:00'),
-('Tom King', 'tom.king1@example.com', 'Isaac Lewis', 'RC009', 340, '2024-8-09 11:25:00'),
-('Amy Wright', 'amy.wright1@example.com', 'Jack Evans', 'RC010', 27320, '2024-8-10 13:50:00'),
-('Nathan Hill', 'nathan.hill1@example.com', 'Laura Martin', 'RC011', 480, '2024-9-11 16:30:00'),
-('Oliver Green', 'oliver.green1@example.com', 'Mia Robinson', 'RC012', 220, '2024-9-12 14:05:00'),
-('Liam Scott', 'liam.scott1@example.com', 'Noah Walker', 'RC013', 30320, '2024-10-13 12:30:00'),
-('Sophia White', 'sophia.white1@example.com', 'Ella Young', 'RC014', 125, '2024-10-14 09:50:00'),
-('Mason Lewis', 'mason.lewis1@example.com', 'Lucas Baker', 'RC015', 150, '2024-11-15 17:45:00'),
-('Isabella Clark', 'isabella.clark1@example.com', 'Charlotte Adams', 'RC016', 22375, '2024-11-16 14:20:00'),
-('William Harris', 'william.harris1@example.com', 'Sophia King', 'RC017', 390, '2024-11-17 13:15:00'),
-('Ava Perez', 'ava.perez1@example.com', 'Henry Mitchell', 'RC018', 180, '2024-11-18 15:55:00'),
-('James Turner', 'james.turner1@example.com', 'Amelia Carter', 'RC019', 320, '2024-12-19 12:25:00'),
-('Charlotte Evans', 'charlotte.evans1@example.com', 'Oliver Morris', 'RC020', 21320, '2024-12-20 14:40:00'),
-('Lucas Martin', 'lucas.martin1@example.com', 'Ella Peterson', 'RC021', 160, '2024-12-21 10:50:00'),
-('Henry Brooks', 'henry.brooks1@example.com', 'Emma Bell', 'RC022', 260, '2025-2-22 13:30:00'),
-('Emily Reed', 'emily.reed1@example.com', 'Aiden Gray', 'RC023', 300, '2025-2-23 11:00:00'),
-('Ella Stewart', 'ella.stewart1@example.com', 'Jackson Diaz', 'RC024', 175, '2025-4-24 09:15:00'),
-('Aiden Murphy', 'aiden.murphy1@example.com', 'Liam Lopez', 'RC025', 4100, '2025-4-25 16:00:00'),
-('Amelia Fisher', 'amelia.fisher1@example.com', 'James Reed', 'RC026', 320, '2025-6-26 14:10:00'),
-('Oliver Bell', 'oliver.bell1@example.com', 'Mason Perry', 'RC027', 220, '2025-6-27 15:35:00'),
-('Emma King', 'emma.king1@example.com', 'Sophia Sanders', 'RC028', 140, '2025-8-28 12:45:00'),
-('Sophia Carter', 'sophia.carter1@example.com', 'Mia Ross', 'RC029', 3, '2025-8-29 11:25:00'),
-('Jackson Morris', 'jackson.morris1@example.com', 'Henry Kelly', 'RC030', 270, '2025-10-30 16:30:00'),
-('Lucas Mitchell', 'lucas.mitchell1@example.com', 'Charlotte Adams', 'RC100', 20, '2025-11-07 12:10:00');
+-- INSERT INTO customers (name, email, Employ_name, recipt_code, total_price, date_time) VALUES 
+-- ('John Doe', 'john.doe1@example.com', 'Alice Smith', 'RC001', 1200, '2024-3-01 14:30:00'),
+-- ('Jane Smith', 'jane.smith1@example.com', 'Bob Johnson', 'RC002', 250, '2024-5-02 15:45:00'),
+-- ('Michael Brown', 'michael.brown1@example.com', 'Charlie Davis', 'RC003', 300, '2024-5-03 12:00:00'),
+-- ('Emily Johnson', 'emily.johnson1@example.com', 'Diana White', 'RC004', 9000, '2024-6-04 18:20:00'),
+-- ('Chris Lee', 'chris.lee1@example.com', 'Edward Taylor', 'RC005', 150, '2024-6-05 09:15:00'),
+-- ('Sarah Parker', 'sarah.parker1@example.com', 'Frank Miller', 'RC006', 17235, '2024-6-06 14:10:00'),
+-- ('David Clark', 'david.clark1@example.com', 'George Hall', 'RC007', 200, '2024-7-07 17:05:00'),
+-- ('Laura Adams', 'laura.adams1@example.com', 'Hannah Scott', 'RC008', 23230, '2024-8-08 10:40:00'),
+-- ('Tom King', 'tom.king1@example.com', 'Isaac Lewis', 'RC009', 340, '2024-8-09 11:25:00'),
+-- ('Amy Wright', 'amy.wright1@example.com', 'Jack Evans', 'RC010', 27320, '2024-8-10 13:50:00'),
+-- ('Nathan Hill', 'nathan.hill1@example.com', 'Laura Martin', 'RC011', 480, '2024-9-11 16:30:00'),
+-- ('Oliver Green', 'oliver.green1@example.com', 'Mia Robinson', 'RC012', 220, '2024-9-12 14:05:00'),
+-- ('Liam Scott', 'liam.scott1@example.com', 'Noah Walker', 'RC013', 30320, '2024-10-13 12:30:00'),
+-- ('Sophia White', 'sophia.white1@example.com', 'Ella Young', 'RC014', 125, '2024-10-14 09:50:00'),
+-- ('Mason Lewis', 'mason.lewis1@example.com', 'Lucas Baker', 'RC015', 150, '2024-11-15 17:45:00'),
+-- ('Isabella Clark', 'isabella.clark1@example.com', 'Charlotte Adams', 'RC016', 22375, '2024-11-16 14:20:00'),
+-- ('William Harris', 'william.harris1@example.com', 'Sophia King', 'RC017', 390, '2024-11-17 13:15:00'),
+-- ('Ava Perez', 'ava.perez1@example.com', 'Henry Mitchell', 'RC018', 180, '2024-11-18 15:55:00'),
+-- ('James Turner', 'james.turner1@example.com', 'Amelia Carter', 'RC019', 320, '2024-12-19 12:25:00'),
+-- ('Charlotte Evans', 'charlotte.evans1@example.com', 'Oliver Morris', 'RC020', 21320, '2024-12-20 14:40:00'),
+-- ('Lucas Martin', 'lucas.martin1@example.com', 'Ella Peterson', 'RC021', 160, '2024-12-21 10:50:00'),
+-- ('Henry Brooks', 'henry.brooks1@example.com', 'Emma Bell', 'RC022', 260, '2025-2-22 13:30:00'),
+-- ('Emily Reed', 'emily.reed1@example.com', 'Aiden Gray', 'RC023', 300, '2025-2-23 11:00:00'),
+-- ('Ella Stewart', 'ella.stewart1@example.com', 'Jackson Diaz', 'RC024', 175, '2025-4-24 09:15:00'),
+-- ('Aiden Murphy', 'aiden.murphy1@example.com', 'Liam Lopez', 'RC025', 4100, '2025-4-25 16:00:00'),
+-- ('Amelia Fisher', 'amelia.fisher1@example.com', 'James Reed', 'RC026', 320, '2025-6-26 14:10:00'),
+-- ('Oliver Bell', 'oliver.bell1@example.com', 'Mason Perry', 'RC027', 220, '2025-6-27 15:35:00'),
+-- ('Emma King', 'emma.king1@example.com', 'Sophia Sanders', 'RC028', 140, '2025-8-28 12:45:00'),
+-- ('Sophia Carter', 'sophia.carter1@example.com', 'Mia Ross', 'RC029', 3, '2025-8-29 11:25:00'),
+-- ('Jackson Morris', 'jackson.morris1@example.com', 'Henry Kelly', 'RC030', 270, '2025-10-30 16:30:00'),
+-- ('Lucas Mitchell', 'lucas.mitchell1@example.com', 'Charlotte Adams', 'RC100', 20, '2025-11-07 12:10:00');

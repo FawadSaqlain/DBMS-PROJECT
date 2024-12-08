@@ -33,7 +33,7 @@ def insert_customer_return(name, email, employ_name, recipt_code_buy, recipt_cod
             create_table_recipt_return(recipt_code_return, products, recipt_code_buy)
 
     except Exception as e:
-        print(f"Error inserting customer return data: {e}")
+        print(f"line 36 Error inserting customer return data: {e}")
 
 def save_customer_recipt_return_to_db(customer_name,customer_email,Employ_name, recipt_code_buy,recipt_code_return, date_time, total_price, products):
 

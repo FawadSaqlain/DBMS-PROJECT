@@ -89,12 +89,6 @@ def sendmail(request, new_recipt):
         return save_customer_recipt(request, new_recipt)
 
     else:
-        # Handle unexpected issues during email sending
-        # return render(request, 'recipt/redirect_popup.html', {
-        #     'customer_name': user_data['customer_name'],
-        #     'customer_email': user_data['customer_email'],
-        #     'error': 'An unexpected issue occurred while sending the email.'
-        # })
         return render(request, 'recipt/error.html', {
                         "error": f"An unexpected issue occurred while sending the email. to {user_data['customer_name']} on {user_data['customer_email']}."
                         })

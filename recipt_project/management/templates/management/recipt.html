@@ -15,15 +15,15 @@
             </tr>
         </thead>
         <tbody>
+            {% for product in recipt %}
             <tr>
-                {% for product in recipt %}
                 <td>{{ product.1 }}</td>
                 <td>{{ product.2 }}</td>
                 <td>{{ product.3 }}</td>
                 <td>{{ product.4 }}</td>
                 <td>{{ product.5 }}</td>
-                {% endfor %}
             </tr>
+            {% endfor %}
         </tbody>
     </table>
 
@@ -34,9 +34,6 @@
                 <th>Email</th>
                 <th>Employ Name</th>
                 <th>Receipt Code (Buy)</th>
-                {% if customer.7 %}
-                <th>Receipt Code (Return)</th>
-                {% endif %}
                 <th>Total Price</th>
                 <th>Date & Time</th>
             </tr>
@@ -48,17 +45,41 @@
                 <td>{{ customer.2 }}</td>
                 <td>{{ customer.3 }}</td>
                 <td><a href="{% url 'management:get_recipt' customer.4 'customers' %}" class="hover-effect">{{ customer.4 }}</a></td>
-                {% if customer.7 %}
-                <td><a href="{% url 'management:get_recipt' customer.5 'customers_return' %}" class="hover-effect">{{ customer.5 }}</a></td>
-                {% else %}
                 <td>{{ customer.5 }}</td>
-                {% endif %}
                 <td>{{ customer.6 }}</td>
-                {% if customer.7 %}
                 <td>{{ customer.7 }}</td>
-                {% endif %}
             </tr>
         </tbody>
     </table>
+    {% if customer_return %}
+    <table class="user-table" style="margin-top: 20px;">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Employ Name</th>
+                <th>Receipt Code (Buy)</th>
+                <th>Receipt Code (Return)</th>
+                <th>Total Price</th>
+                <th>Date & Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {%for cust_return in customer_return %}
+            <tr>
+                <td>{{ cust_return.1 }}</td>
+                <td>{{ cust_return.2 }}</td>
+                <td>{{ cust_return.3 }}</td>
+                <td><a href="{% url 'management:get_recipt' cust_return.4 'customers' %}" class="hover-effect">{{ cust_return.4 }}</a></td>
+                <td><a href="{% url 'management:get_recipt' cust_return.5 'customers_return' %}" class="hover-effect">{{ cust_return.5 }}</a></td>
+                <td>{{ cust_return.6 }}</td>
+                <td>{{ cust_return.7 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1 style="color: brown;">No customer return found.</h1>
+    {% endif %}
 </div>
 {% endblock %}

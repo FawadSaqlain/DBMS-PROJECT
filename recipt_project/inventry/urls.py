@@ -9,6 +9,6 @@ urlpatterns=[
     path('edit_product/<int:prod_index>/<str:prod_code>/', views.edit_product, name='edit_product'),
     path('search_results/', views.search_view, name='search_view'),
     path('inventry_sort/<int:asc_decs>/<str:sort_by>/', views.inventry_sort, name='inventry_sort'),
-    path('export_to_excel',views.export_excel,name='export_excel'),
+    path('export_to_excel/',views.export_excel,name='export_excel'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),]

@@ -245,9 +245,7 @@ def user_sort(request,asc_decs,sort_by):
 
     # Process each username to gather additional information
     for username in user_names:
-        username = username.strip("[]'")  # Ensure clean username strings
-        print(f"Processing username: {username}")  # Debugging output
-        
+        username = username.strip("[]'")  # Ensure clean username strings        
         try:
             # Fetch database information
             completedata_database.append(models.select_userdata(username))
@@ -255,7 +253,6 @@ def user_sort(request,asc_decs,sort_by):
             # Fetch Django's User model information
             user = User.objects.get(username=username)
             completedata_django.append(user)
-            print(f"User.objects.get(username={username}) :: {user}")
         
         except User.DoesNotExist:
             return render(request, 'management/error.html', {
@@ -389,4 +386,5 @@ def customerdata(request):
 def get_recipt(request,code,table_name):
     recipt=models.get_table_recipt(code)
     customer=models.get_customer_by_recipt_code(code , table_name)
-    return render(request,"management/recipt.html",{"recipt":recipt,'customer':customer})
+    customer_return=models.get_customer_return_data(code)
+    return render(request,"management/recipt.html",{"recipt":recipt,'customer':customer,'customer_return':customer_return})

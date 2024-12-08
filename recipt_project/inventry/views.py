@@ -21,7 +21,7 @@ def index(request):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
     return render(request, 'inventry/index.html', {
-        "products": models.view_inventory(request),
+        "products": models.view_sorted_inventory(request,1,'updated_datetime'),
     })
 def inventry_sort(request,asc_decs,sort_by):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
@@ -117,10 +117,11 @@ def edit_product(request, prod_index,prod_code):
             new_prod_quantity = form.cleaned_data['prod_quantity']
             new_quantity_price_sale = new_prod_sale_price * new_prod_quantity
             new_updated_datetime = datetime.now()
-            if request.user.first_name and request.user.last_name:
-                models.add_each_item(prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,f"{request.user.first_name} {request.user.last_name} ({request.user.username})")
-            else :
-                models.add_each_item(prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,f" - - ({request.user.username})")
+            if(new_prod_description!= prod_description or new_prod_sale_price != prod_sale_price or new_prod_quantity != prod_quantity):
+                if request.user.first_name and request.user.last_name:
+                    models.add_each_item(prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,f"{request.user.first_name} {request.user.last_name} ({request.user.username})")
+                else :
+                    models.add_each_item(prod_code, new_prod_description, new_prod_quantity, new_prod_sale_price, new_quantity_price_sale, new_updated_datetime,f" - - ({request.user.username})")
             return redirect('inventry:index')
         else:
             return render(request, 'inventry/error.html', {
@@ -142,6 +143,8 @@ def edit_product(request, prod_index,prod_code):
         'prod_code': prod_code  # Add this line
     })
 def export_excel(request):
+    if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
+        return HttpResponseRedirect(reverse("inventry:login"))
     if request.method == "POST":
         # Extract products from the POST data
         raw_products = request.POST.getlist('products')  # List of serialized products
@@ -174,7 +177,9 @@ def export_excel(request):
 
         return response
     else:
-        return HttpResponse("Invalid request method.", status=405)
+        return render(request, 'inventry/error.html', {
+                        "error": "Invalid request method."
+                        })
 def profile(request):
     if not request.user.is_authenticated or ((models.select_userdata(request.user.username)[1] != "inventory manager" and models.select_userdata(request.user.username)[1] != "administration manager")):
         return HttpResponseRedirect(reverse("inventry:login"))
