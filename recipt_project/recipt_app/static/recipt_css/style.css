@@ -151,7 +151,7 @@ header {
 /* Image swap on hover */
 
 .delete-button img:hover {
-  content: url('../recipt_css/assets/colore_changed_delete_icon.jpg' ); /* Change this to your hover image URL */
+  content: url('../recipt_css/assets/colore_changed_delete_icon.png' ); /* Change this to your hover image URL */
 }
 
 .edit-button img:hover {

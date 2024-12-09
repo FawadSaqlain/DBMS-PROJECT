@@ -201,7 +201,7 @@ def get_customer_data():
     try:
         with connection.cursor() as cursor:
             # Fetch customers
-            query = "SELECT * FROM customers"
+            query = "SELECT * FROM customers ORDER BY date_time DESC"
             cursor.execute(query)
             customers = cursor.fetchall()
 
@@ -355,4 +355,4 @@ def get_customer_by_recipt_code(code,table_name):
             else:
                 return None
     except Exception as e:
-        print(f"Error fetching customer data: {e}")
+        print(f"line 358 Error fetching customer data ({ table_name }) : {e}")

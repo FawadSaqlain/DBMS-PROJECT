@@ -116,7 +116,7 @@ header {
 
 /* Image swap on hover */
 .delete-button img:hover {
-  content: url('../management_css/assets/colore_changed_delete_icon.jpg');
+  content: url('../management_css/assets/colore_changed_delete_icon.png');
   /* Change this to your hover image URL */
 }
 

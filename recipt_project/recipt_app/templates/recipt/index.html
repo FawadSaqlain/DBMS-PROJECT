@@ -1,6 +1,46 @@
 {% extends "recipt/layout.html" %}
 
 {% block body %}
+<style>
+    /* Table Styling */
+.product-table {
+  width: 100%;
+  border-collapse: collapse; /* Remove gaps between cells */
+  border-radius: 10px; /* Apply border radius to the table */
+  overflow: hidden; /* Ensure the border radius effect is visible */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Add shadow to the table */
+}
+
+.product-table th, .product-table td {
+  padding: 10px; /* Add padding for better spacing */
+  text-align: left; /* Align text to the left */
+}
+
+/* Alternating Row Colors */
+.product-table tbody tr:nth-child(even) {
+  background-color: #e8e8e8; /* Light gray for even rows */
+}
+
+.product-table tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* White for odd rows */
+}
+
+/* Optional: Highlight on hover */
+.product-table tbody tr:hover {
+  background-color: rgb(173, 173, 173); /* Light blue on hover */
+}
+.product-table thead tr{
+  background-color: brown;
+  /* color:#ffffff */
+}
+
+.product-table thead tr th:hover {
+  font-weight:bolder;
+}
+
+
+</style>
+
 <div>
     <div id="receipt-content">
         <div style="display: flex; justify-content: space-between;">
@@ -57,7 +97,7 @@
             {% if products %}
             <table class="product-table">
                 <thead>
-                    <tr style="background-color: brown;">
+                    <tr>
                         <th>Index No</th>
                         <th>Product Name</th>
                         <th>Quantity</th>

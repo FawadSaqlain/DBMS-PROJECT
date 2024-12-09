@@ -382,9 +382,11 @@ def customerdata(request):
     return render(request, 'management/customer_table.html',
                 {'customer_buy': customer_buy,'customer_return': customer_return})
 
-
 def get_recipt(request,code,table_name):
+    if not request.user.is_authenticated or models.select_userdata(request.user.username)[1] != "administration manager":
+        return HttpResponseRedirect(reverse("management:login"))
+    
     recipt=models.get_table_recipt(code)
     customer=models.get_customer_by_recipt_code(code , table_name)
-    customer_return=models.get_customer_return_data(code)
-    return render(request,"management/recipt.html",{"recipt":recipt,'customer':customer,'customer_return':customer_return})
+
+    return render(request,"management/recipt.html",{"recipt":recipt,'customer':customer,'recipt_type':table_name})

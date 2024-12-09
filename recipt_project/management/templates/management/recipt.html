@@ -26,7 +26,7 @@
             {% endfor %}
         </tbody>
     </table>
-
+    {% if recipt_type == 'customers'%}
     <table class="user-table" style="margin-top: 20px;">
         <thead>
             <tr>
@@ -44,14 +44,13 @@
                 <td>{{ customer.1 }}</td>
                 <td>{{ customer.2 }}</td>
                 <td>{{ customer.3 }}</td>
-                <td><a href="{% url 'management:get_recipt' customer.4 'customers' %}" class="hover-effect">{{ customer.4 }}</a></td>
+                <td>{{ customer.4 }}</td>
                 <td>{{ customer.5 }}</td>
                 <td>{{ customer.6 }}</td>
-                <td>{{ customer.7 }}</td>
             </tr>
         </tbody>
     </table>
-    {% if customer_return %}
+    {% else %}
     <table class="user-table" style="margin-top: 20px;">
         <thead>
             <tr>
@@ -65,21 +64,17 @@
             </tr>
         </thead>
         <tbody>
-            {%for cust_return in customer_return %}
             <tr>
-                <td>{{ cust_return.1 }}</td>
-                <td>{{ cust_return.2 }}</td>
-                <td>{{ cust_return.3 }}</td>
-                <td><a href="{% url 'management:get_recipt' cust_return.4 'customers' %}" class="hover-effect">{{ cust_return.4 }}</a></td>
-                <td><a href="{% url 'management:get_recipt' cust_return.5 'customers_return' %}" class="hover-effect">{{ cust_return.5 }}</a></td>
-                <td>{{ cust_return.6 }}</td>
-                <td>{{ cust_return.7 }}</td>
+                <td>{{ customer.1 }}</td>
+                <td>{{ customer.2 }}</td>
+                <td>{{ customer.3 }}</td>
+                <td><a href="{% url 'management:get_recipt' customer.4 'customers' %}" class="hover-effect">{{ customer.4 }}</a></td>
+                <td>{{ customer.5 }}</td>
+                <td>{{ customer.6 }}</td>
+                <td>{{ customer.7 }}</td>
             </tr>
-            {% endfor %}
         </tbody>
     </table>
-    {% else %}
-    <h1 style="color: brown;">No customer return found.</h1>
     {% endif %}
 </div>
 {% endblock %}

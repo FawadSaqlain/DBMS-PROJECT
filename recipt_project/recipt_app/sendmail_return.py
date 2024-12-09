@@ -51,24 +51,24 @@ class EmailSupportAgent:
             if matching_returned_product:
                 # Unpacking returned product details
                 product_code_return, quantity_return, price_returned, quantity_price_return, product_description_return = matching_returned_product
-                quantity_was_bought = quantity_bought + quantity_return
                 refund_amount = quantity_return * price_bought  # Calculate refund amount
                 total_refund += refund_amount  # Accumulate total refund
+                quantity_bought_left=quantity_bought-quantity_return
+                body += f"""
+                <tr>
+                    <td>{prod_code_bought}</td>
+                    <td>{prod_description_bought}</td>
+                    <td>{quantity_bought_left}</td>
+                    <td>{quantity_return}</td>
+                    <td>${price_bought:.2f}</td>
+                    <td>${refund_amount:.2f}</td>
+                </tr>
+                """
             else:
                 quantity_return = 0
-                refund_amount = 0
-                quantity_was_bought = quantity_bought
-
-            body += f"""
-            <tr>
-                <td>{prod_code_bought}</td>
-                <td>{prod_description_bought}</td>
-                <td>{quantity_bought}</td>
-                <td>{quantity_return}</td>
-                <td>${price_bought:.2f}</td>
-                <td>${refund_amount:.2f}</td>
-            </tr>
-            """
+                refund_amount = 0.0
+                quantity_bought_left=0
+                matching_returned_product=None
 
         body += f"""
         </table>

@@ -111,7 +111,7 @@ header {
 
 /* Image swap on hover */
 .delete-button img:hover {
-  content: url('../inventry_css/assets/colore_changed_delete_icon.jpg' ); /* Change this to your hover image URL */
+  content: url('../inventry_css/assets/colore_changed_delete_icon.png' ); /* Change this to your hover image URL */
   mix-blend-mode: color-burn;
 }
 
