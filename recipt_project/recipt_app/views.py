@@ -14,7 +14,7 @@ from django.contrib.auth.hashers import check_password
 
 # Helper function to generate a random receipt number
 def generate_random_key(length=5):
-    characters = string.ascii_letters + string.digits
+    characters = string.ascii_lowercase + string.digits  # Only lowercase letters and digits
     random_key = ''.join(random.choices(characters, k=length))
     return "_" + random_key
 
